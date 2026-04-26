@@ -10,7 +10,7 @@ import EmptyState from '@/components/conversion/EmptyState.astro';
 import { getPublished } from '@/lib/content-filters';
 import { offerPath } from '@/lib/offer-paths';
 import { formatDate, formatTime } from '@/lib/format';
-import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import WebinarCard from '@/components/cards/WebinarCard.astro';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
 
 const webinars = (await getPublished('webinars')).sort((a, b) => +b.data.startAt - +a.data.startAt);
@@ -81,19 +81,6 @@ const filters = [
       <a class="btn-cta-invert-ghost" href="/articles">Read the journal first</a>
     </div>
   </MarketingHero>
-  {/** `tone="minimal"` so body scroll tint is not fully covered (same as /articles). */}
-  <Section tone="minimal" spacing="tight" class="!pt-0 sm:!pt-2" aria-label="Sessions art">
-    <div class="container-wfg max-w-4xl">
-      <div class="overflow-hidden pt-1 sm:pt-2">
-        <EditorialImageSlot
-          ratio="3-2"
-          frame="inline"
-          showPlaceholderWhenEmpty
-          specNote="Sessions — room & tempo"
-        />
-      </div>
-    </div>
-  </Section>
 
   <CommunitySpine page="webinars" id="spine-webinars" spotlight={spineSpotlight} />
   <Section id="sessions" tone="minimal" spacing="comfortable" class="scroll-mt-28 !pt-0 sm:!pt-2">
@@ -127,63 +114,19 @@ const filters = [
         />
       )}
       {webinars.length > 0 && (
-        <ul class="mt-8 space-y-0 sm:mt-10" role="list" data-webinar-list>
+        <ul
+          class="mt-8 list-none grid grid-cols-1 gap-6 sm:mt-10 sm:grid-cols-2 sm:gap-7"
+          role="list"
+          data-webinar-list
+        >
           {webinars.map((w) => (
             <li
-              class="border-t-2 border-ink pt-8 first:border-t-0 first:pt-0"
+              class="min-h-0"
               data-webinar-item
               data-webinar-format={w.data.format}
               data-webinar-free={w.data.isFree ? 'true' : 'false'}
             >
-              <div class="overflow-hidden bg-white">
-                <div class="flex flex-col md:flex-row md:items-stretch">
-                  <a
-                    class="md:max-w-[12rem] md:shrink-0"
-                    href={offerPath('webinars', w)}
-                    aria-label={`Open session: ${w.data.title}`}
-                  >
-                    <EditorialImageSlot
-                      src={w.data.coverImage ?? undefined}
-                      alt={w.data.coverImage ? `Session: ${w.data.title}` : ''}
-                      frame="thumb"
-                      ratio="4-5"
-                      heroVariant="webinar"
-                      showPlaceholderWhenEmpty
-                    />
-                  </a>
-                  <div class="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:flex-row md:items-start md:justify-between md:pl-6">
-                    <div>
-                      <p class="text-label">
-                        {w.data.isFree && 'Free · '}
-                        {w.data.format === 'live' ? 'Live' : 'Replay'} · {w.data.durationMinutes} min
-                      </p>
-                      <h2 class="mt-1 font-display text-2xl text-ink md:text-3xl">
-                        <a
-                          class="text-ink underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-secondary"
-                          href={offerPath('webinars', w)}
-                        >
-                          {w.data.title}
-                        </a>
-                      </h2>
-                      <p class="mt-2 max-w-2xl text-charcoal leading-relaxed">{w.data.excerpt}</p>
-                      <p class="mt-3 text-sm text-ink-500">
-                        {formatDate(w.data.startAt)}
-                        {w.data.format === 'live' && ` at ${formatTime(w.data.startAt)}`} · {w.data.host}
-                      </p>
-                    </div>
-                    <div class="flex shrink-0 flex-col gap-2">
-                      <a class="btn-primary" href={offerPath('webinars', w)}>
-                        Session page
-                      </a>
-                      {w.data.primaryLink && (
-                        <a class="btn-secondary" href={w.data.primaryLink}>
-                          {w.data.format === 'live' ? (w.data.isFree ? 'Save a seat' : 'Register') : 'Get access'}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <WebinarCard entry={w} />
             </li>
           ))}
         </ul>

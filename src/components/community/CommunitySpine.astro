@@ -38,9 +38,11 @@ const heads: Record<
     lede: 'Same quiet pace everywhere on the site—read, sit in, go private, or take something home when it is right.',
   },
   webinars: {
-    kicker: 'Level up from the page',
-    title: 'Live hours where you can be heard',
-    lede: 'You get tempo, Q&amp;A, and company—without a sales pitch. Replays wait when the time is wrong.',
+    kicker: '',
+    title:
+      'Join us live for deeper orientation, shared reflection, and practical guidance.',
+    lede:
+      'Our webinars are calm, focused sessions where we take one theme further — astrology and timing, Vastu and place quality, frequency work, daily rituals, or the patterns that shape conscious living. You can listen, ask questions, follow the conversation, and return to the replay whenever the timing is better.',
   },
   shop: {
     kicker: 'Buy with context, not in a hurry',
@@ -113,15 +115,39 @@ const h = heads[page] ?? heads.home;
     aria-labelledby={`${elId}-compact-heading`}
   >
     <div class="container-wfg max-w-4xl py-8 md:py-10" data-reveal>
-      <p id={`${elId}-compact-heading`} class="wfg-reveal-child text-eyebrow text-[0.7rem] text-secondary" style="--stagger: 0">
-        {h.kicker}
-      </p>
-      <p class="wfg-reveal-child mt-1 font-display text-lg text-ink sm:text-xl" style="--stagger: 1">
-        {h.title}
-      </p>
-      <p class="wfg-reveal-child mt-2 max-w-2xl text-sm leading-relaxed text-charcoal" style="--stagger: 2">
-        {h.lede}
-      </p>
+      {page === 'webinars' ? (
+        <>
+          <p
+            id={`${elId}-compact-heading`}
+            class="wfg-reveal-child max-w-3xl font-display text-lg text-ink sm:text-xl"
+            style="--stagger: 0"
+          >
+            {h.title}
+          </p>
+          <p
+            class="wfg-reveal-child mt-3 max-w-3xl text-sm leading-relaxed text-charcoal sm:text-base"
+            style="--stagger: 1"
+          >
+            {h.lede}
+          </p>
+        </>
+      ) : (
+        <>
+          <p
+            id={`${elId}-compact-heading`}
+            class="wfg-reveal-child text-eyebrow text-[0.7rem] text-secondary"
+            style="--stagger: 0"
+          >
+            {h.kicker}
+          </p>
+          <p class="wfg-reveal-child mt-1 font-display text-lg text-ink sm:text-xl" style="--stagger: 1">
+            {h.title}
+          </p>
+          <p class="wfg-reveal-child mt-2 max-w-2xl text-sm leading-relaxed text-charcoal" style="--stagger: 2">
+            {h.lede}
+          </p>
+        </>
+      )}
       <ul
         class="wfg-reveal-child mt-5 flex list-none flex-wrap gap-x-6 gap-y-2 text-sm font-medium"
         style="--stagger: 3"
@@ -172,15 +198,29 @@ const h = heads[page] ?? heads.home;
     aria-labelledby={`${elId}-title`}
   >
     <div class="container-wfg max-w-6xl pb-10 pt-10 sm:pb-12 sm:pt-12 md:pb-14 md:pt-14" data-reveal>
-      <div class="wfg-home-section-head wfg-reveal-child" style="--stagger: 0">
-        <div>
-          <p class="wfg-home-kicker text-primary">{h.kicker}</p>
-          <h2 id={`${elId}-title`} class="mt-1 font-display text-2xl font-medium text-ink sm:text-3xl">
+      {page === 'webinars' ? (
+        <div class="wfg-reveal-child max-w-3xl" style="--stagger: 0">
+          <h2
+            id={`${elId}-title`}
+            class="font-display text-2xl font-medium leading-snug text-balance text-ink sm:text-3xl"
+          >
             {h.title}
           </h2>
+          <p class="mt-4 text-base leading-relaxed text-ink-600 sm:text-lg">
+            {h.lede}
+          </p>
         </div>
-        <p class="text-sm text-ink-500 sm:max-w-md sm:text-base">{h.lede}</p>
-      </div>
+      ) : (
+        <div class="wfg-home-section-head wfg-reveal-child" style="--stagger: 0">
+          <div>
+            <p class="wfg-home-kicker text-primary">{h.kicker}</p>
+            <h2 id={`${elId}-title`} class="mt-1 font-display text-2xl font-medium text-ink sm:text-3xl">
+              {h.title}
+            </h2>
+          </div>
+          <p class="text-sm text-ink-500 sm:max-w-md sm:text-base">{h.lede}</p>
+        </div>
+      )}
 
       {variant === 'mesh' ? (
         <>

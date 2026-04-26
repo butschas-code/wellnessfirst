@@ -19,6 +19,14 @@ const scrollRange = {
   invalidateOnRefresh: true,
 };
 
+/** Last segment: `end: top 38%` can be unreachable for the final on-page block; `max` ties progress to the real scroll end. */
+const scrollRangeLast = {
+  start: 'top bottom' as const,
+  end: 'max' as const,
+  scrub: 0.22,
+  invalidateOnRefresh: true,
+};
+
 function initDocumentColorStops(stops: readonly string[]): void {
   if (stops.length < 2) return;
   gsap.set(document.body, { backgroundColor: stops[0], backgroundImage: 'none' });
@@ -94,7 +102,7 @@ export function scrollColorTransition(): void {
         .timeline({
           scrollTrigger: {
             trigger: el,
-            ...scrollRange,
+            ...scrollRangeLast,
           },
         })
         .fromTo(
@@ -106,6 +114,8 @@ export function scrollColorTransition(): void {
       continue;
     }
 
+    const stRange = i === lastIdx ? scrollRangeLast : scrollRange;
+
     gsap.fromTo(
       document.body,
       { backgroundColor: from },
@@ -116,7 +126,7 @@ export function scrollColorTransition(): void {
         overwrite: 'auto',
         scrollTrigger: {
           trigger: el,
-          ...scrollRange,
+          ...stRange,
         },
       },
     );

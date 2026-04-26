@@ -122,7 +122,7 @@ const menuId = 'wfg-mobile-menu';
         <span class="font-display text-base text-primary sm:text-lg">Menu</span>
         <button
           type="button"
-          class="rounded-full p-2 text-charcoal transition-colors hover:bg-primary/5 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          class="min-h-11 min-w-11 items-center justify-center rounded-full p-2 text-charcoal transition-colors hover:bg-primary/5 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary inline-flex"
           id="wfg-menu-close"
           aria-label="Close menu"
         >
@@ -139,7 +139,7 @@ const menuId = 'wfg-mobile-menu';
       <nav class="max-h-[min(70vh,28rem)] overflow-y-auto px-2 py-2" aria-label="Mobile">
         {primaryNav.map((item) => (
           <a
-            class="block rounded-xl px-3 py-2.5 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary"
+            class="flex min-h-12 items-center rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
             href={item.href}
             data-wfg-menu-link
           >
@@ -148,7 +148,7 @@ const menuId = 'wfg-mobile-menu';
         ))}
         {navPages.map((item) => (
           <a
-            class="block rounded-xl px-3 py-2.5 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary"
+            class="flex min-h-12 items-center rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
             href={item.href}
             data-wfg-menu-link
           >
@@ -156,7 +156,7 @@ const menuId = 'wfg-mobile-menu';
           </a>
         ))}
       </nav>
-      <div class="border-t border-primary/8 p-3 sm:p-4">
+      <div class="border-t border-primary/8 p-3 pt-2 sm:p-4 sm:pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
         <a class="btn-primary w-full justify-center" href="/webinars">Webinars</a>
         <a class="btn-secondary mt-2 w-full justify-center" href="/contact">Contact</a>
       </div>

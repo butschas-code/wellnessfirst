@@ -9,7 +9,6 @@ import ProductCard from '@/components/cards/ProductCard.astro';
 import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
 import EmptyState from '@/components/conversion/EmptyState.astro';
 import { getPublished } from '@/lib/content-filters';
-import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
 
 const products = (await getPublished('products')).sort((a, b) => a.data.order - b.data.order);
@@ -39,16 +38,14 @@ const INFINITY_UNO_EXTERNAL_URL = '#';
       <a class="btn-cta-invert-ghost" href="/articles">Why we stock</a>
     </div>
   </MarketingHero>
-  <Section tone="default" spacing="tight" class="!pt-0 sm:!pt-2 border-b border-ink/10 bg-paper" aria-label="Shelf art">
+  <Section tone="minimal" spacing="comfortable" class="!py-20 md:!py-28 lg:!py-36" aria-labelledby="shop-coming-soon">
     <div class="container-wfg max-w-4xl">
-      <div class="overflow-hidden pt-1 sm:pt-2">
-        <EditorialImageSlot
-          ratio="3-2"
-          frame="inline"
-          showPlaceholderWhenEmpty
-          specNote="Shop — material & scale"
-        />
-      </div>
+      <p
+        id="shop-coming-soon"
+        class="text-balance text-center font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl"
+      >
+        Coming Soon
+      </p>
     </div>
   </Section>
 

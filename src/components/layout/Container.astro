@@ -7,7 +7,7 @@ type Props = {
 
 const { as: Tag = 'div', class: className, narrow }: Props = Astro.props;
 const width = narrow
-  ? 'w-full max-w-[var(--width-prose)] mx-auto px-6'
+  ? 'w-full max-w-[var(--width-prose)] mx-auto pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))]'
   : 'container-wfg';
 ---
 

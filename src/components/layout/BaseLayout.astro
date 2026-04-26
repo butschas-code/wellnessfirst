@@ -63,7 +63,10 @@ const homeFirstPaintStyle = `background-color: ${WFG_HOME_SCROLL_FIRST_BG}; back
 <html lang="en-GB" class="scroll-smooth" style={homeFirstPaintStyle}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#0a2334" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
@@ -118,7 +121,7 @@ const homeFirstPaintStyle = `background-color: ${WFG_HOME_SCROLL_FIRST_BG}; back
   >
     <a
       href="#main-content"
-      class="fixed left-3 top-3 z-[100] -translate-y-24 rounded-lg bg-ink px-3 py-2 text-sm text-white opacity-0 transition-transform focus:translate-y-0 focus:opacity-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink"
+      class="skip-link-wfg fixed z-[100] -translate-y-24 rounded-lg bg-ink px-3 py-2 text-sm text-white opacity-0 transition-transform focus:translate-y-0 focus:opacity-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink"
     >
       Skip to main content
     </a>

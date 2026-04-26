@@ -62,6 +62,12 @@ Content lives under `src/content/` and is registered in `src/content.config.ts`.
 5. **Functions:** `/functions/api/*.ts` deploys as `/api/contact`, `/api/newsletter`, `/api/webinar-interest`. Optional **KV** binding **`FORM_KV`** for durable form payloads (see `.env.example`).
 6. **Wrangler:** `wrangler.jsonc` configures the Astro Cloudflare server entry; production hosting is typically **Pages**, not `wrangler deploy` of the same file—use the Pages UI for env and bindings.
 
+## Deployment (Vercel)
+
+[Vercel](https://vercel.com) sets `VERCEL=1` during the build, which makes `astro.config.mjs` use **`@astrojs/vercel`** instead of `@astrojs/cloudflare`. The site builds as a **static** Astro app suitable for Vercel.
+
+**Important:** the **`/functions` Cloudflare Pages Functions** (e.g. `/api/contact`) are **not** deployed to Vercel. For a Vercel preview, set **`PUBLIC_FORM_MODE=mailto`** in the project environment so contact/newsletter interest forms use mailto; production form APIs and KV should stay on **Cloudflare Pages** as above.
+
 ### Environment variables
 
 | Variable | Where | Purpose |

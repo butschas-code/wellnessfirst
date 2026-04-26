@@ -4,7 +4,6 @@ description: "A small editorial house: long-form writing, live sessions, private
 showInNav: false
 order: 10
 hero:
-  eyebrow: "The house"
   align: "left"
 draft: false
 ---

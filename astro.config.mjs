@@ -4,8 +4,12 @@ import { dirname, resolve } from 'node:path';
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import vercel from '@astrojs/vercel';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+
+/** Vercel sets `VERCEL=1` during `npm run build` — the Cloudflare adapter is incompatible with that platform. */
+const useVercel = Boolean(process.env.VERCEL);
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -25,7 +29,7 @@ export default defineConfig({
     },
     plugins: [tailwindcss()],
   },
-  adapter: cloudflare(),
+  adapter: useVercel ? vercel() : cloudflare(),
   integrations: [
     mdx(),
     sitemap({
