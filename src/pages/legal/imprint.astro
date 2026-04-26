@@ -1,0 +1,71 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+---
+
+<BaseLayout
+  title="Imprint"
+  description="Publisher identification and contact details for Wellness First Global (Angaben gemäß §5 TMG / transparency)."
+  canonicalPath="/legal/imprint"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    legal
+    compact
+    eyebrow="Legal"
+    title="Imprint"
+    description="Required publisher information and a single point of contact. Replace placeholders with your registered entity when you incorporate."
+  />
+  <Section tone="default" spacing="comfortable" class="!pt-0">
+    <Container narrow>
+      <div class="max-w-prose-wfg space-y-3 text-ink-600">
+        <h2 class="font-display text-2xl text-ink-800">Publisher</h2>
+        <p class="leading-relaxed text-ink-800">
+          Wellness First Global
+          <br />
+          (Legal entity and address to be added at incorporation)
+        </p>
+        <h2 class="mt-8 font-display text-2xl text-ink-800">Contact</h2>
+        <p class="leading-relaxed">
+          Email:{' '}
+          <a class="link-wfg" href="mailto:hello@wellnessfirstglobal.com">hello@wellnessfirstglobal.com</a>
+        </p>
+        <h2 class="mt-8 font-display text-2xl text-ink-800">Editorially responsible</h2>
+        <p class="leading-relaxed">Editorial lead: named at publication; correspondence via the address above.</p>
+        <h2 class="mt-8 font-display text-2xl text-ink-800">Dispute resolution</h2>
+        <p class="leading-relaxed">
+          The European Commission provides a platform for online dispute resolution (OS). We are not obliged nor willing
+          to participate in consumer arbitration proceedings before a consumer conciliation body, except where law
+          requires otherwise.
+        </p>
+        <h2 class="mt-8 font-display text-2xl text-ink-800">Liability for links</h2>
+        <p class="leading-relaxed">
+          Our site may contain links to external sites. We have no influence over their content; the respective owner is
+          responsible. Links were checked once for apparent legality; we will remove a link if we learn of a concrete
+          infringement.
+        </p>
+        <p class="mt-8 text-sm text-ink-500">Last updated: April 2026</p>
+      </div>
+    </Container>
+  </Section>
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      <CtaBlock
+        id="imprint-contact"
+        title="Publisher or press?"
+        body="For editorial, commercial, or clarifications to this page—start with a short note. We read with care during the week."
+        href="/contact"
+        label="Write the desk"
+        variant="secondary"
+        secondaryHref="/articles"
+        secondaryLabel="Read the journal"
+      />
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

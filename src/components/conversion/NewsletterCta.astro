@@ -1,0 +1,34 @@
+---
+import InterestForm from '@/components/forms/InterestForm.astro';
+
+interface Props {
+  id: string;
+  compact?: boolean;
+  heading?: string;
+  sub?: string;
+  submitLabel?: string;
+  class?: string;
+}
+
+const {
+  id,
+  compact = false,
+  heading = 'Letters, not blasts',
+  sub = 'New essays, session dates, openings. Unsubscribe in one click.',
+  submitLabel = 'Join the list',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'border-0 border-t-2 border-ink bg-white',
+    !compact && 'pt-6 sm:pt-7',
+    compact && 'pt-4',
+    className,
+  ]}
+>
+  <h3 class="font-display text-lg text-ink sm:text-xl">{heading}</h3>
+  <p class="mt-1 text-sm text-charcoal leading-relaxed">{sub}</p>
+  <InterestForm id={id} class="mt-4 !gap-4" submitLabel={submitLabel} />
+</div>

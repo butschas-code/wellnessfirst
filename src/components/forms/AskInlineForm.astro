@@ -1,0 +1,147 @@
+---
+/**
+ * Inline "Ask the desk" form — posts to /api/contact via the shared `data-wfg-form="contact"`
+ * handler in `wfg-forms.ts`. The user picks an area (Astrology / Vastu / Home / Frequency);
+ * that label is prepended to the message and `topic` is sent as "consultation" (a valid
+ * API enum value).
+ */
+interface Props {
+  id?: string;
+  class?: string;
+}
+const { id, class: className } = Astro.props;
+const formId = id ?? 'wfg-ask-inline';
+---
+
+<form
+  id={formId}
+  class:list={['relative grid gap-4', className]}
+  data-wfg-form="contact"
+  data-ask-inline
+  autocomplete="on"
+>
+  <input type="hidden" name="form" value="contact" />
+  <input type="hidden" name="topic" value="consultation" />
+
+  <p
+    id={`${formId}-status`}
+    class="hidden rounded-lg border border-ink/20 bg-ink/[0.03] px-3 py-2 text-sm text-ink-700"
+    role="status"
+    aria-live="polite"
+  />
+  <p
+    id={`${formId}-error`}
+    class="hidden rounded-lg border border-red-200/80 bg-red-50/80 px-3 py-2 text-sm text-red-900"
+    role="alert"
+    aria-live="assertive"
+  />
+
+  <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+    <label for={`${formId}-company`}>Company (leave empty)</label>
+    <input type="text" id={`${formId}-company`} class="input-wfg" name="company" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <fieldset class="grid gap-2">
+    <legend class="label-wfg">What is this about?</legend>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label="Topic area" data-ask-area-group>
+      {[
+        { value: 'astrology', label: 'Astrology' },
+        { value: 'vastu', label: 'Vastu' },
+        { value: 'home', label: 'Home' },
+        { value: 'frequency', label: 'Frequency' },
+      ].map((opt, i) => (
+        <label class="relative cursor-pointer">
+          <input
+            type="radio"
+            name="ask_area"
+            value={opt.value}
+            class="peer sr-only"
+            required
+            checked={i === 0}
+          />
+          <span
+            class="block rounded-full border border-ink/15 bg-white/90 px-3 py-2 text-center text-sm font-medium text-ink transition-colors hover:border-secondary/50 peer-checked:border-secondary peer-checked:bg-secondary/15 peer-checked:text-ink peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-secondary"
+          >
+            {opt.label}
+          </span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label for={`${formId}-name`} class="label-wfg">Your name</label>
+      <input
+        id={`${formId}-name`}
+        class="input-wfg"
+        type="text"
+        name="name"
+        autocomplete="name"
+        required
+      />
+    </div>
+    <div>
+      <label for={`${formId}-email`} class="label-wfg">Email</label>
+      <input
+        id={`${formId}-email`}
+        class="input-wfg"
+        type="email"
+        name="email"
+        autocomplete="email"
+        inputmode="email"
+        required
+      />
+    </div>
+  </div>
+
+  <div>
+    <label for={`${formId}-question`} class="label-wfg">Your question</label>
+    <p id={`${formId}-hint`} class="mb-2 text-sm text-ink-500">
+      A few sentences is enough. Time zone helps if you want a reply window.
+    </p>
+    <textarea
+      id={`${formId}-question`}
+      class="textarea-wfg min-h-[6.5rem] resize-y"
+      name="question"
+      rows="4"
+      required
+      aria-describedby={`${formId}-hint`}
+      placeholder="e.g. My sleep has been off since we moved — the bedroom faces south. Is that a vastu issue worth looking at?"
+    />
+  </div>
+
+  <input type="hidden" name="message" value="" />
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <button type="submit" class="btn-primary min-h-11 sm:w-auto">Ask the desk</button>
+    <p class="text-sm text-ink-500">
+      We read Mon–Fri and reply in a few business days.
+    </p>
+  </div>
+</form>
+
+<script>
+  // Combine the selected area + question into the `message` field the API expects.
+  document.querySelectorAll<HTMLFormElement>('form[data-ask-inline]').forEach((form) => {
+    form.addEventListener('submit', () => {
+      const area = (form.querySelector<HTMLInputElement>('input[name="ask_area"]:checked')?.value ?? 'general')
+        .trim();
+      const question = (form.querySelector<HTMLTextAreaElement>('textarea[name="question"]')?.value ?? '').trim();
+      const messageInput = form.querySelector<HTMLInputElement>('input[name="message"]');
+      if (messageInput) {
+        const label =
+          area === 'astrology'
+            ? 'Astrology question'
+            : area === 'vastu'
+              ? 'Vastu question'
+              : area === 'home'
+                ? 'Home-harmony question'
+                : area === 'frequency'
+                  ? 'Frequency question'
+                  : 'Question';
+        messageInput.value = `[${label}]\n\n${question}`;
+      }
+    }, true); // capture so it runs before wfg-forms' bindContact submit handler reads the FormData
+  });
+</script>

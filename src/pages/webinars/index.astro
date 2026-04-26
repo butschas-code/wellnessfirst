@@ -1,0 +1,257 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
+import EmptyState from '@/components/conversion/EmptyState.astro';
+import { getPublished } from '@/lib/content-filters';
+import { offerPath } from '@/lib/offer-paths';
+import { formatDate, formatTime } from '@/lib/format';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+
+const webinars = (await getPublished('webinars')).sort((a, b) => +b.data.startAt - +a.data.startAt);
+const now = Date.now();
+const nextWebinar =
+  webinars
+    .filter((w) => w.data.format === 'live' && +w.data.startAt >= now)
+    .sort((a, b) => +a.data.startAt - +b.data.startAt)[0] ??
+  webinars.filter((w) => w.data.format === 'replay').sort((a, b) => +b.data.startAt - +a.data.startAt)[0] ??
+  null;
+const nextWebinarMeta = nextWebinar
+  ? `${formatDate(nextWebinar.data.startAt)}${
+      nextWebinar.data.format === 'live' ? ` · ${formatTime(nextWebinar.data.startAt)}` : ''
+    } · ${nextWebinar.data.durationMinutes} min`
+  : null;
+
+const spineSpotlight = nextWebinar
+  ? {
+      kicker:
+        nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
+          ? 'Next live hour'
+          : nextWebinar.data.format === 'live'
+            ? 'Live session'
+            : 'Recent replay',
+      title: nextWebinar.data.title,
+      meta: nextWebinarMeta ?? undefined,
+      body: nextWebinar.data.excerpt,
+      primary: {
+        href: offerPath('webinars', nextWebinar),
+        label:
+          nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
+            ? nextWebinar.data.isFree
+              ? 'Save a seat'
+              : 'Register'
+            : 'Open the session',
+      },
+      secondary: { href: '/articles', label: 'Read the journal first' },
+    }
+  : {
+      kicker: 'Read first',
+      title: 'Arrive at the hour with context',
+      body: 'The journal carries the same care as the live room. Pick a theme, then scroll the list below.',
+      primary: { href: '/articles', label: 'Open the journal' },
+      secondary: { href: '/contact', label: 'Write the desk' },
+    };
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'free', label: 'Free' },
+  { id: 'live', label: 'Live' },
+  { id: 'replay', label: 'Replay' },
+] as const;
+---
+
+<BaseLayout
+  title="Webinars"
+  description="Live and recorded sessions with room for questions—teaching with patience and adult attention."
+  canonicalPath="/webinars"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="Gatherings"
+    title="Webinars & live sessions"
+    description='A slower tempo for learning. Clear takeaways, honest uncertainty, and no pressure to be “optimised” by the end of the hour. Free sessions stay clearly marked; paid formats will say so in plain language when they arrive.'
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="#sessions">Browse sessions</a>
+      <a class="btn-cta-invert-ghost" href="/articles">Read the journal first</a>
+    </div>
+  </MarketingHero>
+  {/** `tone="minimal"` so body scroll tint is not fully covered (same as /articles). */}
+  <Section tone="minimal" spacing="tight" class="!pt-0 sm:!pt-2" aria-label="Sessions art">
+    <div class="container-wfg max-w-4xl">
+      <div class="overflow-hidden pt-1 sm:pt-2">
+        <EditorialImageSlot
+          ratio="3-2"
+          frame="inline"
+          showPlaceholderWhenEmpty
+          specNote="Sessions — room & tempo"
+        />
+      </div>
+    </div>
+  </Section>
+
+  <CommunitySpine page="webinars" id="spine-webinars" spotlight={spineSpotlight} />
+  <Section id="sessions" tone="minimal" spacing="comfortable" class="scroll-mt-28 !pt-0 sm:!pt-2">
+    <Container>
+      {webinars.length > 0 && (
+        <>
+          <p class="text-label">Filter</p>
+          <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter sessions" data-webinar-filters>
+            {filters.map((f) => (
+              <button
+                type="button"
+                class="btn-filter-pill"
+                data-webinar-filter={f.id}
+                aria-pressed={f.id === 'all' ? 'true' : 'false'}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {webinars.length === 0 && (
+        <EmptyState
+          title="Sessions are between seasons"
+          body="When the next live or replay is ready, it will sit here with full context—no countdown theatre. Meanwhile, the journal carries the same care in writing."
+          actionHref="/articles"
+          actionLabel="Read the journal"
+          secondaryHref="/contact"
+          secondaryLabel="Ask to be notified"
+        />
+      )}
+      {webinars.length > 0 && (
+        <ul class="mt-8 space-y-0 sm:mt-10" role="list" data-webinar-list>
+          {webinars.map((w) => (
+            <li
+              class="border-t-2 border-ink pt-8 first:border-t-0 first:pt-0"
+              data-webinar-item
+              data-webinar-format={w.data.format}
+              data-webinar-free={w.data.isFree ? 'true' : 'false'}
+            >
+              <div class="overflow-hidden bg-white">
+                <div class="flex flex-col md:flex-row md:items-stretch">
+                  <a
+                    class="md:max-w-[12rem] md:shrink-0"
+                    href={offerPath('webinars', w)}
+                    aria-label={`Open session: ${w.data.title}`}
+                  >
+                    <EditorialImageSlot
+                      src={w.data.coverImage ?? undefined}
+                      alt={w.data.coverImage ? `Session: ${w.data.title}` : ''}
+                      frame="thumb"
+                      ratio="4-5"
+                      heroVariant="webinar"
+                      showPlaceholderWhenEmpty
+                    />
+                  </a>
+                  <div class="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:flex-row md:items-start md:justify-between md:pl-6">
+                    <div>
+                      <p class="text-label">
+                        {w.data.isFree && 'Free · '}
+                        {w.data.format === 'live' ? 'Live' : 'Replay'} · {w.data.durationMinutes} min
+                      </p>
+                      <h2 class="mt-1 font-display text-2xl text-ink md:text-3xl">
+                        <a
+                          class="text-ink underline decoration-line decoration-1 underline-offset-4 transition-colors hover:text-secondary"
+                          href={offerPath('webinars', w)}
+                        >
+                          {w.data.title}
+                        </a>
+                      </h2>
+                      <p class="mt-2 max-w-2xl text-charcoal leading-relaxed">{w.data.excerpt}</p>
+                      <p class="mt-3 text-sm text-ink-500">
+                        {formatDate(w.data.startAt)}
+                        {w.data.format === 'live' && ` at ${formatTime(w.data.startAt)}`} · {w.data.host}
+                      </p>
+                    </div>
+                    <div class="flex shrink-0 flex-col gap-2">
+                      <a class="btn-primary" href={offerPath('webinars', w)}>
+                        Session page
+                      </a>
+                      {w.data.primaryLink && (
+                        <a class="btn-secondary" href={w.data.primaryLink}>
+                          {w.data.format === 'live' ? (w.data.isFree ? 'Save a seat' : 'Register') : 'Get access'}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {webinars.length > 0 && (
+        <div
+          data-webinar-no-match
+          class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
+          role="status"
+          aria-live="polite"
+        >
+          <p class="font-display text-xl text-ink-800">No sessions match this filter</p>
+          <p class="mt-2 text-ink-600">Try &ldquo;All&rdquo; or another option—or write if you are looking for something specific.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button type="button" class="btn-primary" data-webinar-show-all>
+              Show all
+            </button>
+            <a class="btn-secondary" href="/contact">Write the desk</a>
+          </div>
+        </div>
+      )}
+    </Container>
+  </Section>
+  <div slot="prefooter">
+    <ConversionCallout topic="webinars" />
+  </div>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  const root = document.querySelector('[data-webinar-filters]');
+  const noMatch = document.querySelector('[data-webinar-no-match]') as HTMLElement | null;
+  const applyFilter = (raw: string) => {
+    document.querySelectorAll('[data-webinar-item]').forEach((li) => {
+      const f = (li as HTMLElement).dataset.webinarFormat;
+      const isFree = (li as HTMLElement).dataset.webinarFree === 'true';
+      let show = raw === 'all';
+      if (raw === 'live' || raw === 'replay') show = f === raw;
+      if (raw === 'free') show = isFree;
+      li.classList.toggle('hidden', !show);
+    });
+  };
+  const updateNoMatch = () => {
+    const rows = document.querySelectorAll('[data-webinar-item]');
+    let visible = 0;
+    rows.forEach((li) => {
+      if (!li.classList.contains('hidden')) visible += 1;
+    });
+    if (noMatch) {
+      const hide = visible > 0;
+      noMatch.classList.toggle('hidden', hide);
+    }
+  };
+  document.querySelector('[data-webinar-show-all]')?.addEventListener('click', () => {
+    if (!root) return;
+    const allBtn = root.querySelector('button[data-webinar-filter="all"]') as HTMLButtonElement | null;
+    allBtn?.click();
+  });
+  if (root) {
+    root.querySelectorAll('button[data-webinar-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const raw = btn.getAttribute('data-webinar-filter') || 'all';
+        root.querySelectorAll('button[data-webinar-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        applyFilter(raw);
+        updateNoMatch();
+      });
+    });
+    updateNoMatch();
+  }
+</script>

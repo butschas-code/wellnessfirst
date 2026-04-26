@@ -1,0 +1,209 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ConsultationCard from '@/components/cards/ConsultationCard.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
+import EmptyState from '@/components/conversion/EmptyState.astro';
+import { getPublished } from '@/lib/content-filters';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { offerPath } from '@/lib/offer-paths';
+import { formatDate, formatTime } from '@/lib/format';
+
+const list = (await getPublished('consultations')).sort((a, b) => a.data.order - b.data.order);
+const allWebinars = await getPublished('webinars');
+const now = Date.now();
+const nextWebinar =
+  allWebinars
+    .filter((w) => w.data.format === 'live' && +w.data.startAt >= now)
+    .sort((a, b) => +a.data.startAt - +b.data.startAt)[0] ??
+  allWebinars.filter((w) => w.data.format === 'replay').sort((a, b) => +b.data.startAt - +a.data.startAt)[0] ??
+  null;
+const nextWebinarMeta = nextWebinar
+  ? `${formatDate(nextWebinar.data.startAt)}${
+      nextWebinar.data.format === 'live' ? ` · ${formatTime(nextWebinar.data.startAt)}` : ''
+    } · ${nextWebinar.data.durationMinutes} min`
+  : null;
+const spineSpotlight = nextWebinar
+  ? {
+      kicker:
+        nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
+          ? 'Next live hour'
+          : 'Sessions & replays',
+      title: nextWebinar.data.title,
+      meta: nextWebinarMeta ?? undefined,
+      body: nextWebinar.data.excerpt,
+      primary: {
+        href: offerPath('webinars', nextWebinar),
+        label:
+          nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
+            ? nextWebinar.data.isFree
+              ? 'Save a seat'
+              : 'Register'
+            : 'Open the session',
+      },
+      secondary: { href: '/articles', label: 'Read the journal' },
+    }
+  : null;
+const groups = [
+  { id: 'all', label: 'All' },
+  { id: 'geopathic', label: 'Place & signal' },
+  { id: 'astrology', label: 'Living pattern' },
+  { id: 'home', label: 'Home harmony' },
+  { id: 'frequency', label: 'Resonance' },
+] as const;
+---
+
+<BaseLayout
+  title="Consultations"
+  description="Private lines: place and signal, living pattern, home, resonance—each with its own pace and lead time."
+  canonicalPath="/consultations"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="Private work"
+    title="Consultations"
+    description="Four offers—geopathy, astrology, home harmony, frequency. Different cadence and lead time each. Dialogue first; next steps you can do in a real week. No funnels, no tests."
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="/contact">Write the desk</a>
+      <a class="btn-cta-invert-ghost" href="/webinars">Try a session first</a>
+    </div>
+  </MarketingHero>
+  <Section tone="default" spacing="tight" class="!pt-0 sm:!pt-2 border-b border-ink/10 bg-paper" aria-label="Consultations art">
+    <div class="container-wfg max-w-4xl">
+      <div class="overflow-hidden pt-1 sm:pt-2">
+        <EditorialImageSlot
+          ratio="3-2"
+          frame="inline"
+          showPlaceholderWhenEmpty
+          specNote="Private work — space & light"
+        />
+      </div>
+    </div>
+  </Section>
+
+  <CommunitySpine page="consultations" id="spine-consultations" spotlight={spineSpotlight} />
+  {list.length > 0 && (
+    <Section tone="default" spacing="comfortable" class="!pt-0 sm:!pt-2">
+      <Container>
+        <p class="text-label">Filter</p>
+        <div
+          class="mt-3 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filter by offering type"
+          data-consult-filters
+        >
+          {groups.map((g) => (
+            <button
+              type="button"
+              class="btn-filter-pill"
+              data-filter={g.id}
+              aria-pressed={g.id === 'all' ? 'true' : 'false'}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  )}
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      {list.length === 0 && (
+        <EmptyState
+          title="Consults on pause"
+          body="When new lines open, we will list them here with lead times. Until then: journal and public sessions."
+          actionHref="/articles"
+          actionLabel="Open the journal"
+          secondaryHref="/contact"
+          secondaryLabel="Write the desk"
+        />
+      )}
+      {list.length > 0 && (
+        <ul class="grid gap-6 md:grid-cols-2" role="list" data-consultation-list>
+          {list.map((entry) => (
+            <li data-consultation-item>
+              <ConsultationCard entry={entry} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {list.length > 0 && (
+        <div
+          data-consult-no-match
+          class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
+          role="status"
+        >
+          <p class="font-display text-xl text-ink-800">Nothing in this filter</p>
+          <p class="mt-2 text-ink-600">Show all, or write with a line about your week—we will suggest a next step in plain language.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button type="button" class="btn-primary" data-consult-show-all>
+              Show all
+            </button>
+            <a class="btn-secondary" href="/contact">Start with a note</a>
+          </div>
+        </div>
+      )}
+    </Container>
+  </Section>
+  <Section spacing="comfortable" tone="default" class="!pt-0">
+    <Container>
+      <CtaBlock
+        id="consult-next"
+        title="Unsure which line fits"
+        body="A few sentences on your week and what you want to shift. We will point you clearly—even if the answer is a referral."
+        href="/contact"
+        label="Contact"
+        variant="secondary"
+        align="left"
+        secondaryHref="/webinars"
+        secondaryLabel="Browse sessions"
+      />
+    </Container>
+  </Section>
+  <div slot="prefooter">
+    <ConversionCallout topic="consultations" />
+  </div>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  const root = document.querySelector('[data-consult-filters]');
+  const noMatch = document.querySelector('[data-consult-no-match]') as HTMLElement | null;
+  const rows = () => document.querySelectorAll<HTMLElement>('[data-consultation-item]');
+  const updateNoMatch = () => {
+    let visible = 0;
+    rows().forEach((li) => {
+      if (!li.classList.contains('hidden')) visible += 1;
+    });
+    if (noMatch) {
+      noMatch.classList.toggle('hidden', visible > 0);
+    }
+  };
+  document.querySelector('[data-consult-show-all]')?.addEventListener('click', () => {
+    (root?.querySelector('button[data-filter="all"]') as HTMLButtonElement | null)?.click();
+  });
+  if (root) {
+    root.querySelectorAll('button[data-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter') || 'all';
+        root.querySelectorAll('button[data-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        rows().forEach((li) => {
+          const g = li.querySelector('[data-consultation-group]')?.getAttribute('data-consultation-group') || '';
+          const show = filter === 'all' || g === filter;
+          li.classList.toggle('hidden', !show);
+        });
+        updateNoMatch();
+      });
+    });
+    updateNoMatch();
+  }
+</script>

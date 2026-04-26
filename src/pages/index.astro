@@ -1,0 +1,558 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import InterestForm from '@/components/forms/InterestForm.astro';
+import { getEntry } from 'astro:content';
+import { getPublished } from '@/lib/content-filters';
+import { articlePath } from '@/lib/articles';
+import { formatDate, formatTime } from '@/lib/format';
+import { getUnsplashPlaceholderUrl } from '@/lib/unsplash-placeholders';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import {
+  homeFeaturedArticleIds,
+  homeJournalDisplay,
+  homeMetaDescription,
+} from '@/lib/homepage-marketing';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import { WFG_HOME_SCROLL_FIRST_BG } from '@/lib/home-scroll-colors';
+import {
+  homeCategoryHash,
+  homePillarList,
+  pillarIdToCategory,
+  type HomePillarId,
+} from '@/lib/home-pillars';
+
+const homeHeroImageUrl = '/images/home-hero.jpg';
+const welcomeImageUrl = '/images/welcome-block-1.jpg';
+const pathsImageUrl = '/images/home-block-2.jpg';
+const fiveSubjectsParallaxUrl = '/images/home-parallax.jpg';
+
+const [articles] = await Promise.all([getPublished('articles')]);
+
+const journalBlocks = homeFeaturedArticleIds.map((id) => {
+  const entry = articles.find((a) => a.id === id);
+  const fallback = homeJournalDisplay[id];
+  const display = entry
+    ? { category: entry.data.category, title: entry.data.title, summary: entry.data.excerpt }
+    : fallback;
+  const href = entry ? articlePath(entry) : '/articles';
+  const coverImage = entry?.data.coverImage;
+  return { id, display, href, coverImage };
+});
+
+const featuredWebinar = await getEntry('webinars', 'bodies-places-breath-free');
+const saveSeatHref = featuredWebinar?.data.primaryLink ?? '/webinars';
+const webinarMeta =
+  featuredWebinar != null
+    ? `${formatDate(featuredWebinar.data.startAt)} · ${formatTime(featuredWebinar.data.startAt)} · ${featuredWebinar.data.durationMinutes} minutes`
+    : '';
+
+function exploreHash(id: HomePillarId): string {
+  return homeCategoryHash(pillarIdToCategory[id]);
+}
+---
+
+<BaseLayout
+  title="Wellness First Global"
+  description={homeMetaDescription}
+  canonicalPath="/"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    headingId="h-hero"
+    dataBg={WFG_HOME_SCROLL_FIRST_BG}
+    title="Explore what quietly makes life better."
+    description="The choices, rhythms, spaces, and practices that create a sense of ease."
+    tagline="Clarity · Regulation · Environment · Energy & Frequency · Practices & Rituals"
+    imageUrl={homeHeroImageUrl}
+    imageAlt="Soft natural light in a calm interior — space to breathe and notice."
+  >
+    <div
+      slot="actions"
+      class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
+    >
+      <a class="btn-cta-invert wfg-hero-line" style="--enter: 2" href="#five-themes">Explore the Five Themes</a>
+      <a class="btn-cta-invert-ghost wfg-hero-line" style="--enter: 3" href="/articles">Browse Articles</a>
+    </div>
+  </MarketingHero>
+
+  <!-- Welcome -->
+  <section class="wfg-home-band wfg-home-skin" data-skin="intro" data-bg="#f8faf8" aria-labelledby="h-welcome">
+    <div class="wfg-home-skin-inner container-wfg max-w-6xl py-16 md:py-24" data-reveal>
+      <div class="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-12">
+        <div class="relative min-h-[18rem] overflow-hidden rounded-[1.75rem] border border-ink/10 shadow-elevated lg:col-span-5">
+          <img
+            src={welcomeImageUrl}
+            alt=""
+            data-wfg-parallax="0.12"
+            class="h-full w-full object-cover"
+            width="800"
+            height="1000"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="flex flex-col justify-center lg:col-span-7">
+          <h2
+            id="h-welcome"
+            class="wfg-reveal-child font-display text-2xl font-medium leading-tight text-ink sm:text-3xl md:text-4xl"
+            style="--stagger: 0"
+          >
+            Welcome to Wellness First.
+          </h2>
+          <div
+            class="wfg-reveal-child mt-6 space-y-4 leading-[1.75] text-charcoal sm:text-lg"
+            style="--stagger: 1"
+          >
+            <p>
+              A place for conscious living, healthier rhythms, aligned spaces, frequency work, astrology, and the small
+              practices that make everyday life feel more easeful.
+            </p>
+            <p class="font-medium text-ink">Everything here lives inside five themes:</p>
+            <ul class="list-none space-y-2.5 text-[0.95rem] sm:text-base" role="list">
+              <li class="flex gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
+                <span
+                  ><span class="font-medium text-ink">Clarity</span> — attention, values, conscious living</span
+                >
+              </li>
+              <li class="flex gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
+                <span><span class="font-medium text-ink">Regulation</span> — rhythm, recovery, steadiness</span>
+              </li>
+              <li class="flex gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
+                <span
+                  ><span class="font-medium text-ink">Environment</span> — home harmony, energetic alignment, Vastu and
+                  place quality</span
+                >
+              </li>
+              <li class="flex gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
+                <span
+                  ><span class="font-medium text-ink">Energy &amp; Frequency</span> — PEMF, frequency work, sound and subtle
+                  inputs</span
+                >
+              </li>
+              <li class="flex gap-2">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
+                <span
+                  ><span class="font-medium text-ink">Practices &amp; Rituals</span> — daily structure, grounding, and the
+                  habits that make it stick</span
+                >
+              </li>
+            </ul>
+            <p class="text-balance text-[0.95rem] leading-relaxed sm:text-base">
+              We also explore the subtle layers that shape daily life — astrology and timing, Vastu, geopathic stress,
+              energetic home alignment, and frequency work — as practical ways to read patterns, refine spaces, and move
+              with more awareness.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Paths: no one sequence -->
+  <section
+    class="wfg-home-band wfg-home-skin"
+    data-skin="journal"
+    data-bg="#f0f4f2"
+    aria-labelledby="h-paths"
+  >
+    <div class="wfg-home-skin-inner container-wfg max-w-5xl py-16 md:py-24" data-reveal>
+      <div class="grid gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-x-10 xl:gap-x-12">
+        <div>
+          <h2
+            id="h-paths"
+            class="wfg-reveal-child font-display text-2xl font-medium text-ink sm:text-3xl"
+            style="--stagger: 0"
+          >
+            This is a space to explore conscious living in a way that stays practical, beautiful, and rooted in real life.
+          </h2>
+          <div
+            class="wfg-reveal-child mt-6 space-y-4 leading-[1.75] text-charcoal"
+            style="--stagger: 1"
+          >
+            <p>
+              Some people come for timing and cycles—astrology as a language for rhythm.
+            </p>
+            <p>
+              Others come because their home feels &ldquo;off,&rdquo; and they want to understand space, Vastu, and geopathic
+              stress with more clarity.
+            </p>
+            <p>
+              Others are curious about subtle inputs—frequency work, PEMF, sound—and how modern tools can support a more
+              intentional lifestyle.
+            </p>
+            <p>
+              And sometimes it&rsquo;s simply about daily rituals: small practices that bring structure, calm, and
+              continuity to the day.
+            </p>
+            <p>
+              You&rsquo;ll find a mix of formats here: short and deep articles, live webinars, and more guided sessions and
+              tools—so you can engage in the way that fits your life. Over time, the themes start to connect: rhythm, space,
+              energy, and the practices that shape everyday experience.
+            </p>
+          </div>
+        </div>
+        <div
+          class="wfg-reveal-child flex w-full min-h-[17rem] flex-col self-stretch lg:h-full lg:min-h-0"
+          style="--stagger: 2"
+        >
+          <div
+            class="relative min-h-[17rem] flex-1 overflow-hidden rounded-3xl border border-ink/8 shadow-elevated lg:min-h-0"
+          >
+            <img
+              src={pathsImageUrl}
+              alt=""
+              data-wfg-parallax="0.1"
+              class="absolute inset-0 h-full w-full object-cover"
+              width="1200"
+              height="800"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </div>
+      <nav
+        class="wfg-reveal-child mt-12 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-medium"
+        style="--stagger: 3"
+        aria-label="Explore next steps"
+      >
+        <a class="text-ink underline decoration-secondary/40 underline-offset-4 transition hover:text-secondary" href="/articles"
+          >Explore Articles</a
+        >
+        <span class="text-ink-300" aria-hidden="true">·</span>
+        <a class="text-ink underline decoration-secondary/40 underline-offset-4 transition hover:text-secondary" href="/webinars"
+          >View Live Sessions</a
+        >
+        <span class="text-ink-300" aria-hidden="true">·</span>
+        <a
+          class="text-ink underline decoration-secondary/40 underline-offset-4 transition hover:text-secondary"
+          href="#newsletter"
+          >Stay close (newsletter)</a
+        >
+      </nav>
+    </div>
+  </section>
+
+  <!-- The five subjects + pillar cards -->
+  <section
+    class="wfg-home-band wfg-home-skin"
+    data-skin="topics"
+    id="five-themes"
+    data-bg="#e8f0e9"
+    aria-labelledby="h-five-subjects"
+  >
+    <!-- Full-bleed parallax with intro copy on top -->
+    <div
+      class="relative left-1/2 w-[100vw] max-w-[100vw] -translate-x-1/2 overflow-hidden"
+    >
+      <div class="relative isolate min-h-[min(24rem,52vh)]">
+        <div class="absolute inset-0" aria-hidden="true">
+          <img
+            src={fiveSubjectsParallaxUrl}
+            alt=""
+            data-wfg-parallax="0.12"
+            class="absolute inset-0 h-[118%] w-full -top-[9%] object-cover"
+            width="1920"
+            height="1080"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div
+          class="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/88 via-ink-900/72 to-primary/90"
+          aria-hidden="true"
+        />
+        <div
+          class="relative z-10 container-wfg mx-auto max-w-4xl px-4 py-16 sm:px-5 md:py-20 lg:px-6"
+          data-reveal
+        >
+          <p
+            class="wfg-reveal-child text-eyebrow text-[0.65rem] tracking-[0.2em] text-white/80"
+            style="--stagger: 0"
+          >
+            The five subjects
+          </p>
+          <h2
+            id="h-five-subjects"
+            class="wfg-reveal-child mt-2 font-display text-2xl font-medium text-paper sm:text-3xl md:text-4xl"
+            style="--stagger: 1"
+          >
+            What we explore
+          </h2>
+          <div
+            class="wfg-reveal-child mt-8 max-w-3xl leading-[1.8] text-paper/92 sm:text-lg"
+            style="--stagger: 2"
+          >
+            <p>
+              Life has always been shaped by more than what we can see. Our choices, rhythms, homes, timing, environment, and
+              daily practices all influence how life feels. Astrology, Vastu, geopathic stress, energetic home alignment, sound,
+              and frequency work point to the same deeper truth: wellbeing is not one isolated thing. It is the relationship
+              between inner clarity, bodily rhythm, place, subtle influence, and repeated practice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wfg-home-skin-inner container-wfg max-w-6xl px-4 pb-16 pt-2 sm:px-5 md:pb-24 md:pt-4 lg:px-6" data-reveal>
+      <header class="max-w-3xl pt-8 sm:pt-10">
+        <h3
+          id="h-five-pillars"
+          class="wfg-reveal-child text-balance font-display text-lg font-medium leading-relaxed text-ink sm:text-xl sm:leading-relaxed"
+          style="--stagger: 0"
+        >
+          That is why Wellness First explores five subjects together: Clarity, Regulation, Environment, Energy &amp; Frequency, and
+          Practices &amp; Rituals. These are the places where life becomes more conscious, more aligned, and more beautiful in
+          everyday form.
+        </h3>
+      </header>
+      <ul class="mt-10 flex list-none flex-col gap-8 sm:mt-12 sm:gap-10 md:gap-12" role="list">
+        {homePillarList.map((p, i) => {
+          const imageSrc =
+            p.imageUrl ?? getUnsplashPlaceholderUrl(p.image.ratio, p.image.key);
+          const imageOnLeft = i % 2 === 0;
+          return (
+        <li class="wfg-reveal-child min-h-0" style={`--stagger: ${1 + i}`}>
+          <article
+            class="group grid min-w-0 overflow-hidden rounded-2xl border border-ink/10 bg-paper shadow-[0_4px_32px_rgba(10,35,52,0.06)] transition-[box-shadow,transform] duration-300 sm:rounded-3xl md:hover:-translate-y-0.5 md:hover:shadow-[0_24px_56px_rgba(10,35,52,0.1)] lg:min-h-0 lg:grid-cols-12"
+          >
+            <div
+              class:list={[
+                'relative min-h-[15rem] w-full overflow-hidden sm:min-h-[18rem] lg:min-h-[22rem] lg:col-span-5',
+                imageOnLeft ? 'lg:order-1' : 'lg:order-2',
+              ]}
+            >
+              <img
+                src={imageSrc}
+                alt=""
+                class="absolute inset-0 h-full w-full object-cover object-center transition duration-500 group-hover:scale-[1.02]"
+                width="1200"
+                height="800"
+                loading="lazy"
+                decoding="async"
+              />
+              <div
+                class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/15 to-transparent sm:from-ink/0"
+                aria-hidden="true"
+              />
+            </div>
+            <div
+              class:list={[
+                'flex min-h-0 flex-col justify-center border-t border-ink/10 p-5 sm:p-7 md:p-8 lg:col-span-7 lg:border-t-0',
+                imageOnLeft ? 'lg:order-2 lg:border-l lg:border-ink/10' : 'lg:order-1 lg:border-r lg:border-ink/10',
+              ]}
+            >
+              {p.kicker && <p class="text-eyebrow text-[0.65rem] text-secondary">{p.kicker}</p>}
+              <h3
+                class:list={['font-display text-2xl font-medium tracking-tight text-ink sm:text-3xl', p.kicker && 'mt-1']}
+              >
+                {p.label}
+              </h3>
+              <p class="mt-1 font-display text-base text-ink-600 sm:text-lg">{p.title}</p>
+              <div class="mt-4 max-w-prose space-y-3 whitespace-pre-line text-sm leading-relaxed text-charcoal sm:text-base">
+                {p.body}
+              </div>
+              <div
+                class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-ink/8 pt-5 text-sm"
+                aria-label={`Explore ${p.label}`}
+              >
+                <a
+                  class="font-medium text-secondary no-underline transition hover:underline"
+                  href={`/articles#${exploreHash(p.id)}`}
+                >
+                  {p.label} articles
+                </a>
+                <span class="text-ink-300">·</span>
+                <a class="font-medium text-ink no-underline transition hover:text-secondary" href="/webinars">
+                  {p.label} webinars
+                </a>
+                {p.id === 'energy' && (
+                  <>
+                    <span class="text-ink-300">·</span>
+                    <a
+                      class="font-medium text-ink no-underline transition hover:text-secondary"
+                      href="/products/infinity-uno"
+                    >
+                      Learn about Infinity Uno
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
+          </article>
+        </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Articles: one per theme -->
+  <section
+    class="wfg-home-band wfg-home-skin"
+    data-skin="journal"
+    id="journal"
+    data-bg="#d7e2da"
+    aria-labelledby="h-journal"
+  >
+    <div class="wfg-home-skin-inner container-wfg max-w-[88rem] py-16 md:py-24" data-reveal>
+      <div class="wfg-reveal-child" style="--stagger: 0">
+        <h2 id="h-journal" class="font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl">
+          Explore our articles
+        </h2>
+      </div>
+      <ul
+        class="mt-12 grid list-none grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 md:mt-14 lg:grid-cols-3 lg:gap-8"
+        role="list"
+      >
+        {journalBlocks.map((row, i) => (
+          <li class="min-h-0 wfg-reveal-child" style={`--stagger: ${1 + (i % 5)}`}>
+            <article
+              class="group flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 shadow-elevated transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:border-secondary/20 hover:shadow-md"
+            >
+              <a href={row.href} class="block no-underline" tabindex="-1" aria-hidden="true">
+                <div class="relative aspect-[4/3] overflow-hidden border-b border-ink/5 sm:aspect-[3/2]">
+                  <EditorialImageSlot
+                    src={row.coverImage}
+                    alt={row.coverImage ? `Cover: ${row.display.title}` : ''}
+                    frame="card"
+                    ratio="3-2"
+                    showPlaceholderWhenEmpty
+                    heroVariant="article"
+                    fillFrame
+                    class="absolute inset-0 h-full w-full min-h-0 transition duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+              </a>
+              <div class="flex flex-1 flex-col p-5 sm:p-6 md:p-7">
+                <p class="text-eyebrow text-[0.65rem] text-secondary">{row.display.category}</p>
+                <h3 class="mt-2 font-display text-lg font-medium leading-snug text-ink sm:text-xl">
+                  <a class="text-inherit no-underline transition group-hover:text-secondary" href={row.href}
+                    >{row.display.title}</a
+                  >
+                </h3>
+                <p class="mt-3 line-clamp-4 flex-1 text-base leading-relaxed text-charcoal sm:line-clamp-5">
+                  {row.display.summary}
+                </p>
+                <a
+                  class="mt-4 inline-flex w-fit text-sm font-medium text-ink no-underline transition group-hover:text-secondary"
+                  href={row.href}
+                >
+                  Read
+                </a>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ul>
+      <p class="wfg-reveal-child mt-10" style="--stagger: 6">
+        <a
+          class="text-sm font-medium text-ink no-underline underline decoration-secondary/30 underline-offset-4 transition hover:text-secondary"
+          href="/articles"
+        >
+          View all articles
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Webinars -->
+  <section
+    class="wfg-home-band wfg-home-skin"
+    data-skin="webinar"
+    id="sessions"
+    data-bg="#c1d0c3"
+    aria-labelledby="h-webinars"
+  >
+    <div class="wfg-home-skin-inner container-wfg max-w-3xl py-16 md:py-24" data-reveal>
+      <p class="wfg-reveal-child wfg-home-kicker text-primary" style="--stagger: 0">Free webinars</p>
+      <h2
+        id="h-webinars"
+        class="wfg-reveal-child mt-1 font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl"
+        style="--stagger: 1"
+      >
+        Live and unhurried
+      </h2>
+      <p
+        class="wfg-reveal-child mt-4 max-w-2xl text-balance text-lg leading-relaxed text-charcoal"
+        style="--stagger: 2"
+      >
+        Sometimes you don’t need another idea. You need a room. A place to slow down, listen, ask questions, and leave with
+        something you can use.
+      </p>
+      <p class="wfg-reveal-child mt-3 text-sm text-ink-600 sm:text-base" style="--stagger: 2">
+        We run free sessions across all five subjects — with occasional special classes on astrology &amp; timing and
+        frequency tools.
+      </p>
+      <div
+        class="wfg-reveal-child group relative mt-8 overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 p-5 shadow-elevated transition-[transform,box-shadow] duration-300 sm:rounded-3xl sm:p-6 md:p-7 hover:-translate-y-1 hover:border-secondary/20 hover:shadow-md"
+        style="--stagger: 3"
+      >
+        {featuredWebinar ? (
+          <>
+            <h3 class="relative font-display text-lg font-medium text-ink sm:text-xl md:text-2xl">
+              {featuredWebinar.data.title}
+            </h3>
+            {webinarMeta && <p class="relative mt-2 text-sm text-ink-500">{webinarMeta}</p>}
+          </>
+        ) : (
+          <p class="relative text-sm text-charcoal">Upcoming sessions are listed on the webinars page.</p>
+        )}
+        <div class="relative mt-6 flex flex-wrap gap-2">
+          <a class="btn-primary" href="/webinars">Browse webinars</a>
+          {featuredWebinar && <a class="btn-secondary" href={saveSeatHref}>Save your seat</a>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section
+    class="wfg-home-band wfg-home-skin"
+    data-skin="newsletter"
+    id="newsletter"
+    data-bg="#9fb0a0"
+    aria-labelledby="h-newsletter"
+  >
+    <div class="wfg-home-skin-inner container-wfg max-w-4xl py-16 md:py-24" data-reveal>
+      <div
+        class="wfg-reveal-child group grid items-stretch gap-6 overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 p-5 shadow-elevated transition-[transform,box-shadow] duration-300 sm:gap-8 sm:rounded-3xl sm:p-6 md:grid-cols-2 md:gap-8 md:p-7 hover:-translate-y-1 hover:border-secondary/20 hover:shadow-md"
+        style="--stagger: 0"
+      >
+        <div class="min-w-0 self-center">
+          <h2
+            id="h-newsletter"
+            class="font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl"
+          >
+            Stay close
+          </h2>
+          <p class="mt-3 max-w-md leading-relaxed text-charcoal sm:text-lg">
+            New articles, webinar dates, and occasional notes that feel like a steady hand. No noise. No spam. Unsubscribe
+            anytime.
+          </p>
+        </div>
+        <div class="min-w-0 self-center border-t border-ink/10 pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-8">
+          <InterestForm
+            id="home-interest"
+            class="!max-w-none"
+            submitLabel="Join the list"
+            supportingLine="We read every sign-up. Unsubscribe in one click."
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  import { initHomeParallax } from '@/scripts/home-parallax';
+  initHomeParallax();
+</script>

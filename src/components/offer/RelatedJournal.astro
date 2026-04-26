@@ -1,0 +1,34 @@
+---
+import ArticleCard from '@/components/cards/ArticleCard.astro';
+import type { ArticleEntry } from '@/types/content';
+
+interface Props {
+  /** Resolved article entries; empty hides the region. */
+  entries: ArticleEntry[];
+  eyebrow?: string;
+  title?: string;
+}
+
+const { entries, eyebrow = 'Related reading', title = 'From the journal' } = Astro.props;
+---
+
+{
+  entries.length > 0 && (
+    <section class="border-t-2 border-ink bg-white py-12 md:py-16" aria-label={title}>
+      <div class="container-wfg">
+        <h2 class="text-eyebrow">{eyebrow}</h2>
+        <p class="mt-1 font-display text-2xl text-ink-800 md:text-3xl">{title}</p>
+        <ul
+          class="mt-8 grid list-none grid-cols-1 gap-6 sm:gap-7 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          role="list"
+        >
+          {entries.map((a) => (
+            <li>
+              <ArticleCard entry={a} showFeaturedBadge={true} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

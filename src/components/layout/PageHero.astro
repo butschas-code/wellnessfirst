@@ -1,0 +1,65 @@
+---
+import Container from '@/components/layout/Container.astro';
+
+interface Props {
+  eyebrow?: string;
+  subtitle?: string;
+  title: string;
+  description?: string;
+  align?: 'left' | 'center';
+  /** Kept for API compatibility; visual treatment is flat editorial (no “mood” gradients) */
+  mood?: 'dawn' | 'forest' | 'neutral';
+  size?: 'full' | 'page' | 'legal';
+}
+
+const { eyebrow, subtitle, title, description, align = 'left', size = 'full' } = Astro.props;
+
+const isLegal = size === 'legal';
+const isPage = size === 'page';
+const isFull = size === 'full';
+
+const outerClass = isLegal
+  ? 'border-b border-ink/10 bg-paper'
+  : 'border-b border-ink/10 bg-paper';
+
+const paddingClass = isLegal
+  ? 'py-10 sm:py-12'
+  : isPage
+    ? 'py-12 sm:py-16 md:py-20 lg:py-24'
+    : 'py-14 sm:py-20 md:py-24 lg:py-32';
+
+const titleClass = isLegal
+  ? 'font-display text-3xl font-medium leading-[1.08] tracking-[-0.02em] text-ink sm:text-4xl'
+  : isPage
+    ? 'font-display text-[clamp(2rem,4vw,3.25rem)] font-medium leading-[1.05] tracking-[-0.03em] text-ink'
+    : 'font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-medium leading-[1.02] tracking-[-0.04em] text-ink';
+
+const descClass = isLegal
+  ? 'mt-3 max-w-2xl text-charcoal'
+  : isPage
+    ? 'mt-5 max-w-2xl text-base leading-[1.65] text-charcoal sm:mt-6 sm:text-lg'
+    : 'mt-6 max-w-2xl text-lg leading-[1.6] text-charcoal sm:mt-8 sm:text-xl';
+---
+
+<div class={outerClass}>
+  <Container>
+    <div
+      class:list={[
+        isFull || isPage ? 'max-w-4xl' : 'max-w-3xl',
+        paddingClass,
+        align === 'center' && 'mx-auto text-center',
+      ]}
+    >
+      {eyebrow && <p class="text-eyebrow mb-3 sm:mb-5">{eyebrow}</p>}
+      {subtitle && !isLegal && (
+        <p class="mb-2 font-display text-lg font-normal leading-snug text-charcoal sm:mb-3 sm:text-xl">{subtitle}</p>
+      )}
+      <h1 class={titleClass}>{title}</h1>
+      {description && <p class={descClass}>{description}</p>}
+      <div class="mt-8 empty:hidden md:mt-12">
+        <slot name="actions" />
+      </div>
+      <slot />
+    </div>
+  </Container>
+</div>

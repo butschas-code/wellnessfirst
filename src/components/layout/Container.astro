@@ -1,0 +1,16 @@
+---
+type Props = {
+  as?: 'div' | 'section' | 'article' | 'header' | 'footer' | 'nav';
+  class?: string;
+  narrow?: boolean;
+};
+
+const { as: Tag = 'div', class: className, narrow }: Props = Astro.props;
+const width = narrow
+  ? 'w-full max-w-[var(--width-prose)] mx-auto px-6'
+  : 'container-wfg';
+---
+
+<Tag class:list={[width, className]}>
+  <slot />
+</Tag>

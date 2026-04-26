@@ -1,0 +1,104 @@
+---
+import { site } from '@/lib/site';
+
+interface Props {
+  id?: string;
+  class?: string;
+}
+
+const { id, class: className } = Astro.props;
+const formId = id ?? 'wfg-contact';
+const contactEmail = String(site.contactEmail);
+---
+
+<form
+  id={formId}
+  class:list={['relative grid max-w-lg gap-5', className]}
+  data-wfg-form="contact"
+  autocomplete="on"
+>
+  <input type="hidden" name="form" value="contact" />
+  <p
+    id={`${formId}-status`}
+    class="hidden rounded-lg border border-ink/20 bg-ink/[0.03] px-3 py-2 text-sm text-ink-700"
+    role="status"
+    aria-live="polite"
+  />
+  <p
+    id={`${formId}-error`}
+    class="hidden rounded-lg border border-red-200/80 bg-red-50/80 px-3 py-2 text-sm text-red-900"
+    role="alert"
+    aria-live="assertive"
+  />
+  <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+    <label for={`${formId}-company`}>Company (leave empty)</label>
+    <input
+      type="text"
+      id={`${formId}-company`}
+      class="input-wfg"
+      name="company"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+  <div>
+    <label for={`${formId}-name`} class="label-wfg">Name</label>
+    <input
+      id={`${formId}-name`}
+      class="input-wfg"
+      type="text"
+      name="name"
+      autocomplete="name"
+      required
+    />
+  </div>
+  <div>
+    <label for={`${formId}-email`} class="label-wfg">Email</label>
+    <input
+      id={`${formId}-email`}
+      class="input-wfg"
+      type="email"
+      name="email"
+      autocomplete="email"
+      inputmode="email"
+      required
+    />
+  </div>
+  <div>
+    <label for={`${formId}-topic`} class="label-wfg">What is this about?</label>
+    <select id={`${formId}-topic`} class="input-wfg" name="topic" required autocomplete="off">
+      <option value="" selected disabled>— Select a path —</option>
+      <option value="consultation">Private consultation or integration</option>
+      <option value="editorial">Editorial, articles, or press</option>
+      <option value="community">Community timing or access</option>
+      <option value="shop">Shop, objects, or waitlists</option>
+      <option value="general">Something else</option>
+    </select>
+  </div>
+  <div>
+    <label for={`${formId}-message`} class="label-wfg">Message</label>
+    <p id={`${formId}-hint`} class="mb-2 text-sm text-ink-500">
+      A few sentences is enough. If you are asking about a consult, mention your time zone and what a good week would look
+      like.
+    </p>
+    <textarea
+      id={`${formId}-message`}
+      class="textarea-wfg min-h-[8.5rem] resize-y"
+      name="message"
+      rows="6"
+      required
+      aria-describedby={`${formId}-hint`}
+    />
+  </div>
+  <div>
+    <button type="submit" class="btn-primary w-full min-h-11 sm:w-auto">Send message</button>
+  </div>
+  <p class="text-sm text-ink-500">
+    Submits through this site. We read Monday–Friday; human reply within a few business days when we can.
+  </p>
+  <p class="text-sm text-ink-500">
+    <a class="text-secondary underline decoration-line" href={`mailto:${contactEmail}`}
+      >Or email {contactEmail} from your client</a
+    >.
+  </p>
+</form>

@@ -1,0 +1,80 @@
+---
+import { site } from '@/lib/site';
+
+interface Props {
+  id?: string;
+  submitLabel?: string;
+  class?: string;
+  /** When set, replaces the default “submits through…” line under the button. */
+  supportingLine?: string;
+}
+
+const { id, submitLabel = 'Join the list', class: className, supportingLine } = Astro.props;
+const formId = id ?? 'interest';
+const contactEmail = String(site.contactEmail);
+---
+
+<form id={formId} class:list={['relative grid max-w-md gap-5', className]} data-wfg-form="interest" autocomplete="on">
+  <input type="hidden" name="form" value="interest" />
+  <input type="hidden" name="source" value={formId} />
+  <p
+    id={`${formId}-status`}
+    class="hidden rounded-lg border border-ink/20 bg-ink/[0.03] px-3 py-2 text-sm text-ink-700"
+    role="status"
+    aria-live="polite"
+  />
+  <p
+    id={`${formId}-error`}
+    class="hidden rounded-lg border border-red-200/80 bg-red-50/80 px-3 py-2 text-sm text-red-900"
+    role="alert"
+    aria-live="assertive"
+  />
+  <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+    <label for={`${formId}-company`}>Company (leave empty)</label>
+    <input
+      type="text"
+      id={`${formId}-company`}
+      class="input-wfg"
+      name="company"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+  <div>
+    <label for={`${formId}-name`} class="label-wfg">Name</label>
+    <input
+      id={`${formId}-name`}
+      class="input-wfg"
+      type="text"
+      name="name"
+      autocomplete="name"
+      required
+    />
+  </div>
+  <div>
+    <label for={`${formId}-email`} class="label-wfg">Email</label>
+    <input
+      id={`${formId}-email`}
+      class="input-wfg"
+      type="email"
+      name="email"
+      autocomplete="email"
+      inputmode="email"
+      required
+    />
+  </div>
+  <div>
+    <button type="submit" class="btn-primary w-full min-h-11 sm:w-auto">
+      {submitLabel}
+    </button>
+  </div>
+  {supportingLine ? (
+    <p class="text-sm text-ink-500">{supportingLine}</p>
+  ) : (
+    <p class="text-sm text-ink-500">
+      Submits through this site. Or write
+      <a class="text-secondary underline decoration-line" href={`mailto:${contactEmail}`}>{contactEmail}</a>
+      directly.
+    </p>
+  )}
+</form>

@@ -1,0 +1,85 @@
+---
+import { site } from '@/lib/site';
+
+interface Props {
+  id: string;
+  /** Public slug in URLs (e.g. session id) */
+  webinarSlug: string;
+  /** Display title for routing and your inbox */
+  webinarTitle: string;
+  class?: string;
+}
+
+const { id: formId, webinarSlug, webinarTitle, class: className } = Astro.props;
+const contactEmail = String(site.contactEmail);
+---
+
+<form
+  id={formId}
+  class:list={['relative grid max-w-md gap-5', className]}
+  data-wfg-form="webinar"
+  autocomplete="on"
+>
+  <input type="hidden" name="form" value="webinar" />
+  <input type="hidden" name="webinar_slug" value={webinarSlug} />
+  <input type="hidden" name="webinar_title" value={webinarTitle} />
+  <input type="hidden" name="source" value={formId} />
+  <p
+    id={`${formId}-status`}
+    class="hidden rounded-lg border border-ink/20 bg-ink/[0.03] px-3 py-2 text-sm text-ink-700"
+    role="status"
+    aria-live="polite"
+  />
+  <p
+    id={`${formId}-error`}
+    class="hidden rounded-lg border border-red-200/80 bg-red-50/80 px-3 py-2 text-sm text-red-900"
+    role="alert"
+    aria-live="assertive"
+  />
+  <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+    <label for={`${formId}-company`}>Company (leave empty)</label>
+    <input
+      type="text"
+      id={`${formId}-company`}
+      class="input-wfg"
+      name="company"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
+  <p class="text-label">This session</p>
+  <p class="text-sm text-ink-600 leading-relaxed">
+    {webinarTitle}
+  </p>
+  <div>
+    <label for={`${formId}-name`} class="label-wfg">Name</label>
+    <input
+      id={`${formId}-name`}
+      class="input-wfg"
+      type="text"
+      name="name"
+      autocomplete="name"
+      required
+    />
+  </div>
+  <div>
+    <label for={`${formId}-email`} class="label-wfg">Email</label>
+    <input
+      id={`${formId}-email`}
+      class="input-wfg"
+      type="email"
+      name="email"
+      autocomplete="email"
+      inputmode="email"
+      required
+    />
+  </div>
+  <div>
+    <button type="submit" class="btn-primary w-full min-h-11 sm:w-auto">Keep me posted</button>
+  </div>
+  <p class="text-sm text-ink-500">
+    Submits through the site. Or email
+    <a class="text-secondary underline decoration-line" href={`mailto:${contactEmail}`}>{contactEmail}</a>
+    and name this session.
+  </p>
+</form>

@@ -1,0 +1,121 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import OfferNarrativeSections from '@/components/offer/OfferNarrativeSections.astro';
+import RelatedJournal from '@/components/offer/RelatedJournal.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { publishedOnly } from '@/lib/content-filters';
+import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
+import { resolveRelatedArticles } from '@/lib/related-journal';
+import { productJsonLd } from '@/lib/seo';
+export async function getStaticPaths() {
+  const items = await getCollection('products', publishedOnly);
+  const used = new Map<string, string>();
+  for (const e of items) {
+    const key = e.data.slug ?? e.id;
+    const prev = used.get(key);
+    if (prev && prev !== e.id) throw new Error(`Duplicate product public slug "${key}"`);
+    used.set(key, e.id);
+  }
+  return items.map((entry) => ({ params: { slug: entry.data.slug ?? entry.id } }));
+}
+
+const { slug } = Astro.params;
+const items = await getCollection('products', publishedOnly);
+const entry = resolveByPublicSlug(items, slug!);
+if (!entry) throw new Error(`Product not found: ${slug}`);
+const { Content } = await render(entry);
+const d = entry.data;
+const related = await resolveRelatedArticles(d.relatedArticleIds);
+const metaTitle = d.seoTitle ?? d.name;
+const metaDescription = d.seoDescription ?? d.oneLine;
+const canonical = offerPath('products', entry);
+const availabilityLabel =
+  d.availability === 'available' ? 'Available' : d.availability === 'waitlist' ? 'Waitlist' : 'Archive';
+const blocks = [
+  { id: 'what', title: 'What it is', body: d.whatItIs },
+  { id: 'who', title: 'Who it is for', body: d.whoItIsFor },
+  { id: 'why', title: 'Why it matters', body: d.whyItMatters },
+  { id: 'expect', title: 'What to expect', body: d.whatToExpect },
+];
+const craft = d.craftNote;
+
+const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const productPageUrl = new URL(canonical, siteBase).toString();
+const productLd = productJsonLd({
+  name: d.name,
+  description: metaDescription,
+  url: productPageUrl,
+  imageUrl: d.image,
+  availability: d.availability,
+});
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  canonicalPath={canonical}
+  ogImagePath={d.image}
+  ogImageAlt={d.image ? `Hero image: ${d.name}` : undefined}
+  jsonLd={productLd}
+  {...marketingPageLayout}
+>
+  <article>
+    <MarketingHero
+      eyebrow={d.category}
+      title={d.name}
+      description={d.oneLine}
+      imageUrl={d.image}
+      imageAlt={d.image ? `Hero image: ${d.name}` : `Product: ${d.name}`}
+    />
+    <Section tone="default" spacing="comfortable" class="!pt-0 sm:!pt-2">
+      <Container>
+        <div class="mb-10 max-w-3xl">
+          <p class="text-sm text-ink-500">
+            {d.priceNote && <span>{d.priceNote} · </span>}
+            {availabilityLabel}
+            {d.availability === 'waitlist' && ' — we will confirm as batches open'}
+          </p>
+          {craft && (
+            <p class="mt-4 max-w-2xl border-l-2 border-ink/20 pl-4 font-display text-lg text-ink italic">
+              {craft}
+            </p>
+          )}
+          <div class="mt-8 flex flex-wrap gap-3">
+            {d.learnMoreUrl && (
+              <a class="btn-primary" href={d.learnMoreUrl}>
+                {d.availability === 'available' ? 'Inquire' : 'Request or join waitlist'}
+              </a>
+            )}
+            <a class="btn-secondary" href="/shop">
+              Back to shop
+            </a>
+            <a class="link-wfg-ghost" href="/contact">Ask before you buy</a>
+          </div>
+        </div>
+        <OfferNarrativeSections blocks={blocks} />
+      </Container>
+    </Section>
+    <Section tone="contrast" spacing="comfortable" class="!pt-0">
+      <Container narrow>
+        <h2 class="text-eyebrow">Note</h2>
+        <RichText as="div" variant="article" class="mt-2">
+          <Content />
+        </RichText>
+      </Container>
+    </Section>
+    <RelatedJournal
+      entries={related}
+      eyebrow="Reading"
+      title="Why we stock it"
+    />
+    <CommunitySpine page="product" compact id="spine-after-product" />
+  </article>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

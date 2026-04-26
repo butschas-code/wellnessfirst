@@ -1,0 +1,35 @@
+---
+/**
+ * Public-folder or remote URL images from content (not `src/assets` imports).
+ * Sets dimensions to limit CLS; adjust if you add real width/height metadata to frontmatter later.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  /** LCP candidate (hero / cover) */
+  priority?: boolean;
+  width?: number;
+  height?: number;
+}
+
+const {
+  src,
+  alt,
+  class: className,
+  priority = false,
+  width = 1200,
+  height = 630,
+} = Astro.props;
+---
+
+<img
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  class={className}
+  loading={priority ? 'eager' : 'lazy'}
+  fetchpriority={priority ? 'high' : 'auto'}
+  decoding="async"
+/>

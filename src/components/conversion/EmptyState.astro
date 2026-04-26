@@ -1,0 +1,29 @@
+---
+interface Props {
+  title: string;
+  body: string;
+  actionHref?: string;
+  actionLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}
+
+const { title, body, actionHref, actionLabel, secondaryHref, secondaryLabel } = Astro.props;
+---
+
+<div
+  class="border-0 border-t-2 border-dashed border-ink/30 bg-white px-0 py-10 text-left md:py-12"
+  role="status"
+  aria-live="polite"
+>
+  <p class="font-display text-xl font-medium text-ink md:text-2xl">{title}</p>
+  <p class="mt-2 max-w-2xl text-sm leading-relaxed text-charcoal sm:text-base">{body}</p>
+  <div class="mt-6 flex flex-wrap gap-3">
+    {actionHref && actionLabel && <a class="btn-primary" href={actionHref}>{actionLabel}</a>}
+    {secondaryHref && secondaryLabel && (
+      <a class="btn-secondary" href={secondaryHref}>
+        {secondaryLabel}
+      </a>
+    )}
+  </div>
+</div>

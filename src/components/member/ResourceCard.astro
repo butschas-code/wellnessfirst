@@ -1,0 +1,21 @@
+---
+import type { CommunityResource } from '@/lib/community/types';
+import TrackPill from './TrackPill.astro';
+
+interface Props {
+  resource: CommunityResource;
+  trackLabel: string;
+}
+const { resource, trackLabel } = Astro.props;
+const kindLabel = resource.kind === 'reading' ? 'Reading' : resource.kind === 'link' ? 'Link' : 'Tool';
+---
+
+<article class="card-wfg-sand flex h-full flex-col p-5">
+  <div class="flex items-start justify-between gap-2">
+    <p class="text-label">{kindLabel}</p>
+    <TrackPill label={trackLabel} />
+  </div>
+  <h3 class="mt-3 font-display text-lg text-ink-800 leading-snug">{resource.title}</h3>
+  <p class="mt-2 line-clamp-3 flex-1 text-sm text-ink-600 leading-relaxed">{resource.blurb}</p>
+  {resource.state === 'placeholder' && <p class="mt-3 text-sm text-ink-500">Opens with the season.</p>}
+</article>

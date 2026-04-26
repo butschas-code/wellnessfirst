@@ -1,0 +1,62 @@
+---
+import { offerPath } from '@/lib/offer-paths';
+import type { ConsultationEntry } from '@/types/content';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+
+interface Props {
+  entry: ConsultationEntry;
+}
+
+const { entry } = Astro.props;
+const { title, summary, cadence, leadTime, ctaLabel, ctaHref, group, coverImage } = entry.data;
+const groupLabel =
+  group === 'geopathic'
+    ? 'Place & signal'
+    : group === 'astrology'
+      ? 'Living pattern'
+      : group === 'home'
+        ? 'Home harmony'
+        : group === 'frequency'
+          ? 'Resonance & regulation'
+          : group === 'environment'
+            ? 'Space & environment'
+            : group === 'ritual'
+              ? 'Ritual'
+              : 'Private work';
+---
+
+<article
+  class="flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-sm"
+  data-consultation-group={group}
+>
+  <div class="bg-white">
+    <EditorialImageSlot
+      src={coverImage ?? undefined}
+      alt={coverImage ? `${title} — consultation` : ''}
+      frame="card"
+      ratio="3-2"
+      heroVariant="article"
+      showPlaceholderWhenEmpty
+    />
+  </div>
+  <div class="flex flex-1 flex-col p-6 sm:p-7">
+    <p class="text-eyebrow text-[0.65rem]">{groupLabel}</p>
+    <h2 class="mt-2 font-display text-2xl font-medium text-ink">
+      <a class="text-ink transition-colors hover:text-secondary" href={offerPath('consultations', entry)}>
+        {title}
+      </a>
+    </h2>
+    <p class="mt-2 flex-1 text-sm leading-relaxed text-charcoal sm:text-base">{summary}</p>
+    <p class="mt-4 text-xs text-ink-500 sm:text-sm">
+      {cadence} · Lead time: {leadTime}
+    </p>
+    <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <a class="btn-secondary w-fit" href={offerPath('consultations', entry)}>
+        Read the offering
+      </a>
+      <a class="link-wfg-ghost w-fit" href={ctaHref}>
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+</article>

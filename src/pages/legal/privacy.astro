@@ -1,0 +1,71 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+---
+
+<BaseLayout
+  title="Privacy"
+  description="How Wellness First Global handles your information, email, and quiet attention."
+  canonicalPath="/legal/privacy"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    legal
+    compact
+    eyebrow="Legal"
+    title="Privacy"
+    description="A plain-language summary of what we collect, why, and what we refuse to do with it. We believe privacy is part of care."
+  />
+  <Section tone="default" spacing="comfortable" class="!pt-0">
+    <Container narrow>
+      <div class="max-w-prose-wfg space-y-3 text-ink-600">
+        <h2 class="mt-10 font-display text-2xl text-ink-800 first:mt-0">What we collect</h2>
+        <p class="leading-relaxed">
+          When you join the interest list, contact the desk, or request a consult, you may provide your name, email, and
+          a short message. We do not ask for more than we need to respond with clarity.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">How we use it</h2>
+        <p class="leading-relaxed">
+          We use this information to reply to you, to schedule or route consult conversations, and—only if you have
+          explicitly agreed—to send community updates. We do not sell, rent, or trade contact lists. We do not use dark
+          patterns to keep you enrolled.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Cookies &amp; analytics</h2>
+        <p class="leading-relaxed">
+          This Phase 1 site is intentionally light. We may use basic, privacy-respecting traffic signals to know which
+          pages are read; we do not run invasive cross-site advertising trackers.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Retention</h2>
+        <p class="leading-relaxed">
+          We keep correspondence long enough to serve you and meet reasonable obligations, then we delete or archive it
+          with care. You may ask to have your list subscription removed at any time.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Questions</h2>
+        <p class="leading-relaxed">
+          For privacy questions, write to{' '}
+          <a class="link-wfg" href="mailto:hello@wellnessfirstglobal.com?subject=Privacy%20inquiry">hello@wellnessfirstglobal.com</a>
+          with “Privacy” in the subject line.
+        </p>
+        <p class="mt-8 text-sm text-ink-500">Last updated: April 2026. We will note substantive changes on this page.</p>
+      </div>
+    </Container>
+  </Section>
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      <CtaBlock
+        id="privacy-cta"
+        title="Prefer a single thread"
+        body="For privacy or data questions, you can also use the contact form—we will route it to the same small desk that reads mail."
+        href="/contact"
+        label="Go to contact"
+        variant="secondary"
+      />
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

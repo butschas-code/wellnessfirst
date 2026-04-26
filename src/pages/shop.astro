@@ -1,0 +1,159 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ProductCard from '@/components/cards/ProductCard.astro';
+import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
+import EmptyState from '@/components/conversion/EmptyState.astro';
+import { getPublished } from '@/lib/content-filters';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+
+const products = (await getPublished('products')).sort((a, b) => a.data.order - b.data.order);
+const categories = [
+  'All',
+  ...[...new Set(products.map((p) => p.data.category))].sort((a, b) => a.localeCompare(b)),
+];
+
+// TODO(sascha): replace with the real Infinity Uno PEMF shop URL when you have it.
+const INFINITY_UNO_EXTERNAL_URL = '#';
+---
+
+<BaseLayout
+  title="Shop"
+  description="A small shelf—after reading, and often after a conversation. Craft, fit, and inquiry before purchase."
+  canonicalPath="/shop"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="The shelf"
+    title="Shop"
+    description="We add little. Every piece has to answer a real question. Infinity Uno is our regulation line—inquiry only. Browse slow; write the desk if you need fit first."
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="#shop-list">Browse the edit</a>
+      <a class="btn-cta-invert-ghost" href="/articles">Why we stock</a>
+    </div>
+  </MarketingHero>
+  <Section tone="default" spacing="tight" class="!pt-0 sm:!pt-2 border-b border-ink/10 bg-paper" aria-label="Shelf art">
+    <div class="container-wfg max-w-4xl">
+      <div class="overflow-hidden pt-1 sm:pt-2">
+        <EditorialImageSlot
+          ratio="3-2"
+          frame="inline"
+          showPlaceholderWhenEmpty
+          specNote="Shop — material & scale"
+        />
+      </div>
+    </div>
+  </Section>
+
+  <CommunitySpine
+    page="shop"
+    id="spine-shop"
+    infinityUnoExternalUrl={INFINITY_UNO_EXTERNAL_URL}
+  />
+  <Section tone="default" spacing="comfortable" class="!pt-0 sm:!pt-2">
+    <Container>
+      {products.length > 0 && (
+        <>
+          <p class="text-label">Filter by category</p>
+          <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter products" data-shop-filters>
+            {categories.map((c) => (
+              <button
+                type="button"
+                class="btn-filter-pill"
+                data-shop-filter={c === 'All' ? 'all' : c}
+                aria-pressed={c === 'All' ? 'true' : 'false'}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </Container>
+  </Section>
+  <Section id="shop-list" tone="contrast" spacing="comfortable" class="!pt-0 scroll-mt-28">
+    <Container>
+      {products.length === 0 && (
+        <EmptyState
+          title="Shelf on pause"
+          body="We restock slowly. The next piece lands here with a full story first."
+          actionHref="/articles"
+          actionLabel="Open the journal"
+          secondaryHref="/contact"
+          secondaryLabel="Write the desk"
+        />
+      )}
+      {products.length > 0 && (
+        <ul class="grid gap-6 md:grid-cols-2" role="list" data-shop-list>
+          {products.map((entry) => (
+            <li data-shop-item>
+              <ProductCard entry={entry} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {products.length > 0 && (
+        <div
+          data-shop-no-match
+          class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
+          role="status"
+        >
+          <p class="font-display text-xl text-ink-800">Nothing in this category yet</p>
+          <p class="mt-2 text-ink-600">Show all, or write what you are looking for.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button type="button" class="btn-primary" data-shop-show-all>
+              Show all
+            </button>
+            <a class="btn-secondary" href="/contact">Write the desk</a>
+          </div>
+        </div>
+      )}
+    </Container>
+  </Section>
+  <div slot="prefooter">
+    <ConversionCallout topic="shop" />
+  </div>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  const root = document.querySelector('[data-shop-filters]');
+  const noMatch = document.querySelector('[data-shop-no-match]') as HTMLElement | null;
+  const updateNoMatch = () => {
+    const rows = document.querySelectorAll('[data-shop-item]');
+    let visible = 0;
+    rows.forEach((li) => {
+      if (!li.classList.contains('hidden')) visible += 1;
+    });
+    if (noMatch) {
+      noMatch.classList.toggle('hidden', visible > 0);
+    }
+  };
+  document.querySelector('[data-shop-show-all]')?.addEventListener('click', () => {
+    if (!root) return;
+    (root.querySelector('button[data-shop-filter="all"]') as HTMLButtonElement | null)?.click();
+  });
+  if (root) {
+    root.querySelectorAll('button[data-shop-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const raw = btn.getAttribute('data-shop-filter') || 'all';
+        root.querySelectorAll('button[data-shop-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        document.querySelectorAll('[data-shop-item]').forEach((li) => {
+          const cat = li.querySelector('[data-product-category]')?.getAttribute('data-product-category') || '';
+          const show = raw === 'all' || cat === raw;
+          li.classList.toggle('hidden', !show);
+        });
+        updateNoMatch();
+      });
+    });
+    updateNoMatch();
+  }
+</script>

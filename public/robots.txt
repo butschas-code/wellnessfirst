@@ -1,0 +1,18 @@
+# https://wellnessfirstglobal.com/robots.txt
+User-agent: *
+Allow: /
+
+# Internal design reference — also noindex in page metadata
+Disallow: /styleguide
+# Member areas (sitemap also excludes; public Community invitation page stays crawlable)
+Disallow: /app/
+Disallow: /community/dashboard
+Disallow: /community/astra-basic
+Disallow: /community/conscious-living
+Disallow: /community/frq-healing
+Disallow: /community/wellness
+Disallow: /community/l-rods
+Disallow: /community/geopathic-stress
+Disallow: /community/telluric-energy
+
+Sitemap: https://wellnessfirstglobal.com/sitemap-index.xml

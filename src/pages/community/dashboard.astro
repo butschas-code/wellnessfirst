@@ -1,0 +1,84 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import { COMMUNITY_TRACKS } from '@/lib/community-tracks';
+import { getCommunityTrackContent } from '@/lib/community/placeholder-data';
+import { TRACK_CARD_LEDE } from '@/lib/community/track-summaries';
+import MemberTrackCard from '@/components/member/MemberTrackCard.astro';
+import TrackContentSection from '@/components/member/TrackContentSection.astro';
+---
+
+<AppLayout
+  title="Member library"
+  description="Your tracks, lessons, and resources (preview layout)."
+  memberNav="library"
+>
+  <div class="container-wfg py-10 sm:py-14">
+    <p id="comm-dash-state" class="text-sm text-ink-500">Loading…</p>
+
+    <div id="comm-dash-panel" class="hidden">
+      <h1 class="font-display text-3xl text-ink-800 sm:text-4xl">Member library</h1>
+      <p class="mt-3 max-w-2xl text-ink-600 leading-relaxed">
+        Seven areas, one place. What you see is structure only — the same card types will carry real material when the season opens.
+      </p>
+      <p class="mt-2 text-sm text-ink-500">
+        <a class="link-wfg-ghost" href="/app/dashboard">Account</a>
+        <span class="text-taupe-300"> · </span>
+        <button type="button" id="comm-signout" class="link-wfg-ghost">Sign out</button>
+      </p>
+
+      <h2 class="text-eyebrow mt-14">Browse by area</h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {
+          COMMUNITY_TRACKS.map((t) => (
+            <MemberTrackCard trackId={t.id} label={t.label} lede={TRACK_CARD_LEDE[t.id]} />
+          ))
+        }
+      </div>
+
+      <h2 class="text-eyebrow mt-16">By track</h2>
+      <p class="mt-2 text-sm text-ink-500">Jump to a section or open a track in full view.</p>
+
+      <div class="mt-10 flex flex-col gap-20 sm:mt-12 sm:gap-24">
+        {
+          COMMUNITY_TRACKS.map((t) => (
+            <TrackContentSection
+              label={t.label}
+              trackId={t.id}
+              anchorId={`track-${t.id}`}
+              content={getCommunityTrackContent(t.id)}
+              variant="hub"
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</AppLayout>
+<script>
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+
+  const state = document.getElementById('comm-dash-state');
+  const panel = document.getElementById('comm-dash-panel');
+
+  (async () => {
+    if (!isSupabaseConfigured()) {
+      if (state) {
+        state.textContent =
+          'Supabase is not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then rebuild.';
+      }
+      return;
+    }
+    const session = await guardSessionOrRedirect();
+    if (!session) return;
+    if (state) state.classList.add('hidden');
+    if (panel) panel.classList.remove('hidden');
+  })();
+
+  document.getElementById('comm-signout')?.addEventListener('click', async () => {
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
+    window.location.replace('/app/sign-in');
+  });
+</script>

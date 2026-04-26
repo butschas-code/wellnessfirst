@@ -1,0 +1,123 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import OfferNarrativeSections from '@/components/offer/OfferNarrativeSections.astro';
+import RelatedJournal from '@/components/offer/RelatedJournal.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { publishedOnly } from '@/lib/content-filters';
+import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
+import { resolveRelatedArticles } from '@/lib/related-journal';
+import { serviceJsonLd } from '@/lib/seo';
+type ConsultGroup = 'geopathic' | 'astrology' | 'home' | 'frequency' | 'coaching' | 'environment' | 'ritual';
+
+function groupEyebrow(g: ConsultGroup) {
+  if (g === 'geopathic') return 'Place & signal';
+  if (g === 'astrology') return 'Living pattern';
+  if (g === 'home') return 'Home harmony';
+  if (g === 'frequency') return 'Resonance & regulation';
+  if (g === 'environment') return 'Space & environment';
+  if (g === 'ritual') return 'Ritual';
+  return 'Coaching & dialogue';
+}
+
+export async function getStaticPaths() {
+  const items = await getCollection('consultations', publishedOnly);
+  const used = new Map<string, string>();
+  for (const e of items) {
+    const key = e.data.slug ?? e.id;
+    const prev = used.get(key);
+    if (prev && prev !== e.id) throw new Error(`Duplicate consultation public slug "${key}"`);
+    used.set(key, e.id);
+  }
+  return items.map((entry) => ({ params: { slug: entry.data.slug ?? entry.id } }));
+}
+
+const { slug } = Astro.params;
+const items = await getCollection('consultations', publishedOnly);
+const entry = resolveByPublicSlug(items, slug!);
+if (!entry) throw new Error(`Consultation not found: ${slug}`);
+const { Content } = await render(entry);
+const d = entry.data;
+const related = await resolveRelatedArticles(d.relatedArticleIds);
+const metaTitle = d.seoTitle ?? d.title;
+const metaDescription = d.seoDescription ?? d.summary;
+const canonical = offerPath('consultations', entry);
+const eyebrow = groupEyebrow(d.group);
+const blocks = [
+  { id: 'what', title: 'What it is', body: d.whatItIs },
+  { id: 'who', title: 'Who it is for', body: d.whoItIsFor },
+  { id: 'why', title: 'Why it matters', body: d.whyItMatters },
+  { id: 'expect', title: 'What to expect', body: d.whatToExpect },
+];
+
+const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const consultationPageUrl = new URL(canonical, siteBase).toString();
+const serviceLd = serviceJsonLd({
+  name: d.title,
+  description: metaDescription,
+  url: consultationPageUrl,
+});
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  canonicalPath={canonical}
+  ogImagePath={d.coverImage}
+  ogImageAlt={d.coverImage ? `Consultation image: ${d.title}` : undefined}
+  jsonLd={serviceLd}
+  {...marketingPageLayout}
+>
+  <article>
+    <MarketingHero
+      eyebrow={eyebrow}
+      title={d.title}
+      description={d.summary}
+      imageUrl={d.coverImage}
+      imageAlt={d.coverImage ? `Consultation image: ${d.title}` : `Consultation: ${d.title}`}
+    />
+    <Section tone="default" spacing="comfortable" class="!pt-0 sm:!pt-2">
+      <Container>
+        <div class="mb-10 max-w-3xl">
+          <p class="text-sm text-ink-500">
+            {d.cadence} · Lead time: {d.leadTime}
+          </p>
+          <ul class="mt-4 space-y-2 border-l-2 border-ink/15 pl-4" role="list" aria-label="Focus areas">
+            {d.focusAreas.map((area) => (
+              <li class="text-sm text-charcoal">
+                {area}
+              </li>
+            ))}
+          </ul>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a class="btn-primary" href={d.ctaHref}>
+              {d.ctaLabel}
+            </a>
+            <a class="btn-secondary" href="/consultations">
+              All offerings
+            </a>
+            <a class="link-wfg-ghost" href="/contact">Ask a question first</a>
+          </div>
+        </div>
+        <OfferNarrativeSections blocks={blocks} />
+      </Container>
+    </Section>
+    <Section tone="contrast" spacing="comfortable" class="!pt-0">
+      <Container narrow>
+        <h2 class="text-eyebrow">How we work, in plain language</h2>
+        <RichText as="div" variant="article" class="mt-2">
+          <Content />
+        </RichText>
+      </Container>
+    </Section>
+    <RelatedJournal entries={related} />
+    <CommunitySpine page="consultation" compact id="spine-after-consultation" />
+  </article>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

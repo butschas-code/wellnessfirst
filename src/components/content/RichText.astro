@@ -1,0 +1,18 @@
+---
+/**
+ * Wraps rendered Markdown from content collections.
+ * Add class `prose-article` for article detail pages; default is `rich-text`.
+ */
+type Props = {
+  as?: 'div' | 'article' | 'section';
+  class?: string;
+  variant?: 'article' | 'page';
+};
+
+const { as: Tag = 'div', class: className, variant = 'page' }: Props = Astro.props;
+const bodyClass = variant === 'article' ? 'rich-text max-w-[var(--width-prose)]' : 'rich-text';
+---
+
+<Tag class:list={[bodyClass, className]}>
+  <slot />
+</Tag>

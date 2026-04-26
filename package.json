@@ -1,0 +1,37 @@
+{
+  "name": "wellnessfirstglobal.com",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && npm run check:functions",
+    "check:functions": "tsc -p functions/tsconfig.json",
+    "astro": "astro",
+    "generate-types": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.2.1",
+    "@astrojs/mdx": "^5.0.4",
+    "@astrojs/sitemap": "^3.7.2",
+    "@supabase/supabase-js": "^2.104.1",
+    "@tailwindcss/vite": "^4.2.4",
+    "astro": "^6.1.9",
+    "gsap": "^3.15.0",
+    "tailwindcss": "^4.2.4",
+    "wrangler": "^4.84.1"
+  },
+  "overrides": {
+    "vite": "^7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@cloudflare/workers-types": "^4.20260424.1",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
+  }
+}

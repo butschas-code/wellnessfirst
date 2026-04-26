@@ -1,0 +1,102 @@
+---
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+
+export type CalloutTopic = 'articles' | 'webinars' | 'consultations' | 'community' | 'shop' | 'home';
+
+interface Props {
+  topic: CalloutTopic;
+}
+
+const { topic } = Astro.props;
+
+const copy: Record<
+  CalloutTopic,
+  { eyebrow: string; title: string; body: string; href: string; label: string; href2?: string; label2?: string }
+> = {
+  home: {
+    eyebrow: 'Start here',
+    title: 'Read, sit in, then ask in private',
+    body: 'Trust comes from the page first. The rest is optional—and on your calendar.',
+    href: '/articles',
+    label: 'Open the journal',
+    href2: '/webinars',
+    label2: 'Browse sessions',
+  },
+  articles: {
+    eyebrow: 'When you are ready',
+    title: 'Sit in on a session',
+    body: 'Free and paid sessions are clearly marked. Join when the time works for you.',
+    href: '/webinars',
+    label: 'View sessions',
+    href2: '/consultations',
+    label2: 'Private consults',
+  },
+  webinars: {
+    eyebrow: 'Beyond the hour',
+    title: 'Private work, human pace',
+    body: 'For questions that need more than a session—answered by hand, on your week.',
+    href: '/consultations',
+    label: 'See consults',
+    href2: '/contact',
+    label2: 'Write the desk',
+  },
+  consultations: {
+    eyebrow: 'Before you book',
+    title: 'Read or sit in first',
+    body: 'Words first, then tempo. Consults when you can name a fair question.',
+    href: '/articles',
+    label: 'Open the journal',
+    href2: '/webinars',
+    label2: 'Sessions & replays',
+  },
+  community: {
+    eyebrow: 'Not a feed',
+    title: 'Rooms, in seasons',
+    body: 'We announce by letter. Until then: the journal and public sessions.',
+    href: '/articles',
+    label: 'Read the journal',
+    href2: '/webinars',
+    label2: 'View sessions',
+  },
+  shop: {
+    eyebrow: 'Before you buy',
+    title: 'A note beats a hasty cart',
+    body: 'The shelf is small. If something fits, say so. If not, we will say that too.',
+    href: '/contact',
+    label: 'Write us',
+    href2: '/articles',
+    label2: 'Why we stock',
+  },
+};
+
+const c = copy[topic];
+---
+
+<Section tone="contrast" spacing="tight" class="!py-10 md:!py-14">
+  <Container>
+    <div
+      class="flex flex-col gap-8 border-t-2 border-ink pt-8 md:flex-row md:items-end md:justify-between md:gap-12 md:pt-10"
+    >
+      <div class="max-w-2xl">
+        <p class="text-eyebrow text-ink-500">{c.eyebrow}</p>
+        <h2 class="mt-2 font-display text-2xl font-medium text-ink md:text-3xl">
+          {c.title}
+        </h2>
+        <p class="mt-3 text-sm leading-relaxed text-charcoal sm:text-base">
+          {c.body}
+        </p>
+      </div>
+      <div class="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+        <a class="btn-primary w-fit" href={c.href}>
+          {c.label}
+        </a>
+        {c.href2 && c.label2 && (
+          <a class="btn-secondary w-fit" href={c.href2}>
+            {c.label2}
+          </a>
+        )}
+      </div>
+    </div>
+  </Container>
+</Section>

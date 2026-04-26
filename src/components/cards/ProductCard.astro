@@ -1,0 +1,54 @@
+---
+import { offerPath } from '@/lib/offer-paths';
+import type { ProductEntry } from '@/types/content';
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+
+interface Props {
+  entry: ProductEntry;
+}
+
+const { entry } = Astro.props;
+const { name, oneLine, category, priceNote, availability, learnMoreUrl, image } = entry.data;
+const detailHref = offerPath('products', entry);
+
+const availabilityLabel =
+  availability === 'available' ? 'In stock' : availability === 'waitlist' ? 'Waitlist' : 'Archive';
+---
+
+<article
+  class="group flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white transition-shadow duration-300 hover:shadow-md"
+  data-product-category={category}
+  data-product-availability={availability}
+>
+  <a class="flex flex-1 flex-col no-underline" href={detailHref}>
+    <div>
+      <EditorialImageSlot
+        src={image ?? undefined}
+        alt={image ? `${name} — product` : ''}
+        frame="card"
+        ratio="3-2"
+        heroVariant="product"
+        showPlaceholderWhenEmpty
+      />
+    </div>
+    <div class="flex flex-1 flex-col pt-5 sm:pt-6">
+      <p class="text-eyebrow text-[0.65rem] text-charcoal">{category}</p>
+      <h2 class="mt-2 font-display text-xl font-medium text-ink sm:text-2xl">{name}</h2>
+      <p class="mt-2 flex-1 text-sm leading-relaxed text-charcoal sm:text-base">{oneLine}</p>
+      <p class="mt-4 text-xs text-ink-500 sm:text-sm">
+        {priceNote && <span>{priceNote} · </span>}
+        {availabilityLabel}
+      </p>
+      <span class="mt-5 text-sm font-medium text-ink underline decoration-line decoration-1 underline-offset-4" role="presentation">
+        Read more
+      </span>
+    </div>
+  </a>
+  {learnMoreUrl && (
+    <div class="mt-3 border-t border-ink/10 pt-3">
+      <a class="type-ui text-ink transition-colors hover:text-secondary" href={learnMoreUrl}>
+        Inquire or reserve →
+      </a>
+    </div>
+  )}
+</article>

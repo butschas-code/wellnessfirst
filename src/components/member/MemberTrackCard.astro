@@ -1,0 +1,21 @@
+---
+import type { CommunityTrackId } from '@/lib/community-tracks';
+
+interface Props {
+  trackId: CommunityTrackId;
+  label: string;
+  lede: string;
+}
+const { trackId, label, lede } = Astro.props;
+---
+
+<a
+  href={`/community/${trackId}`}
+  class="card-wfg group block p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+>
+  <h3 class="font-display text-xl text-ink transition-colors group-hover:text-secondary">
+    {label}
+  </h3>
+  <p class="mt-2 text-sm text-ink-600 leading-relaxed line-clamp-2">{lede}</p>
+  <p class="mt-4 text-sm font-medium text-secondary">View track →</p>
+</a>

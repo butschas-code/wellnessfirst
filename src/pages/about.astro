@@ -1,0 +1,210 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { getPublished } from '@/lib/content-filters';
+import { offerPath } from '@/lib/offer-paths';
+import { formatDate, formatTime } from '@/lib/format';
+
+const entry = await getEntry('pages', 'about');
+if (!entry) throw new Error('Missing content: pages/about');
+const { Content } = await render(entry);
+const { title, description, hero } = entry.data;
+
+const offers = [
+  {
+    kicker: 'Reading',
+    title: 'The journal',
+    body: 'Long-form articles you can use in a real week. No clickbait, no feed — written by humans and fixed in public when we must.',
+    href: '/articles',
+    cta: 'Open the journal',
+  },
+  {
+    kicker: 'Gatherings',
+    title: 'Live webinars',
+    body: 'A slower tempo for learning — clear takeaways, honest uncertainty, and room for questions. Free sessions stay marked.',
+    href: '/webinars',
+    cta: 'Browse sessions',
+  },
+  {
+    kicker: 'Private work',
+    title: 'Consultations',
+    body: 'Four small lines — geopathy, astrology, home harmony, frequency. Dialogue first, then next steps you can live with.',
+    href: '/consultations',
+    cta: 'See consultations',
+  },
+  {
+    kicker: 'The shelf',
+    title: 'A narrow shop',
+    body: 'Objects we actually use. Infinity Uno — our frequency line — lives on its own shop.',
+    href: '/shop',
+    cta: 'Browse the shelf',
+  },
+] as const;
+
+const allWebinars = await getPublished('webinars');
+const now = Date.now();
+const nextWebinar =
+  allWebinars
+    .filter((w) => w.data.format === 'live' && +w.data.startAt >= now)
+    .sort((a, b) => +a.data.startAt - +b.data.startAt)[0] ??
+  allWebinars.filter((w) => w.data.format === 'replay').sort((a, b) => +b.data.startAt - +a.data.startAt)[0] ??
+  null;
+const nextWebinarMeta = nextWebinar
+  ? `${formatDate(nextWebinar.data.startAt)}${
+      nextWebinar.data.format === 'live' ? ` · ${formatTime(nextWebinar.data.startAt)}` : ''
+    } · ${nextWebinar.data.durationMinutes} min`
+  : null;
+const aboutSpotlight = nextWebinar
+  ? {
+      kicker:
+        nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now ? 'What is on now' : 'Sessions & replays',
+      title: nextWebinar.data.title,
+      meta: nextWebinarMeta ?? undefined,
+      body: nextWebinar.data.excerpt,
+      primary: { href: offerPath('webinars', nextWebinar), label: 'View this session' },
+      secondary: { href: '/articles', label: 'The journal' },
+    }
+  : null;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath="/about"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    eyebrow={hero?.eyebrow}
+    title={title}
+    description={description}
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="/articles">Read the journal</a>
+      <a class="btn-cta-invert-ghost" href="/webinars">Join a live hour</a>
+    </div>
+  </MarketingHero>
+
+  <CommunitySpine page="about" id="spine-about" spotlight={aboutSpotlight} />
+
+  <!-- 1. Narrative (from content collection) -->
+  <section class="wfg-home-band" aria-label="About, in our own words" data-bg="#f8faf8">
+    <Container narrow>
+      <div class="py-16 md:py-20" data-reveal>
+        <div class="wfg-reveal-child" style="--stagger: 0">
+          <RichText as="div" variant="page">
+            <Content />
+          </RichText>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- 2. What we offer -->
+  <section class="wfg-home-band" aria-labelledby="h-offers" data-bg="#eef3ee">
+    <div class="container-wfg py-16 md:py-20" data-reveal>
+      <div class="wfg-home-section-head wfg-reveal-child" style="--stagger: 0">
+        <div>
+          <p class="wfg-home-kicker text-primary">What we offer</p>
+          <h2 id="h-offers" class="mt-1 font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl">
+            Four ways in — at your own pace
+          </h2>
+        </div>
+        <p class="text-sm text-ink-500 sm:max-w-md sm:text-base">
+          Start where it fits. Nothing here asks you to arrive all at once.
+        </p>
+      </div>
+
+      <ul class="mt-10 grid list-none grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-5 lg:gap-6" role="list">
+        {offers.map((o, i) => {
+          const n = i + 1;
+          const pad = n < 10 ? `0${n}` : String(n);
+          const badge = n % 3 === 1 ? 'bg-primary' : n % 3 === 2 ? 'bg-secondary' : 'bg-ink-600';
+          const tint =
+            i === 0
+              ? 'wfg-card-home--tint'
+              : i === 1
+                ? 'wfg-card-home--tint2'
+                : i === 2
+                  ? 'wfg-card-home--tint3'
+                  : 'wfg-card-home--tint';
+          return (
+            <li class="min-h-0">
+              <article
+                class:list={[
+                  'flex h-full min-h-0 flex-col p-6 sm:p-7 wfg-reveal-child wfg-card-home',
+                  tint,
+                ]}
+                style={`--stagger: ${1 + i}`}
+              >
+                <div class="mb-3 flex items-center gap-3">
+                  <span class={`wfg-home-number flex h-8 w-8 items-center justify-center rounded-full ${badge}`}>
+                    {pad}
+                  </span>
+                  <p class="wfg-home-kicker text-secondary">{o.kicker}</p>
+                </div>
+                <h3 class="font-display text-xl font-medium text-ink sm:text-2xl">{o.title}</h3>
+                <p class="mt-3 flex-1 text-sm leading-relaxed text-charcoal sm:text-base">{o.body}</p>
+                <a
+                  class="wfg-link-animated mt-5 inline-flex w-fit text-sm font-medium text-ink no-underline transition-colors hover:text-secondary"
+                  href={o.href}
+                >
+                  {o.cta} →
+                </a>
+              </article>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3. Private guidance / inset card -->
+  <section class="wfg-home-band" aria-labelledby="h-private" data-bg="#c1d0c3">
+    <div class="container-wfg max-w-3xl py-12 md:py-16" data-reveal>
+      <div
+        class="wfg-reveal-child rounded-2xl border border-accent/20 bg-gradient-to-br from-white via-white to-accent/10 p-6 shadow-elevated sm:p-8"
+        style="--stagger: 0"
+      >
+        <p class="wfg-home-kicker text-ink-500">Ask the desk</p>
+        <h2 id="h-private" class="mt-2 font-display text-xl font-medium text-ink sm:text-2xl">
+          When a page is not enough
+        </h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-600 sm:text-base">
+          For some questions — astrological timing, a room that does not sit right, a question behind the question —
+          it helps to write plainly. Small team, human reply.
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <a class="btn-primary" href="/contact">Write the desk</a>
+          <a class="btn-secondary" href="/contact">See what to ask</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Final CTA -->
+  <section class="text-white" aria-labelledby="h-final" data-bg="#0a2334">
+    <div class="container-wfg max-w-2xl py-16 text-center md:py-20" data-reveal>
+      <h2 id="h-final" class="wfg-reveal-child font-display text-2xl font-medium sm:text-3xl" style="--stagger: 0">
+        Small house, careful pace
+      </h2>
+      <p class="wfg-reveal-child mt-3 text-balance text-white/85 sm:text-lg" style="--stagger: 1">
+        Start with one page, one room, or one conversation. The rest can come later.
+      </p>
+      <div
+        class="wfg-reveal-child mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3"
+        style="--stagger: 2"
+      >
+        <a class="btn-cta-invert" href="/webinars">Browse sessions</a>
+        <a class="btn-cta-invert-ghost" href="/articles">Open the journal</a>
+      </div>
+    </div>
+  </section>
+
+  <HomePageFooter slot="footer" />
+</BaseLayout>

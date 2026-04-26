@@ -1,0 +1,67 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+import { publishedOnly } from '@/lib/content-filters';
+
+export async function getStaticPaths() {
+  const reserved = new Set(['about', 'community']);
+  const pages = await getCollection('pages', publishedOnly);
+  return pages.filter((e) => !reserved.has(e.id)).map((entry) => ({ params: { slug: entry.id } }));
+}
+
+const { slug } = Astro.params;
+const entry = await getEntry('pages', slug!);
+if (!entry) throw new Error(`Page not found: ${slug}`);
+const { Content } = await render(entry);
+const { title, description, hero } = entry.data;
+const alignCenter = (hero?.align ?? 'left') === 'center';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath={`/p/${entry.id}`}
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    alignCenter={alignCenter}
+    eyebrow={hero?.eyebrow}
+    title={title}
+    description={description}
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="/articles">Open the journal</a>
+      <a class="btn-cta-invert-ghost" href="/contact">Write the desk</a>
+    </div>
+  </MarketingHero>
+  <div class="py-12 md:py-20">
+    <Container narrow>
+      <RichText as="div" variant="page">
+        <Content />
+      </RichText>
+    </Container>
+  </div>
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      <CtaBlock
+        id={`p-${entry.id}-next`}
+        title="Questions or a correction?"
+        body="We read every serious note. If something here should be sharper—or if you are deciding whether a session or consult fits—start with a short message."
+        href="/contact"
+        label="Write to us"
+        variant="secondary"
+        secondaryHref="/webinars"
+        secondaryLabel="Browse sessions"
+      />
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

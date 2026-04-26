@@ -1,0 +1,29 @@
+---
+/**
+ * In-article CTA: use as `<Cta ... />` from MDX (passed via `render` components map)
+ * or mirror markup with class `article-cta` in plain markdown.
+ */
+interface Props {
+  title: string;
+  body?: string;
+  href: string;
+  cta: string;
+  /** default: rule + type · subtle: light rule only */
+  tone?: 'default' | 'subtle';
+}
+
+const { title, body, href, cta, tone = 'default' } = Astro.props;
+const surfaceClass = tone === 'subtle' ? 'bg-paper' : 'bg-white';
+---
+
+<aside
+  class:list={['article-cta not-prose border-t-2 border-ink p-0 pt-6 sm:pt-7', surfaceClass]}
+  data-article-cta
+  aria-label="Call to action"
+>
+  <p class="font-display text-lg text-ink-800 sm:text-xl">{title}</p>
+  {body && <p class="mt-2 text-ink-600 leading-relaxed">{body}</p>}
+  <a class="btn-secondary mt-4 inline-flex" href={href}>
+    {cta}
+  </a>
+</aside>

@@ -1,0 +1,74 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+---
+
+<BaseLayout
+  title="Terms of use"
+  description="Terms for reading and using the Wellness First Global website and community touchpoints in Phase 1."
+  canonicalPath="/legal/terms"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    legal
+    compact
+    eyebrow="Legal"
+    title="Terms of use"
+    description="These terms keep expectations clear: editorial work is not personal medical or legal advice, and we ask for the same good faith you bring to the table."
+  />
+  <Section tone="default" spacing="comfortable" class="!pt-0">
+    <Container narrow>
+      <div class="max-w-prose-wfg space-y-3 text-ink-600">
+        <h2 class="mt-10 font-display text-2xl text-ink-800 first:mt-0">Use of the site</h2>
+        <p class="leading-relaxed">
+          The content on this site is offered for information and education. It is not a substitute for care from a
+          qualified professional who knows your situation. We invite discernment, not dependency.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Intellectual property</h2>
+        <p class="leading-relaxed">
+          Unless otherwise noted, text and design are copyright Wellness First Global. You may link to our pages; you
+          may not republish long excerpts without written permission. Short quotations with clear attribution are
+          welcome in the spirit of conversation.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Community conduct</h2>
+        <p class="leading-relaxed">
+          When community spaces are live, we expect kindness under scrutiny: no harassment, no pile-ons, and no advice
+          that presumes to diagnose others. We may moderate or close participation that breaks the room.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Limitation of liability</h2>
+        <p class="leading-relaxed">
+          We provide this site and its materials on an as-is basis. To the extent permitted by law, we are not liable
+          for any indirect or consequential loss arising from your use of the site. Our liability is limited to the
+          amount you have paid us in the prior twelve months for a specific product or service—if no payment applies,
+          that limit is zero.
+        </p>
+        <h2 class="mt-10 font-display text-2xl text-ink-800">Governing law</h2>
+        <p class="leading-relaxed">
+          These terms are governed by the laws applicable at our registered business address, without regard to conflict
+          of law rules, unless a stronger consumer protection in your home jurisdiction cannot be waived.
+        </p>
+        <p class="mt-8 text-sm text-ink-500">Last updated: April 2026</p>
+      </div>
+    </Container>
+  </Section>
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      <CtaBlock
+        id="terms-cta"
+        title="Something unclear?"
+        body="We’d rather a plain question than a quiet misunderstanding. If a line here conflicts with what you need, write the desk and we will answer in good faith."
+        href="/contact"
+        label="Write the desk"
+        variant="secondary"
+        secondaryHref="/p/editorial-standards"
+        secondaryLabel="Editorial standards"
+      />
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

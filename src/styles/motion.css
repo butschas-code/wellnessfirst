@@ -1,0 +1,186 @@
+/**
+ * Subtle motion: scroll reveals, hero entrance, card hovers.
+ * Respects prefers-reduced-motion.
+ */
+
+@keyframes wfg-enter-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes wfg-hero-ken {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Home: optional parallax layers (see home-parallax.ts) */
+[data-wfg-parallax] {
+  will-change: transform;
+  transform: translate3d(0, var(--wfg-p-y, 0), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-wfg-parallax] {
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Scroll-triggered: parent [data-reveal] gets .wfg-reveal-visible from JS */
+[data-reveal] .wfg-reveal-child {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity 0.8s var(--ease-wfg),
+    transform 0.8s var(--ease-wfg);
+  transition-delay: calc(var(--stagger, 0) * 75ms);
+}
+
+[data-reveal].wfg-reveal-visible .wfg-reveal-child {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Hero: load-in lines (stagger --enter) */
+.wfg-hero-line {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  animation: wfg-enter-up 0.9s var(--ease-wfg) forwards;
+  animation-delay: calc(0.12s + var(--enter, 0) * 0.1s);
+}
+
+.wfg-hero-img {
+  transform: scale(1.08);
+  transform-origin: center center;
+  animation: wfg-hero-ken 20s var(--ease-wfg) forwards;
+}
+
+@keyframes wfg-orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(3%, -2%, 0) scale(1.04);
+  }
+  66% {
+    transform: translate3d(-2%, 3%, 0) scale(0.98);
+  }
+}
+
+/* Homepage: mesh orbs (see .wfg-home-skin in global.css) */
+.wfg-home-skin::before,
+.wfg-home-skin::after {
+  animation: wfg-orb-drift 20s var(--ease-wfg) infinite;
+}
+
+.wfg-home-skin::after {
+  animation: wfg-orb-drift 24s var(--ease-wfg) infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] .wfg-reveal-child {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .wfg-hero-line {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .wfg-hero-img {
+    animation: none;
+    transform: none;
+  }
+
+  .wfg-home-skin::before,
+  .wfg-home-skin::after {
+    animation: none;
+  }
+
+  .wfg-shelf-row:hover {
+    transform: none;
+  }
+}
+
+/* Card lift on hover (fine pointer only) */
+@media (hover: hover) and (pointer: fine) {
+  @media (prefers-reduced-motion: no-preference) {
+    .wfg-card-home {
+      transition:
+        transform 0.4s var(--ease-wfg),
+        box-shadow 0.4s var(--ease-wfg),
+        border-color 0.3s;
+    }
+
+    .wfg-card-home:hover {
+      transform: translate3d(0, -4px, 0);
+      box-shadow: 0 8px 30px rgba(10, 35, 52, 0.1);
+    }
+  }
+}
+
+/* Primary links in content: soft underline grow */
+@layer components {
+  .wfg-link-animated {
+    @apply relative inline-block;
+  }
+
+  .wfg-link-animated::after {
+    content: "";
+    @apply pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-secondary transition-transform duration-300;
+    transition-timing-function: var(--ease-wfg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    @media (prefers-reduced-motion: no-preference) {
+      .wfg-link-animated:hover::after,
+      .wfg-link-animated:focus-visible::after {
+        @apply scale-x-100;
+      }
+    }
+  }
+}
+
+/* Buttons: gentle lift (extends utilities) */
+@media (hover: hover) and (pointer: fine) {
+  @media (prefers-reduced-motion: no-preference) {
+    .btn-primary,
+    .btn-secondary,
+    .btn-cta-invert,
+    .btn-cta-invert-ghost {
+      transition:
+        transform 0.25s var(--ease-wfg),
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.25s;
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-cta-invert:hover,
+    .btn-cta-invert-ghost:hover {
+      transform: translate3d(0, -2px, 0);
+    }
+
+    .btn-primary:active,
+    .btn-secondary:active,
+    .btn-cta-invert:active,
+    .btn-cta-invert-ghost:active {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}

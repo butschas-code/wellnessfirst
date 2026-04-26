@@ -1,0 +1,20 @@
+---
+import type { WebinarReplay } from '@/lib/community/types';
+import TrackPill from './TrackPill.astro';
+
+interface Props {
+  replay: WebinarReplay;
+  trackLabel: string;
+}
+const { replay, trackLabel } = Astro.props;
+---
+
+<article class="card-wfg flex h-full flex-col p-5 sm:p-6">
+  <div class="flex items-start justify-between gap-2">
+    <p class="text-label">Replay</p>
+    <TrackPill label={trackLabel} />
+  </div>
+  <h3 class="mt-3 font-display text-lg text-ink-800 leading-snug">{replay.title}</h3>
+  <p class="mt-1 text-sm text-ink-500">{replay.sessionLabel} · {replay.seasonLabel}</p>
+  <p class="mt-4 text-sm text-ink-500">{replay.durationMinutes} min · when sessions ship</p>
+</article>

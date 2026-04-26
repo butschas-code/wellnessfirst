@@ -1,0 +1,173 @@
+---
+/**
+ * Editorial hero / card / thumb — real image or Unsplash placeholder when empty.
+ */
+import {
+  getUnsplashPlaceholderUrl,
+  keyFromHeroVariant,
+  type UnsplashPhotoKey,
+} from '@/lib/unsplash-placeholders';
+
+interface Props {
+  src?: string | null;
+  alt?: string;
+  ratio?: '16-9' | '3-2' | '4-5' | '1-1' | '21-9' | 'og';
+  frame?: 'hero' | 'card' | 'thumb' | 'inline';
+  showPlaceholderWhenEmpty?: boolean;
+  specNote?: string;
+  heroVariant?: 'article' | 'webinar' | 'product';
+  /** Override which Unsplash image to use for the placeholder. */
+  unsplashKey?: UnsplashPhotoKey;
+  /** `contain` shows the full image in the frame (letterboxing); default is cover. */
+  objectFit?: 'cover' | 'contain';
+  /**
+   * When the card image sits in a fixed aspect box (e.g. home article tiles), set true so
+   * the image uses height 100% instead of a max-height cap (avoids a gap under the image).
+   */
+  fillFrame?: boolean;
+  class?: string;
+}
+
+const {
+  src,
+  alt = '',
+  ratio = '3-2',
+  frame = 'hero',
+  showPlaceholderWhenEmpty = false,
+  specNote,
+  heroVariant = 'article',
+  unsplashKey,
+  objectFit = 'cover',
+  fillFrame = false,
+  class: className = '',
+} = Astro.props;
+
+const aspectClass =
+  ratio === '16-9'
+    ? 'aspect-[16/9]'
+    : ratio === '4-5'
+      ? 'aspect-[4/5]'
+      : ratio === '1-1'
+        ? 'aspect-square'
+        : ratio === '21-9'
+          ? 'aspect-[21/9]'
+          : ratio === 'og'
+            ? 'aspect-[1200/630]'
+            : 'aspect-[3/2]';
+
+const maxHPlaceholder =
+  frame === 'hero'
+    ? ratio === '21-9'
+      ? 'max-h-[min(32vh,14rem)] md:max-h-[min(40vh,18rem)]'
+      : 'max-h-[min(40vh,22rem)] md:max-h-[min(48vh,26rem)]'
+    : frame === 'card'
+      ? 'max-h-[min(40vh,18rem)]'
+      : frame === 'thumb'
+        ? 'max-h-56'
+        : 'max-h-[min(36vh,22rem)]';
+
+const fit = objectFit === 'contain' ? 'object-contain' : 'object-cover';
+const realImgClass =
+  frame === 'hero'
+    ? heroVariant === 'webinar'
+      ? `max-h-[min(48vh,26rem)] w-full ${fit} object-center`
+      : heroVariant === 'product'
+        ? `max-h-[min(50vh,28rem)] w-full ${fit} object-center`
+        : `max-h-[min(52vh,28rem)] w-full ${fit} object-center`
+    : frame === 'card'
+      ? fillFrame
+        ? `h-full w-full min-h-0 ${fit} object-center`
+        : objectFit === 'contain'
+          ? `h-full w-full min-h-0 ${fit} object-center`
+          : 'max-h-[min(40vh,18rem)] w-full object-cover object-center'
+      : frame === 'thumb'
+        ? `h-full w-full max-h-56 ${fit} object-center`
+        : `max-h-[min(36vh,22rem)] w-full ${fit} object-center`;
+
+const showImageFigureClass =
+  objectFit === 'contain' && frame === 'card'
+    ? 'flex h-full w-full min-h-0 items-center justify-center bg-paper'
+    : fillFrame && frame === 'card'
+      ? 'h-full w-full min-h-0'
+      : '';
+
+const showImage = Boolean(src);
+const showPlaceholder = !showImage && showPlaceholderWhenEmpty;
+
+const photoKey = unsplashKey ?? keyFromHeroVariant(heroVariant);
+const placeholderUrl = showPlaceholder ? getUnsplashPlaceholderUrl(ratio, photoKey) : '';
+const placeholderAlt = alt || 'Placeholder photograph';
+
+const frameRadius =
+  frame === 'card'
+    ? 'rounded-t-2xl'
+    : frame === 'thumb'
+      ? 'rounded-lg'
+      : frame === 'inline'
+        ? 'rounded-xl'
+        : 'rounded-2xl';
+
+/** Card frames sit inside a rounded parent; avoid a second full box border. */
+const frameBorderClass =
+  frame === 'card' ? 'border-0 border-b border-ink/10' : 'border border-ink/12';
+---
+
+{
+  showImage && (
+    <figure
+      class:list={['overflow-hidden', frameBorderClass, frameRadius, showImageFigureClass, className]}
+      data-editorial-slot="image"
+    >
+      <img
+        src={src!}
+        alt={alt}
+        class:list={[realImgClass]}
+        loading={frame === 'hero' ? 'eager' : 'lazy'}
+        fetchpriority={frame === 'hero' ? 'high' : 'auto'}
+        decoding="async"
+      />
+    </figure>
+  )
+}
+{
+  showPlaceholder && (
+    <figure
+      class:list={['group relative w-full overflow-hidden', frameBorderClass, frameRadius, className]}
+      data-editorial-slot="unsplash-placeholder"
+      aria-label={specNote || placeholderAlt}
+    >
+      {fillFrame && frame === 'card' ? (
+        <div class="absolute inset-0 h-full w-full min-h-0">
+          <img
+            src={placeholderUrl}
+            alt={placeholderAlt}
+            class="h-full w-full object-cover object-center"
+            loading="lazy"
+            fetchpriority="auto"
+            decoding="async"
+          />
+        </div>
+      ) : (
+        <div class:list={['relative w-full', aspectClass, maxHPlaceholder]}>
+          <img
+            src={placeholderUrl}
+            alt={placeholderAlt}
+            class:list={[realImgClass, 'block']}
+            loading={frame === 'hero' ? 'eager' : 'lazy'}
+            fetchpriority={frame === 'hero' ? 'high' : 'auto'}
+            decoding="async"
+          />
+          {
+            specNote && (
+              <p
+                class="pointer-events-none absolute bottom-0 left-0 right-0 border-t border-white/30 bg-white/90 px-3 py-1.5 text-center text-[0.65rem] font-medium uppercase tracking-[0.12em] text-ink-500"
+              >
+                {specNote}
+              </p>
+            )
+          }
+        </div>
+      )}
+    </figure>
+  )
+}

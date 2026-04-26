@@ -1,0 +1,168 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import ArticleCard from '@/components/cards/ArticleCard.astro';
+import ArticleCta from '@/components/content/ArticleCta.astro';
+import ArticleRelatedOffers from '@/components/content/ArticleRelatedOffers.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { publishedOnly } from '@/lib/content-filters';
+import { formatDate } from '@/lib/format';
+import { getArticleByParamSlug, fillRelatedArticles, articlePath } from '@/lib/articles';
+import { articleJsonLd } from '@/lib/seo';
+import type { ProductEntry, WebinarEntry, ConsultationEntry } from '@/types/content';
+export async function getStaticPaths() {
+  const items = await getCollection('articles', publishedOnly);
+  const used = new Map<string, string>();
+  for (const post of items) {
+    const key = post.data.slug ?? post.id;
+    const prev = used.get(key);
+    if (prev && prev !== post.id) {
+      throw new Error(`Duplicate public article slug or id "${key}" (${prev} vs ${post.id})`);
+    }
+    used.set(key, post.id);
+  }
+  return items.map((post) => ({ params: { slug: post.data.slug ?? post.id } }));
+}
+
+const { slug } = Astro.params;
+const allArticles = await getCollection('articles', publishedOnly);
+const post = getArticleByParamSlug(allArticles, slug!);
+if (!post) throw new Error(`Article not found: ${slug}`);
+
+const { Content } = await render(post);
+
+const {
+  title,
+  excerpt,
+  author,
+  publishedAt,
+  updatedAt,
+  category,
+  subtitle,
+  seoTitle,
+  seoDescription,
+  coverImage,
+  coverImageFit,
+  relatedProducts: relatedProductIds,
+  relatedWebinar: relatedWebinarId,
+  relatedConsultation: relatedConsultationId,
+} = post.data;
+
+const metaTitle = seoTitle ?? title;
+const metaDescription = seoDescription ?? excerpt;
+const publicPath = articlePath(post);
+
+const productEntries: ProductEntry[] = [];
+for (const id of relatedProductIds) {
+  const p = await getEntry('products', id);
+  if (p && publishedOnly(p)) productEntries.push(p);
+}
+
+let webinar: WebinarEntry | undefined;
+if (relatedWebinarId) {
+  const w = await getEntry('webinars', relatedWebinarId);
+  if (w && publishedOnly(w)) webinar = w;
+}
+
+let consultation: ConsultationEntry | undefined;
+if (relatedConsultationId) {
+  const c = await getEntry('consultations', relatedConsultationId);
+  if (c && publishedOnly(c)) consultation = c;
+}
+
+const related = fillRelatedArticles(allArticles, post, 3);
+
+const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const articlePageUrl = new URL(publicPath, siteBase).toString();
+const articleLd = articleJsonLd({
+  headline: title,
+  description: metaDescription,
+  url: articlePageUrl,
+  datePublished: publishedAt.toISOString(),
+  dateModified: (updatedAt ?? publishedAt).toISOString(),
+  authorName: author,
+  imageUrls: coverImage ? [coverImage] : undefined,
+});
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  canonicalPath={publicPath}
+  ogImagePath={coverImage}
+  ogImageAlt={coverImage ? `Cover image: ${title}` : undefined}
+  ogType="article"
+  articlePublishedTime={publishedAt.toISOString()}
+  articleModifiedTime={updatedAt ? updatedAt.toISOString() : undefined}
+  articleAuthor={author}
+  articleSection={category}
+  jsonLd={articleLd}
+  {...marketingPageLayout}
+>
+  <article>
+    <MarketingHero
+      eyebrow={category}
+      subtitle={subtitle}
+      title={title}
+      description={excerpt}
+      imageUrl={coverImage}
+      imageAlt={coverImage ? `Cover image: ${title}` : `Article: ${title}`}
+      imageObjectFit={coverImageFit === 'contain' ? 'contain' : 'cover'}
+    >
+      <p
+        slot="actions"
+        class="wfg-hero-line text-sm text-white/85 [text-shadow:0_1px_1px_rgba(0,0,0,0.15)]"
+      >
+        By {author} · {formatDate(publishedAt)}
+        {updatedAt && ` · Updated ${formatDate(updatedAt)}`}
+      </p>
+    </MarketingHero>
+    <Section tone="contrast" spacing="comfortable" class="!pt-8 sm:!pt-10 md:!pt-12">
+      <Container narrow>
+        <p
+          class="mb-8 max-w-prose border-b border-ink/10 pb-8 text-balance text-base leading-[1.75] text-charcoal sm:mb-10 sm:pb-10 sm:text-lg"
+        >
+          Welcome. This is long-form writing—meant to be read in a calm stretch, and to revisit when the questions in your
+          life resurface. There is no score here; only language you can use in a real week.
+        </p>
+        <RichText as="div" variant="article">
+          <Content
+            components={{
+              Cta: ArticleCta,
+              ArticleCta: ArticleCta,
+            }}
+          />
+        </RichText>
+      </Container>
+    </Section>
+    {
+      related.length > 0 && (
+        <Section tone="default" spacing="comfortable" class="!pt-0" aria-label="Related reading">
+          <Container>
+            <h2 class="text-eyebrow">Related reading</h2>
+            <p class="mt-1 font-display text-2xl text-ink-800 md:text-3xl">Elsewhere in the journal</p>
+            <ul
+              class="mt-8 grid list-none grid-cols-1 gap-6 sm:gap-7 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+              role="list"
+            >
+              {related.map((entry) => (
+                <li>
+                  <ArticleCard entry={entry} showFeaturedBadge={true} />
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </Section>
+      )
+    }
+    <ArticleRelatedOffers products={productEntries} webinar={webinar} consultation={consultation} />
+    <CommunitySpine page="article" compact class="!border-t-0" id="spine-after-article" />
+  </article>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

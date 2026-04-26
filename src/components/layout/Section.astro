@@ -1,0 +1,21 @@
+---
+interface Props {
+  id?: string;
+  class?: string;
+  /** default: paper · contrast: white band with rules · minimal: transparent */
+  tone?: 'default' | 'contrast' | 'minimal';
+  spacing?: 'comfortable' | 'tight' | 'hero';
+}
+
+const { id, class: className, tone = 'default', spacing = 'comfortable' } = Astro.props;
+
+const toneClass =
+  tone === 'contrast' ? 'border-y border-ink/10 bg-white' : tone === 'minimal' ? 'bg-transparent' : 'bg-paper';
+
+const spacingClass =
+  spacing === 'tight' ? 'section-pad-tight' : spacing === 'hero' ? 'section-pad-hero' : 'section-pad-y';
+---
+
+<section id={id} class:list={[toneClass, spacingClass, className]}>
+  <slot />
+</section>

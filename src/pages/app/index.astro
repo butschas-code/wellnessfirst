@@ -1,0 +1,33 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+---
+
+<AppLayout title="Member area" description="Redirecting to your account or sign-in.">
+  <div class="container-wfg py-12 text-ink-600">
+    <p id="app-root-redirect" class="text-sm">Preparing your session…</p>
+  </div>
+</AppLayout>
+<script>
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+
+  (async () => {
+    const el = document.getElementById('app-root-redirect');
+    if (!isSupabaseConfigured()) {
+      if (el) el.textContent = 'Sign-in is not configured. Add Supabase environment variables, then return here.';
+      return;
+    }
+    try {
+      const supabase = getSupabaseBrowser();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        window.location.replace('/app/dashboard');
+      } else {
+        window.location.replace('/app/sign-in');
+      }
+    } catch {
+      if (el) el.textContent = 'Something went wrong. Try again from the sign-in page.';
+    }
+  })();
+</script>

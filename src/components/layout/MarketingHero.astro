@@ -1,0 +1,143 @@
+---
+import { getUnsplashHomeHeroUrl } from '@/lib/unsplash-placeholders';
+import { WFG_HOME_SCROLL_FIRST_BG } from '@/lib/home-scroll-colors';
+
+export interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  subtitle?: string;
+  /** Full-bleed background; defaults to the same Unsplash strip as the home hero. */
+  imageUrl?: string | null;
+  imageAlt?: string;
+  /** `contain` shows the full image (letterboxed); default fills and crops. */
+  imageObjectFit?: 'cover' | 'contain';
+  headingId?: string;
+  /** Only the home index uses this (scroll tint). */
+  dataBg?: string;
+  /** Optional fourth line (home tagline). */
+  tagline?: string;
+  /** Shorter band (list pages, styleguide). */
+  compact?: boolean;
+  /** Legal pages: smaller type and height. */
+  legal?: boolean;
+  /** Center hero text (legacy PageHero `align="center"`). */
+  alignCenter?: boolean;
+}
+
+const {
+  title,
+  description,
+  eyebrow,
+  subtitle,
+  imageUrl,
+  imageAlt,
+  imageObjectFit = 'cover',
+  headingId = 'marketing-hero-heading',
+  dataBg: dataBgProp,
+  tagline,
+  compact = false,
+  legal = false,
+  alignCenter = false,
+} = Astro.props;
+
+/** Home + inner pages: first scroll-tint stop (see `scroll-color-transition.ts`). */
+const dataBg = dataBgProp ?? WFG_HOME_SCROLL_FIRST_BG;
+
+const src = imageUrl || getUnsplashHomeHeroUrl();
+const heroImgFit = imageObjectFit === 'contain' ? 'object-contain' : 'object-cover';
+const heroLetterboxBg = imageObjectFit === 'contain' && imageUrl ? 'bg-primary' : '';
+const alt =
+  imageAlt ??
+  'Calm, bright interior with natural light — a calm, spacious room.';
+
+const sectionMin = legal
+  ? 'min-h-[min(52svh,28rem)]'
+  : compact
+    ? 'min-h-[min(72svh,44rem)]'
+    : 'min-h-[min(88svh,52rem)]';
+
+const innerMin = legal
+  ? 'min-h-[min(52svh,28rem)]'
+  : compact
+    ? 'min-h-[min(72svh,44rem)]'
+    : 'min-h-[min(88svh,52rem)]';
+
+const h1Class = legal
+  ? 'wfg-hero-line font-display text-balance text-3xl font-medium leading-[1.1] tracking-tight text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] sm:text-4xl'
+  : 'wfg-hero-line font-display text-balance text-[2.1rem] font-medium leading-[1.1] tracking-tight text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] sm:text-5xl md:text-[2.75rem]';
+
+const descClass = legal
+  ? 'wfg-hero-line mt-4 max-w-2xl text-pretty text-base leading-relaxed text-white/90 sm:mt-5 [text-shadow:0_1px_1px_rgba(0,0,0,0.12)]'
+  : 'wfg-hero-line mt-4 max-w-xl text-pretty text-lg leading-[1.65] text-white/95 sm:mt-5 sm:max-w-2xl sm:text-xl [text-shadow:0_1px_1px_rgba(0,0,0,0.12)]';
+---
+
+<section
+  class:list={[
+    'relative isolate overflow-hidden rounded-b-3xl border-b border-primary/15',
+    sectionMin,
+    heroLetterboxBg,
+  ]}
+  aria-labelledby={headingId}
+  data-bg={dataBg}
+>
+  <img
+    src={src}
+    alt={alt}
+    class:list={['wfg-hero-img absolute inset-0 h-full w-full object-center', heroImgFit]}
+    width="2520"
+    height="1080"
+    sizes="100vw"
+    fetchpriority="high"
+    loading="eager"
+    decoding="async"
+  />
+  <div class="wfg-home-hero-overlay pointer-events-none absolute inset-0 z-[1]" aria-hidden="true"></div>
+  <div
+    class:list={[
+      'container-wfg relative z-10 flex max-w-4xl flex-col justify-end py-10 sm:py-14 md:py-16',
+      legal && 'md:py-20',
+      innerMin,
+      alignCenter && 'mx-auto text-center',
+    ]}
+  >
+    <div class:list={['max-w-2xl', alignCenter && 'mx-auto']}>
+      {
+        eyebrow && (
+          <p
+            class="wfg-hero-line text-eyebrow mb-3 text-white/85 sm:mb-4 [text-shadow:0_1px_1px_rgba(0,0,0,0.2)]"
+            style="--enter: -1"
+          >
+            {eyebrow}
+          </p>
+        )
+      }
+      {
+        subtitle && !legal && (
+          <p
+            class="wfg-hero-line mb-2 font-display text-lg font-normal leading-snug text-white/95 [text-shadow:0_1px_1px_rgba(0,0,0,0.1)] sm:mb-3 sm:text-xl"
+          >
+            {subtitle}
+          </p>
+        )
+      }
+      <h1 id={headingId} class={h1Class} style="--enter: 0">
+        {title}
+      </h1>
+      {description && <p class={descClass} style="--enter: 1">{description}</p>}
+      <div class="mt-6 empty:hidden sm:mt-8 md:mt-10">
+        <slot name="actions" />
+      </div>
+      {
+        tagline && (
+          <p
+            class="wfg-hero-line mt-5 max-w-xl text-pretty text-sm leading-relaxed text-white/80 sm:mt-6 sm:max-w-2xl sm:text-base [text-shadow:0_1px_1px_rgba(0,0,0,0.1)]"
+            style="--enter: 4"
+          >
+            {tagline}
+          </p>
+        )
+      }
+    </div>
+  </div>
+</section>

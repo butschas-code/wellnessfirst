@@ -1,0 +1,31 @@
+---
+/** Slim wayfinding between account and library (no marketing chrome). */
+interface Props {
+  current: 'account' | 'library';
+}
+const { current } = Astro.props;
+const link = 'text-sm text-charcoal transition-colors hover:text-ink';
+const currentCls = 'font-medium text-ink border-b-2 border-ink';
+---
+
+<nav
+  class="border-b border-ink/10 bg-white"
+  aria-label="Member navigation"
+>
+  <div class="container-wfg flex h-12 items-center gap-6 sm:gap-8">
+    <a
+      href="/app/dashboard"
+      class:list={[link, current === 'account' && currentCls]}
+      aria-current={current === 'account' ? 'page' : undefined}
+    >
+      Account
+    </a>
+    <a
+      href="/community/dashboard"
+      class:list={[link, current === 'library' && currentCls]}
+      aria-current={current === 'library' ? 'page' : undefined}
+    >
+      Library
+    </a>
+  </div>
+</nav>

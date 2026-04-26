@@ -1,0 +1,375 @@
+---
+/**
+ * Site-wide “community room” wayfinding — not a new visual system, just shared copy + links.
+ * Intentionally no `data-bg` (does not add scroll color stops on home).
+ */
+import type { CommunityPage, SpotlightCard } from './community-spine-types';
+export type { CommunityPage, SpotlightCard } from './community-spine-types';
+
+interface Props {
+  page: CommunityPage;
+  /** Card 1 when `variant` is `spotlight`. `mesh` (home) uses four equal doors instead. */
+  spotlight?: SpotlightCard | null;
+  variant?: 'mesh' | 'spotlight';
+  compact?: boolean;
+  class?: string;
+  id?: string;
+  /** e.g. shop Infinity Uno external target */
+  infinityUnoExternalUrl?: string;
+}
+
+const {
+  page,
+  spotlight: spotlightProp,
+  variant = 'spotlight',
+  compact = false,
+  class: className,
+  id: elId = 'room',
+  infinityUnoExternalUrl: infinityUrl = '#',
+} = Astro.props;
+
+const heads: Record<
+  CommunityPage,
+  { kicker: string; title: string; lede: string }
+> = {
+  home: {
+    kicker: 'From this place',
+    title: 'Find your next door in',
+    lede: 'Same quiet pace everywhere on the site—read, sit in, go private, or take something home when it is right.',
+  },
+  webinars: {
+    kicker: 'Level up from the page',
+    title: 'Live hours where you can be heard',
+    lede: 'You get tempo, Q&amp;A, and company—without a sales pitch. Replays wait when the time is wrong.',
+  },
+  shop: {
+    kicker: 'Buy with context, not in a hurry',
+    title: 'Tools after you have named the need',
+    lede: 'You get honest fit first—Infinity Uno, murtis, or craft—after reading or asking, not instead of it.',
+  },
+  consultations: {
+    kicker: 'When the question is yours alone',
+    title: 'One-to-one for what does not fit a post',
+    lede: 'You get private attention on place, pattern, or harmony—after you have read or sat in, if that served you.',
+  },
+  about: {
+    kicker: 'If this is for you',
+    title: 'What you get from sticking around',
+    lede: 'Steady writing, open rooms, and slow seasons—so you can think in peace and act with care.',
+  },
+  contact: {
+    kicker: 'Raise your hand',
+    title: 'We read; you stay in control',
+    lede: 'You set the topic. We answer in a few business days, or point you to the right read, hour, or line.',
+  },
+  article: {
+    kicker: 'Keep going on your terms',
+    title: 'This article is one step—not the whole climb',
+    lede: 'You can join a live hour, read another piece, or book private work when you are ready to go further.',
+  },
+  webinar: {
+    kicker: 'After you leave the room',
+    title: 'You do not have to hold it all alone',
+    lede: 'Related reading, 1:1 work, the shelf, and the desk are there when you want the next level of help.',
+  },
+  product: {
+    kicker: 'Before anything ships',
+    title: 'You deserve to know it fits your life',
+    lede: 'Use the journal and sessions to pressure-test the story; ask the desk if you are on the edge of yes.',
+  },
+  consultation: {
+    kicker: 'This line is yours',
+    title: 'Private work is the deepest step on purpose',
+    lede: 'You can still read and join free hours elsewhere—so this hour stays for what only a 1:1 can hold.',
+  },
+};
+
+const defaultSpotlight: SpotlightCard = {
+  kicker: 'Your next room',
+  title: 'Sit in for an hour, or catch the replay',
+  body: 'You get clear format and price before you book—adult learning, not a performance.',
+  primary: { href: '/webinars', label: 'Find a session' },
+  secondary: { href: '/articles', label: 'Read a piece first' },
+};
+
+const spotlight: SpotlightCard =
+  page === 'shop' && !spotlightProp
+    ? {
+        kicker: 'When your body needs steady support',
+        title: 'Infinity Uno (PEMF)—shop &amp; help live off-site',
+        body: 'You get full specs and purchase where the line is supported. Here we only help you decide if it belongs in your day.',
+        primary: { href: infinityUrl, label: 'Open the Infinity Uno shop' },
+        secondary: { href: '/products/infinity-uno', label: 'Read our take first' },
+        primaryExternal: true,
+      }
+    : spotlightProp ?? defaultSpotlight;
+
+const h = heads[page] ?? heads.home;
+---
+
+{compact ? (
+  <section
+    class:list={['border-t-2 border-ink/12 bg-paper', className]}
+    aria-labelledby={`${elId}-compact-heading`}
+  >
+    <div class="container-wfg max-w-4xl py-8 md:py-10" data-reveal>
+      <p id={`${elId}-compact-heading`} class="wfg-reveal-child text-eyebrow text-[0.7rem] text-secondary" style="--stagger: 0">
+        {h.kicker}
+      </p>
+      <p class="wfg-reveal-child mt-1 font-display text-lg text-ink sm:text-xl" style="--stagger: 1">
+        {h.title}
+      </p>
+      <p class="wfg-reveal-child mt-2 max-w-2xl text-sm leading-relaxed text-charcoal" style="--stagger: 2">
+        {h.lede}
+      </p>
+      <ul
+        class="wfg-reveal-child mt-5 flex list-none flex-wrap gap-x-6 gap-y-2 text-sm font-medium"
+        style="--stagger: 3"
+        role="list"
+        aria-label="Your path: read, join, book, buy"
+      >
+        <li>
+          <a class="text-ink underline decoration-line underline-offset-4 hover:text-secondary" href="/articles"
+            >Read</a
+          >
+        </li>
+        <li>
+          <a class="text-ink underline decoration-line underline-offset-4 hover:text-secondary" href="/webinars"
+            >Join a live hour</a
+          >
+        </li>
+        <li>
+          <a
+            class="text-ink underline decoration-line underline-offset-4 hover:text-secondary"
+            href="/consultations"
+            >1:1 consultations</a
+          >
+        </li>
+        <li>
+          <a class="text-ink underline decoration-line underline-offset-4 hover:text-secondary" href="/shop"
+            >Shop / tools</a
+          >
+        </li>
+        <li>
+          <a
+            class="text-ink underline decoration-line underline-offset-4 hover:text-secondary"
+            href="/contact?topic=astrology"
+            >Ask the desk</a
+          >
+        </li>
+        <li>
+          <a class="text-ink underline decoration-line underline-offset-4 hover:text-secondary" href="/#the-room"
+            >Home map</a
+          >
+        </li>
+      </ul>
+    </div>
+  </section>
+) : (
+  <section
+    class:list={['wfg-home-band', className]}
+    id={elId}
+    aria-labelledby={`${elId}-title`}
+  >
+    <div class="container-wfg max-w-6xl pb-10 pt-10 sm:pb-12 sm:pt-12 md:pb-14 md:pt-14" data-reveal>
+      <div class="wfg-home-section-head wfg-reveal-child" style="--stagger: 0">
+        <div>
+          <p class="wfg-home-kicker text-primary">{h.kicker}</p>
+          <h2 id={`${elId}-title`} class="mt-1 font-display text-2xl font-medium text-ink sm:text-3xl">
+            {h.title}
+          </h2>
+        </div>
+        <p class="text-sm text-ink-500 sm:max-w-md sm:text-base">{h.lede}</p>
+      </div>
+
+      {variant === 'mesh' ? (
+        <>
+        <p class="wfg-reveal-child mt-3 max-w-2xl text-sm leading-relaxed text-ink-600 sm:text-base" style="--stagger: 0">
+          Nothing here is a race. Linger in writing, show up to an hour, open a private line, or add a tool when the story
+          already fits—each layer is for you when you are ready.
+        </p>
+        <ul
+          class="mt-10 grid list-none grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5"
+          role="list"
+          aria-label="Ways to engage with this community"
+        >
+          <li class="min-h-0 sm:col-span-2 lg:col-span-5">
+            <article
+              class="wfg-reveal-child flex min-h-[14rem] flex-col justify-end overflow-hidden rounded-3xl border border-secondary/25 bg-gradient-to-br from-paper via-muted-bg/50 to-secondary/12 p-6 shadow-md sm:min-h-[16rem] sm:p-8"
+              style="--stagger: 1"
+            >
+              <p class="wfg-home-kicker text-secondary">The journal</p>
+              <h3 class="mt-1 font-display text-xl font-medium text-ink sm:text-2xl">Writing you can return to</h3>
+              <p class="mt-3 max-w-prose flex-1 text-sm leading-relaxed text-charcoal">
+                Long, careful pieces—rhythm, space, pattern, timing—so your week has language for what you feel.
+              </p>
+              <a
+                class="mt-5 inline-flex w-fit text-sm font-semibold text-ink no-underline underline-offset-4 transition-colors hover:text-secondary"
+                href="/articles"
+              >
+                Read →
+              </a>
+            </article>
+          </li>
+          <li class="min-h-0 sm:col-span-2 lg:col-span-4">
+            <article
+              class="wfg-reveal-child flex min-h-[14rem] flex-col rounded-3xl border border-primary/12 bg-gradient-to-b from-paper to-primary/[0.06] p-6 sm:min-h-[16rem] sm:p-7"
+              style="--stagger: 2"
+            >
+              <p class="wfg-home-kicker text-primary">Live &amp; replays</p>
+              <h3 class="mt-1 font-display text-lg font-medium text-ink sm:text-xl">A room with other humans</h3>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-charcoal">
+                Free hours stay marked; the tempo is unhurried. Replays when the clock is wrong, not the heart.
+              </p>
+              <a
+                class="mt-4 inline-flex w-fit text-sm font-semibold text-ink no-underline underline-offset-4 transition-colors hover:text-secondary"
+                href="/webinars"
+              >
+                Find a gathering →
+              </a>
+            </article>
+          </li>
+          <li class="min-h-0 sm:col-span-2 lg:col-span-3">
+            <article
+              class="wfg-reveal-child flex min-h-[14rem] flex-col rounded-3xl border border-ink/10 bg-gradient-to-b from-muted-bg/80 to-paper p-6 sm:min-h-[16rem] sm:p-7"
+              style="--stagger: 3"
+            >
+              <p class="wfg-home-kicker text-ink-500">One to one</p>
+              <h3 class="mt-1 font-display text-lg font-medium text-ink sm:text-xl">When it has to be yours</h3>
+              <p class="mt-3 flex-1 text-sm leading-relaxed text-charcoal">
+                Geopathy, living pattern, home harmony, frequency—private lines with room to go deep.
+              </p>
+              <a
+                class="mt-4 inline-flex w-fit text-sm font-semibold text-ink no-underline underline-offset-4 transition-colors hover:text-secondary"
+                href="/consultations"
+              >
+                See consultations →
+              </a>
+            </article>
+          </li>
+          <li class="min-h-0 lg:col-span-7">
+            <article
+              class="wfg-reveal-child flex h-full min-h-0 flex-col justify-between gap-4 rounded-3xl border border-accent/30 bg-gradient-to-r from-accent/12 to-paper p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-8"
+              style="--stagger: 4"
+            >
+              <div class="min-w-0">
+                <p class="wfg-home-kicker text-secondary">The shelf &amp; Infinity Uno</p>
+                <h3 class="mt-1 font-display text-lg font-medium text-ink sm:text-xl">What we put in a room, not a warehouse</h3>
+                <p class="mt-2 text-sm leading-relaxed text-charcoal sm:max-w-xl">
+                  Murtis, craft, and our PEMF line—ask first if you are on the edge of yes. Context lives here; purchase
+                  lives where support does.
+                </p>
+              </div>
+              <a
+                class="shrink-0 self-start rounded-full border border-ink/12 bg-paper px-5 py-2.5 text-sm font-medium text-ink no-underline shadow-sm transition-colors hover:border-secondary/50 hover:text-secondary sm:self-center"
+                href="/shop"
+              >
+                Browse the shelf
+              </a>
+            </article>
+          </li>
+          <li class="min-h-0 lg:col-span-5">
+            <div
+              class="wfg-reveal-child flex h-full min-h-full flex-col items-start justify-center rounded-3xl border border-dashed border-primary/25 bg-paper/95 p-6 sm:p-8"
+              style="--stagger: 5"
+            >
+              <p class="wfg-home-kicker text-ink-500">From the home page</p>
+              <p class="mt-2 font-display text-lg text-ink sm:text-xl">Ways in—reading, room, list</p>
+              <a
+                class="mt-3 inline-flex text-sm font-semibold text-ink no-underline underline-offset-4 transition-colors hover:text-secondary"
+                href="/#the-room"
+              >
+                See the map →
+              </a>
+            </div>
+          </li>
+        </ul>
+        </>
+      ) : (
+        <ul class="mt-8 grid list-none grid-cols-1 gap-4 lg:grid-cols-4" role="list">
+          <li class="min-h-0 lg:col-span-2">
+            <article
+            class="wfg-reveal-child relative flex min-h-0 h-full flex-col overflow-hidden p-6 sm:p-7 wfg-card-home wfg-card-home--featured"
+            style="--stagger: 1"
+          >
+            <div
+              class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-secondary/12 blur-2xl"
+              aria-hidden="true"
+            />
+            <p class="relative wfg-home-kicker text-secondary">{spotlight.kicker}</p>
+            <h3 class="relative mt-2 font-display text-xl font-medium text-ink sm:text-2xl">{spotlight.title}</h3>
+            {spotlight.meta && <p class="relative mt-2 text-sm text-ink-500">{spotlight.meta}</p>}
+            <p class="relative mt-3 flex-1 text-sm leading-relaxed text-charcoal sm:text-base">{spotlight.body}</p>
+            <div class="relative mt-5 flex flex-wrap gap-2">
+              <a
+                class="btn-primary"
+                href={spotlight.primary.href}
+                {...(spotlight.primaryExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {spotlight.primary.label}
+              </a>
+              {spotlight.secondary && (
+                <a class="btn-secondary" href={spotlight.secondary.href}>
+                  {spotlight.secondary.label}
+                </a>
+              )}
+            </div>
+          </article>
+          </li>
+          <li class="min-h-0">
+            <article
+            class="wfg-reveal-child flex h-full min-h-0 flex-col p-5 sm:p-6 wfg-card-home wfg-card-home--tint2"
+            style="--stagger: 2"
+          >
+            <p class="wfg-home-kicker text-primary">See the full path</p>
+            <h3 class="mt-2 font-display text-lg font-medium text-ink">Live, reading, and the shelf</h3>
+            <p class="mt-3 flex-1 text-sm leading-relaxed text-charcoal">
+              You get public sessions, long pieces, and a narrow shelf—so you can plan your next step in one pass.
+            </p>
+            <a
+              class="wfg-link-animated mt-4 inline-flex w-fit text-sm font-medium text-ink no-underline transition-colors hover:text-secondary"
+              href="/webinars"
+            >
+              Browse sessions →
+            </a>
+          </article>
+          </li>
+          <li class="min-h-0">
+            <article
+            class="wfg-reveal-child flex h-full min-h-0 flex-col p-5 sm:p-6 wfg-card-home wfg-card-home--tint"
+            style="--stagger: 3"
+          >
+            <p class="wfg-home-kicker text-secondary">Ask the desk</p>
+            <h3 class="mt-2 font-display text-lg font-medium text-ink">A nudge in the right direction</h3>
+            <p class="mt-3 flex-1 text-sm leading-relaxed text-charcoal">
+              You get a plain reply—astrology, vastu, or fit—or a link to the read, hour, or line that actually matches.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <a class="btn-primary" href="/contact?topic=astrology">Astrology</a>
+              <a class="btn-secondary" href="/contact?topic=vastu">Vastu &amp; home</a>
+            </div>
+          </article>
+          </li>
+          <li class="min-h-0 lg:col-span-4">
+            <article
+            class="wfg-reveal-child flex min-h-0 h-full flex-col p-5 sm:p-6 wfg-card-home wfg-card-home--tint3"
+            style="--stagger: 4"
+          >
+            <p class="wfg-home-kicker text-ink-500">First in line</p>
+            <h3 class="mt-2 font-display text-lg font-medium text-ink sm:text-xl">Hear when a season opens</h3>
+            <p class="mt-3 max-w-3xl text-sm leading-relaxed text-charcoal sm:text-base">
+              You get one letter when a live hour or a big piece is ready—no drip, no spam. Unsubscribe in one click.
+            </p>
+            <a
+              class="wfg-link-animated mt-4 inline-flex w-fit text-sm font-medium text-ink no-underline transition-colors hover:text-secondary"
+              href="/#newsletter"
+            >
+              Join the list →
+            </a>
+          </article>
+          </li>
+        </ul>
+      )}
+    </div>
+  </section>
+)}

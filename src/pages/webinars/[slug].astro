@@ -1,0 +1,134 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import RichText from '@/components/content/RichText.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import OfferNarrativeSections from '@/components/offer/OfferNarrativeSections.astro';
+import RelatedJournal from '@/components/offer/RelatedJournal.astro';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import WebinarInterestForm from '@/components/forms/WebinarInterestForm.astro';
+import { publishedOnly } from '@/lib/content-filters';
+import { formatDate, formatTime } from '@/lib/format';
+import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
+import { resolveRelatedArticles } from '@/lib/related-journal';
+import { webinarEventJsonLd } from '@/lib/seo';
+export async function getStaticPaths() {
+  const items = await getCollection('webinars', publishedOnly);
+  const used = new Map<string, string>();
+  for (const e of items) {
+    const key = e.data.slug ?? e.id;
+    const prev = used.get(key);
+    if (prev && prev !== e.id) throw new Error(`Duplicate webinar public slug "${key}"`);
+    used.set(key, e.id);
+  }
+  return items.map((entry) => ({ params: { slug: entry.data.slug ?? entry.id } }));
+}
+
+const { slug } = Astro.params;
+const items = await getCollection('webinars', publishedOnly);
+const entry = resolveByPublicSlug(items, slug!);
+if (!entry) throw new Error(`Webinar not found: ${slug}`);
+const publicSlug = entry.data.slug ?? entry.id;
+const { Content } = await render(entry);
+const w = entry.data;
+const related = await resolveRelatedArticles(w.relatedArticleIds);
+const eyebrow = `${w.isFree ? 'Free · ' : ''}${w.format === 'live' ? 'Live session' : 'Recorded session'} · ${w.durationMinutes} minutes`;
+const metaTitle = w.seoTitle ?? w.title;
+const metaDescription = w.seoDescription ?? w.excerpt;
+const canonical = offerPath('webinars', entry);
+const blocks = [
+  { id: 'what', title: 'What it is', body: w.whatItIs },
+  { id: 'who', title: 'Who it is for', body: w.whoItIsFor },
+  { id: 'why', title: 'Why it matters', body: w.whyItMatters },
+  { id: 'expect', title: 'What to expect', body: w.whatToExpect },
+];
+
+const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const webinarPageUrl = new URL(canonical, siteBase).toString();
+const webinarLd = webinarEventJsonLd({
+  name: w.title,
+  description: metaDescription,
+  url: webinarPageUrl,
+  startDate: w.startAt,
+  durationMinutes: w.durationMinutes,
+  imageUrl: w.coverImage,
+  isOnline: true,
+});
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  canonicalPath={canonical}
+  ogImagePath={w.coverImage}
+  ogImageAlt={w.coverImage ? `Session image: ${w.title}` : undefined}
+  jsonLd={webinarLd}
+  {...marketingPageLayout}
+>
+  <article>
+    <MarketingHero
+      eyebrow={eyebrow}
+      title={w.title}
+      description={w.excerpt}
+      imageUrl={w.coverImage}
+      imageAlt={w.coverImage ? `Session image: ${w.title}` : `Session: ${w.title}`}
+    >
+      <div slot="actions" class="space-y-4">
+        <p class="wfg-hero-line text-sm text-white/80 [text-shadow:0_1px_1px_rgba(0,0,0,0.12)]">
+          {formatDate(w.startAt)}
+          {w.format === 'live' && ` · ${formatTime(w.startAt)}`} · {w.host}
+        </p>
+        {w.trustNote && (
+          <p class="max-w-2xl border-l-2 border-white/25 pl-4 text-sm leading-relaxed text-white/90 [text-shadow:0_1px_1px_rgba(0,0,0,0.1)] sm:text-base">
+            {w.trustNote}
+          </p>
+        )}
+        <div class="flex flex-wrap gap-3">
+          {w.primaryLink && (
+            <a class="btn-cta-invert" href={w.primaryLink}>
+              {w.format === 'live' ? (w.isFree ? 'Save your place' : 'Register') : 'Access or recording'}
+            </a>
+          )}
+          <a class="btn-cta-invert-ghost" href="/webinars">
+            All sessions
+          </a>
+        </div>
+      </div>
+    </MarketingHero>
+    <Section tone="default" spacing="comfortable" class="!pt-0">
+      <Container>
+        <OfferNarrativeSections blocks={blocks} />
+      </Container>
+    </Section>
+    <Section tone="contrast" spacing="comfortable" class="!pt-0">
+      <Container narrow>
+        <h2 class="text-eyebrow">A little more context</h2>
+        <RichText as="div" variant="article" class="mt-2">
+          <Content />
+        </RichText>
+      </Container>
+    </Section>
+    <Section tone="default" spacing="comfortable" class="!pt-0">
+      <Container narrow>
+        <h2 class="text-eyebrow">Stay close to this session</h2>
+        <p class="mt-2 font-display text-2xl text-ink-800 sm:text-3xl">Reminders &amp; replays</p>
+        <p class="mt-2 text-ink-600 leading-relaxed max-w-2xl">
+          Low volume. Unsubscribe anytime.
+        </p>
+        <WebinarInterestForm
+          id={`webinar-interest-${publicSlug}`}
+          webinarSlug={publicSlug}
+          webinarTitle={w.title}
+          class="mt-6"
+        />
+      </Container>
+    </Section>
+    <RelatedJournal entries={related} />
+    <CommunitySpine page="webinar" compact id="spine-after-webinar" />
+  </article>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

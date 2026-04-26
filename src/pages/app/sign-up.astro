@@ -1,0 +1,94 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+---
+
+<AppLayout title="Create account" description="Create a member account for future community areas.">
+  <div class="container-wfg max-w-md py-12 sm:py-16">
+    <h1 class="font-display text-3xl text-ink-800">Create account</h1>
+    <p class="mt-2 text-ink-600">You will use this to access member-only content when it opens.</p>
+
+    <form id="app-signup-form" class="mt-8 grid max-w-md gap-5">
+      <div>
+        <label for="app-signup-email" class="label-wfg">Email</label>
+        <input
+          id="app-signup-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          class="input-wfg"
+        />
+      </div>
+      <div>
+        <label for="app-signup-password" class="label-wfg">Password</label>
+        <input
+          id="app-signup-password"
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          required
+          minlength="8"
+          class="input-wfg"
+        />
+        <p class="mt-1.5 text-sm text-ink-500">At least 8 characters.</p>
+      </div>
+      <p id="app-signup-error" class="hidden text-sm text-red-800" role="alert"></p>
+      <p id="app-signup-success" class="hidden text-sm text-ink-700" role="status"></p>
+      <button type="submit" class="btn-primary w-full min-h-11">Create account</button>
+    </form>
+
+    <p class="mt-6 text-sm text-ink-500">
+      Already have an account? <a class="text-secondary underline decoration-line" href="/app/sign-in"
+        >Sign in</a
+      >.
+    </p>
+
+    <div
+      id="app-config-missing"
+      class="mt-8 hidden border-0 border-t-2 border-dashed border-ink/30 bg-white py-4 text-sm text-charcoal leading-relaxed"
+    />
+  </div>
+</AppLayout>
+<script>
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+
+  const box = document.getElementById('app-config-missing');
+  if (box && !isSupabaseConfigured()) {
+    box.classList.remove('hidden');
+    box.textContent =
+      'Supabase is not configured. Copy .env.example to .env, set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then restart the dev server.';
+  }
+
+  const form = document.getElementById('app-signup-form') as HTMLFormElement | null;
+  const err = document.getElementById('app-signup-error');
+  const ok = document.getElementById('app-signup-success');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!isSupabaseConfigured() || !form || !err || !ok) return;
+    err.classList.add('hidden');
+    ok.classList.add('hidden');
+    const fd = new FormData(form);
+    const email = String(fd.get('email') ?? '').trim();
+    const password = String(fd.get('password') ?? '');
+    const supabase = getSupabaseBrowser();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/app/sign-in`,
+      },
+    });
+    if (error) {
+      err.textContent = error.message;
+      err.classList.remove('hidden');
+      return;
+    }
+    if (data.session) {
+      window.location.replace('/app/dashboard');
+      return;
+    }
+    ok.textContent =
+      'Check your email to confirm your address, then return here to sign in. If nothing arrives, check spam or your Supabase auth settings.';
+    ok.classList.remove('hidden');
+  });
+</script>

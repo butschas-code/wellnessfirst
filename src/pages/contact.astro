@@ -1,0 +1,167 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import NewsletterCta from '@/components/conversion/NewsletterCta.astro';
+import { site } from '@/lib/site';
+import CommunitySpine from '@/components/community/CommunitySpine.astro';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Consult asks, community timing, editorial notes. Small team; no ticket queue."
+  canonicalPath="/contact"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    eyebrow="The desk"
+    title="Contact"
+    description="A small team reads mail—most weeks Monday–Friday; reply within a few business days when we can. Not a crisis line: in acute danger, use emergency services or a trusted clinician."
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="#send-message">Send a message</a>
+      <a class="btn-cta-invert-ghost" href="/articles">Read first, then write</a>
+    </div>
+  </MarketingHero>
+  <CommunitySpine
+    page="contact"
+    id="spine-contact"
+    spotlight={{
+      kicker: 'Before you write',
+      title: 'See what is already here for you',
+      body: 'Reading, live hours, 1:1 lines, and the shelf are on the site—use this form when you need a human answer or a private next step.',
+      primary: { href: '/webinars', label: 'View live & replays' },
+      secondary: { href: '/articles', label: 'Read a post first' },
+    }}
+  />
+  <Section id="send-message" tone="default" spacing="comfortable" class="scroll-mt-28 !pt-0">
+    <Container>
+      <div
+        id="contact-topic-banner"
+        class="hidden mb-8 rounded-2xl border border-secondary/30 bg-secondary/[0.08] px-5 py-4 sm:px-6 sm:py-5"
+        role="status"
+        aria-live="polite"
+      >
+        <p class="wfg-home-kicker text-secondary" data-contact-topic-kicker>Ask the desk</p>
+        <p class="mt-1 font-display text-lg text-ink sm:text-xl" data-contact-topic-heading>
+          You asked about a topic
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-charcoal sm:text-base" data-contact-topic-body>
+          We have pre-filled a subject. A few sentences is enough — your time zone and what a workable week looks like
+          help us reply usefully.
+        </p>
+      </div>
+      <div class="grid gap-10 lg:grid-cols-2 lg:gap-12">
+        <div class="max-w-md lg:pt-1">
+          <h2 class="font-display text-2xl text-ink sm:text-3xl">What to expect</h2>
+          <ul class="mt-4 space-y-3 text-charcoal leading-relaxed">
+            <li>
+              <span class="font-medium text-ink">Consults.</span> Time zone and a few lines on a workable week. We match
+              you to a path—or say if the fit is not here.
+            </li>
+            <li>
+              <span class="font-medium text-ink">Editorial / press.</span> One link or one ask. No PR desk; thoughtful
+              mail only.
+            </li>
+            <li>
+              <span class="font-medium text-ink">Shop / waitlists.</span> Ask before you need a yes. Slow over hasty.
+            </li>
+          </ul>
+          <p class="mt-8 text-sm text-ink-500">
+            Direct:{' '}
+            <a class="text-ink underline decoration-line underline-offset-4 hover:text-secondary" href={`mailto:${site.contactEmail}`}
+              >{site.contactEmail}</a
+            >.
+          </p>
+        </div>
+        <div class="max-w-lg border-0 border-t-2 border-ink bg-white pt-8 sm:pt-10 lg:border-l-2 lg:border-t-0 lg:pl-10 lg:pt-0">
+          <h2 class="font-display text-2xl text-ink">Send a message</h2>
+          <p class="mt-2 text-charcoal">A short note is enough.</p>
+          <ContactForm id="page-contact" class="mt-6" />
+        </div>
+      </div>
+    </Container>
+  </Section>
+  <Section tone="contrast" spacing="comfortable" class="!pt-0">
+    <Container>
+      <div class="grid gap-8 lg:grid-cols-2 lg:items-start">
+        <div>
+          <h2 class="font-display text-2xl text-ink sm:text-3xl">The list</h2>
+          <p class="mt-2 text-charcoal leading-relaxed">Session dates and interest—separate from the form above.</p>
+        </div>
+        <NewsletterCta
+          id="contact-newsletter"
+          heading="Same list as home"
+          sub="Community and session mail. Unsubscribe anytime."
+          submitLabel="Join the list"
+        />
+      </div>
+    </Container>
+  </Section>
+  <Section spacing="comfortable" tone="default" class="!pt-0">
+    <Container narrow>
+      <h2 class="font-display text-2xl text-ink">Postal mail</h2>
+      <p class="mt-3 text-charcoal leading-relaxed">
+        No signature required. A studio address will appear when we have one. Email first.
+      </p>
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  type TopicPreset = {
+    kicker: string;
+    heading: string;
+    body: string;
+    subject: string;
+    messageSeed: string;
+  };
+  const presets: Record<string, TopicPreset> = {
+    astrology: {
+      kicker: 'Living pattern',
+      heading: 'Re: astrological questions',
+      body: 'Share a chart or a short sketch of what is up — season, timing, a decision. Your time zone helps. Reply within a few business days when we can.',
+      subject: 'Astrology — ',
+      messageSeed:
+        "Hello — I have a question about astrology / timing. Briefly:\n\n(What is up right now, and the time zone you are in.)",
+    },
+    vastu: {
+      kicker: 'Home & environment',
+      heading: 'Re: vastu &amp; home harmony',
+      body: 'Tell us the room, the orientation if you know it, and what does not sit right (sleep, mood, focus). A photo or rough sketch is welcome as a follow-up.',
+      subject: 'Vastu / home harmony — ',
+      messageSeed:
+        "Hello — I have a vastu / home-harmony question. Briefly:\n\n(Room and orientation, what feels off, and what you have tried.)",
+    },
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const rawTopic = (params.get('topic') || '').toLowerCase();
+  const preset = presets[rawTopic];
+  if (preset) {
+    const banner = document.getElementById('contact-topic-banner');
+    if (banner) {
+      banner.classList.remove('hidden');
+      const k = banner.querySelector('[data-contact-topic-kicker]');
+      const h = banner.querySelector('[data-contact-topic-heading]');
+      const b = banner.querySelector('[data-contact-topic-body]');
+      if (k) k.textContent = preset.kicker;
+      if (h) h.innerHTML = preset.heading;
+      if (b) b.textContent = preset.body;
+    }
+    const select = document.querySelector<HTMLSelectElement>('select[name="topic"]');
+    if (select) {
+      const opt = Array.from(select.options).find((o) => o.value === 'consultation');
+      if (opt) select.value = 'consultation';
+    }
+    const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+    if (message && message.value.trim().length === 0) {
+      message.value = preset.messageSeed;
+    }
+  }
+</script>

@@ -1,0 +1,62 @@
+---
+import { articlePath } from '@/lib/articles';
+import { getUnsplashThumbUrl } from '@/lib/unsplash-placeholders';
+import { formatDate } from '@/lib/format';
+import type { ArticleEntry } from '@/types/content';
+interface Props {
+  entry: ArticleEntry;
+  /** Softer label treatment for the homepage. */
+  calm?: boolean;
+}
+
+const { entry, calm = false } = Astro.props;
+const { title, category, publishedAt, coverImage } = entry.data;
+const href = articlePath(entry);
+---
+
+<article
+  class="group grid border-b border-ink/10 last:border-0 sm:grid-cols-[8rem_1fr] sm:items-start sm:gap-6 md:grid-cols-[9.5rem_1fr] md:gap-8"
+  data-article-id={entry.id}
+>
+  <a class="block overflow-hidden border-0 border-b border-ink/10 bg-white" href={href} tabindex="-1" aria-hidden="true">
+    {coverImage ? (
+      <div class="aspect-[4/3] w-full sm:aspect-square sm:max-h-28 md:max-h-32">
+        <img
+          src={coverImage}
+          alt=""
+          class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+          loading="lazy"
+        />
+      </div>
+    ) : (
+      <div class="aspect-[4/3] w-full overflow-hidden bg-white sm:aspect-square sm:max-h-28 md:max-h-32">
+        <img
+          src={getUnsplashThumbUrl('article')}
+          alt=""
+          class="h-full w-full object-cover"
+          width="640"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )}
+  </a>
+  <a class="block no-underline pt-4 sm:pt-0" href={href}>
+    <p
+      class:list={[
+        calm
+          ? 'text-sm text-ink-500'
+          : 'text-eyebrow text-[0.6rem] text-ink-500 sm:text-[0.65rem]',
+      ]}
+    >
+      {category}
+    </p>
+    <h3
+      class="mt-1 font-display text-xl font-medium leading-snug text-ink transition-colors group-hover:text-secondary sm:text-2xl"
+    >
+      {title}
+    </h3>
+    <p class="mt-2 text-xs text-ink-500 sm:text-sm">{formatDate(publishedAt)}</p>
+  </a>
+</article>

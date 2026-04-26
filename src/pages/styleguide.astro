@@ -1,0 +1,271 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import Container from '@/components/layout/Container.astro';
+import Section from '@/components/layout/Section.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+import InterestForm from '@/components/forms/InterestForm.astro';
+import RichText from '@/components/content/RichText.astro';
+---
+
+<BaseLayout
+  title="Design system"
+  description="Wellness First Global — typography, color, components, and responsive foundation."
+  canonicalPath="/styleguide"
+  noIndex={true}
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="Internal · Visual foundation"
+    title="Design system"
+    description="Bright editorial: paper white, brand navy (primary), sage (secondary), cool mist (accent). Newsreader headlines, Inter for body. Gradients and hairline structure—calm, not loud."
+  />
+
+  <Section tone="default" spacing="tight" class="!pt-0">
+    <Container>
+      <h2 class="type-heading mb-8 text-2xl sm:text-3xl">Color</h2>
+      <p class="mb-8 max-w-2xl text-charcoal">Brand tokens. `ink` matches `primary` for text. `forest-*` / `brass-*` names in older code map onto this palette.</p>
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-paper" />
+          <p class="border-t border-line p-3 text-sm text-charcoal">paper <span class="text-ink-500">#FFFFFF</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-primary" />
+          <p class="border-t border-line p-3 text-sm text-white">primary <span class="text-cool-gray">#0A2334</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-secondary" />
+          <p class="border-t border-line p-3 text-sm text-white">secondary <span class="text-cool-gray">#89A375</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-accent" />
+          <p class="border-t border-line p-3 text-sm text-ink">accent <span class="text-ink-500">#A2C0C5</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-ink" />
+          <p class="border-t border-line p-3 text-sm text-white">ink (= primary) <span class="text-cool-gray">#0A2334</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-charcoal" />
+          <p class="border-t border-line p-3 text-sm text-white">charcoal <span class="text-cool-gray">#2F3A42</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-cool-gray" />
+          <p class="border-t border-line p-3 text-sm text-ink">cool-gray <span class="text-ink-500">#8E9AA3</span></p>
+        </li>
+        <li class="overflow-hidden rounded-xl border border-line">
+          <div class="h-20 bg-line" />
+          <p class="border-t border-line p-3 text-sm text-charcoal">line <span class="text-ink-500">#DBE4E0</span></p>
+        </li>
+      </ul>
+    </Container>
+  </Section>
+
+  <Section tone="contrast" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-4 text-2xl sm:text-3xl">Typography</h2>
+      <p class="mb-10 max-w-2xl text-charcoal">
+        Newsreader for display and headings; Inter for body, labels, and UI. Fluid display sizes use clamp; body is 17px with generous leading.
+      </p>
+      <div class="space-y-10 border-t border-line pt-10">
+        <div>
+          <p class="text-label mb-2">Display / hero</p>
+          <p class="type-display max-w-4xl">Clarity, calm, alignment</p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Heading</p>
+          <p class="type-heading text-3xl sm:text-4xl">A premium editorial voice</p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Title (sans)</p>
+          <p class="type-title text-xl">Section label · navigation group</p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Body large</p>
+          <p class="type-body-lg text-ink-600">
+            The first hours belong to the room itself: a window, a surface cleared, light allowed in. The environment is a silent partner to the nervous system.
+          </p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Body</p>
+          <p class="type-body text-ink-600">
+            We separate evidence from anecdote. We welcome integrative thinking without borrowing the authority of traditions to sell certainty. When we recommend
+            a tool, we say why it earned a place.
+          </p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Eyebrow</p>
+          <p class="text-eyebrow">Editorial · Community · Consultation</p>
+        </div>
+        <div>
+          <p class="text-label mb-2">Label / meta</p>
+          <p class="text-label">12 min read · March 2026</p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="default" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-4 text-2xl sm:text-3xl">Spacing &amp; layout</h2>
+      <p class="mb-6 max-w-2xl text-ink-600">
+        4px base scale; section rhythm uses <code class="rounded bg-sand-100 px-1.5 py-0.5 text-sm text-ink-700">section-pad-y</code> (responsive
+        <code class="rounded bg-sand-100 px-1.5 py-0.5 text-sm">py-14 → md:py-20</code>). Container max width 72rem with fluid gutters
+        <code class="rounded bg-sand-100 px-1.5 py-0.5 text-sm">1.25rem → 2.5rem</code>.
+      </p>
+      <div class="flex flex-wrap items-end gap-2 sm:gap-3">
+        {['spacing-2', 'spacing-4', 'spacing-6', 'spacing-8', 'spacing-12', 'spacing-16'].map((t) => (
+          <div class="flex flex-col items-center gap-1 text-center">
+            <div
+              class="w-full rounded-sm bg-forest-600/20"
+              style={{ height: `var(--${t})`, minWidth: '2rem' }}
+            />
+            <span class="text-xs text-ink-500">{t}</span>
+          </div>
+        ))}
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="contrast" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-6 text-2xl sm:text-3xl">Buttons</h2>
+      <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+        <a class="btn-primary" href="#buttons">Primary</a>
+        <a class="btn-secondary" href="#buttons">Secondary</a>
+        <a class="btn-ghost" href="#buttons">Text / ghost</a>
+      </div>
+      <div
+        class="mt-6 flex flex-col gap-4 rounded-2xl border border-primary/10 bg-gradient-to-br from-primary to-primary-hover p-6 sm:flex-row sm:flex-wrap sm:items-center"
+      >
+        <p class="w-full text-sm text-white/90 sm:w-auto sm:mr-4">On dark band (home CTA):</p>
+        <a class="btn-cta-invert" href="#buttons">Invert primary</a>
+        <a class="btn-cta-invert-ghost" href="#buttons">Invert ghost</a>
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="default" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-6 text-2xl sm:text-3xl">Links</h2>
+      <div class="max-w-prose-wfg space-y-4 text-ink-600">
+        <p>
+          Inline:
+          <a class="link-wfg" href="#links">default link style</a>
+          for body copy. Inherit color:
+          <a class="link-wfg-inherit" href="#links">inherited link</a>.
+        </p>
+        <p>
+          <a class="link-wfg-ghost" href="#links">Ghost link for light UI</a>
+        </p>
+        <p>
+          <a class="link-wfg-nav" href="#links">Navigation link</a>
+        </p>
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="contrast" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-6 text-2xl sm:text-3xl">Cards</h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="card-wfg p-6">
+          <p class="text-eyebrow mb-2">Default</p>
+          <h3 class="type-heading text-xl">card-wfg</h3>
+          <p class="mt-2 text-ink-600">Subtle border, ivory wash, soft elevation on hover.</p>
+        </div>
+        <div class="card-wfg-elevated">
+          <p class="text-eyebrow mb-2">Elevated</p>
+          <h3 class="type-heading text-xl">card-wfg-elevated</h3>
+          <p class="mt-2 text-ink-600">Stronger shadow for key panels.</p>
+        </div>
+        <div class="card-wfg-sand md:col-span-2">
+          <p class="text-eyebrow mb-2">Sand</p>
+          <h3 class="type-heading text-xl">card-wfg-sand</h3>
+          <p class="mt-2 text-ink-600">Alternating sections or product tiles.</p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="default" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-4 text-2xl sm:text-3xl">Editorial article (rich text)</h2>
+      <div class="max-w-prose-wfg">
+        <RichText as="div" variant="article">
+          <h2>Section title in article</h2>
+          <p>
+            Body copy at 17px with comfortable leading. <a href="#editorial">Links use forest and brass</a> without shouting. Lists and quotes respect the
+            same rhythm.
+          </p>
+          <h3>Small caps label</h3>
+          <p>Supporting paragraph with enough air between lines for long reading sessions on any device.</p>
+          <blockquote>“Calm is not a mood you chase. It is a sequence you protect.”</blockquote>
+          <ul>
+            <li>Generous measure</li>
+            <li>Brass list markers, restrained</li>
+            <li>Section breaks that breathe</li>
+          </ul>
+        </RichText>
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="contrast" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-4 text-2xl sm:text-3xl">Form fields</h2>
+      <p class="mb-6 text-ink-600">label-wfg + input-wfg. Focus: forest ring, taupe border default.</p>
+      <InterestForm id="styleguide-form" submitLabel="Submit" />
+    </Container>
+  </Section>
+
+  <Section tone="default" spacing="tight">
+    <Container>
+      <h2 class="type-heading mb-4 text-2xl sm:text-3xl">Section surfaces</h2>
+      <p class="mb-6 max-w-2xl text-ink-600">
+        <code class="rounded bg-sand-100 px-1.5 py-0.5 text-sm">section-surface-*</code> classes and <code class="rounded bg-sand-100 px-1.5 py-0.5 text-sm"
+          >Section</code
+        > component tones (ivory, sand, minimal).
+      </p>
+    </Container>
+  </Section>
+
+  <div class="space-y-0">
+    <div class="section-surface-ivory section-pad-tight text-center text-sm text-ink-500">section-surface-ivory + section-pad-tight</div>
+    <div class="section-surface-sand section-pad-tight text-center text-sm text-ink-500">section-surface-sand</div>
+    <div class="section-surface-forest-mist section-pad-tight text-center text-sm text-ink-500">section-surface-forest-mist</div>
+    <div class="section-surface-brass section-pad-tight text-center text-sm text-ink-500">section-surface-brass</div>
+    <div class="section-surface-hero-dusk section-pad-tight text-center text-sm text-ink-500">section-surface-hero-dusk</div>
+    <div class="section-surface-hero-forest section-pad-tight text-center text-sm text-ink-500">section-surface-hero-forest</div>
+  </div>
+
+  <Section tone="default" spacing="tight" class="!border-t-0">
+    <Container>
+      <CtaBlock
+        id="sg-cta"
+        title="CTA block"
+        body="Used for end-of-article and consultation prompts. Pairs with brass and sand, not loud contrast."
+        href="/consultations"
+        label="View consultations"
+        variant="secondary"
+      />
+    </Container>
+  </Section>
+
+  <Section tone="contrast" spacing="tight" class="!pb-20 md:!pb-28">
+    <Container>
+      <h2 class="type-heading mb-3 text-2xl sm:text-3xl">Responsive</h2>
+      <p class="max-w-2xl text-ink-600">
+        Breakpoints follow Tailwind defaults: <strong class="text-ink-800">sm 640px</strong>, <strong class="text-ink-800">md 768px</strong>,
+        <strong class="text-ink-800">lg 1024px</strong>. Page hero, section padding, grids, and type scale adjust at these steps; navigation collapses to a
+        scroll chip row on small viewports. Touch targets for buttons and inputs are at least 44px height where specified (<code
+          class="rounded bg-ivory-100 px-1.5 py-0.5 text-sm">min-h-11</code>).
+      </p>
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>

@@ -1,0 +1,304 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ArticleCard from '@/components/cards/ArticleCard.astro';
+import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
+import EmptyState from '@/components/conversion/EmptyState.astro';
+import { getPublished } from '@/lib/content-filters';
+import type { ArticleEntry } from '@/types/content';
+
+/** The five home themes; every article `category` is one of these. */
+const PILLAR_TOPICS: readonly string[] = [
+  'Clarity',
+  'Regulation',
+  'Environment',
+  'Energy & Frequency',
+  'Practices & Rituals',
+] as const;
+
+function topicAnchorId(category: string) {
+  return category
+    .toLowerCase()
+    .replace(/\s*&\s*/g, '-and-')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+const allPosts: ArticleEntry[] = (await getPublished('articles')).sort(
+  (a, b) => +b.data.publishedAt - +a.data.publishedAt,
+);
+const byCategory = new Map<string, typeof allPosts>();
+for (const a of allPosts) {
+  const c = a.data.category;
+  if (!byCategory.has(c)) byCategory.set(c, []);
+  byCategory.get(c)!.push(a);
+}
+for (const list of byCategory.values()) {
+  list.sort((a, b) => +b.data.publishedAt - +a.data.publishedAt);
+}
+
+const pillarSections = PILLAR_TOPICS.map((category) => ({
+  category,
+  slug: topicAnchorId(category),
+  items: (byCategory.get(category) ?? []) as ArticleEntry[],
+})).filter((g) => g.items.length > 0);
+
+const allTags: string[] = [
+  ...new Set(allPosts.flatMap((a) => a.data.tags ?? [])),
+].sort((a, b) => a.localeCompare(b, 'en'));
+
+const activePillars = PILLAR_TOPICS.filter((t) => (byCategory.get(t)?.length ?? 0) > 0);
+const topicFilterValues = ['all', ...activePillars] as const;
+---
+
+<BaseLayout
+  title="Articles"
+  description="Long-form reading on living well: rhythm, body, space, and ideas you can return to. Updated on a human schedule."
+  canonicalPath="/articles"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="Read first"
+    title="Articles"
+    description="Clear writing you can use in a real week—no clickbait, no feed. Jump to a theme or filter the list; each section holds pieces that belong together."
+  >
+    <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a class="btn-cta-invert" href="#all-writing">Browse by topic</a>
+      <a class="btn-cta-invert-ghost" href="/webinars">Upcoming sessions</a>
+    </div>
+  </MarketingHero>
+
+  {/** `tone="minimal"` so body scroll tint is not fully covered by opaque `bg-paper` bands. */}
+  <Section id="all-writing" tone="minimal" spacing="comfortable" class="scroll-mt-28 !pt-8 sm:!pt-10 md:!pt-12">
+    <Container narrow>
+      <p
+        class="max-w-3xl text-balance text-base leading-[1.75] text-charcoal sm:text-lg"
+      >
+        Welcome. The journal is organized around <strong class="font-medium text-ink">five themes</strong>—Clarity, Regulation, Environment, Energy
+        &amp; Frequency, and Practices &amp; Rituals. Use the topic chips to focus one theme, or add a keyword to narrow further. There is
+        no race; follow what fits your week.
+      </p>
+    </Container>
+
+    <Container class="mt-10 sm:mt-12">
+      <h2 class="font-display text-xl text-ink sm:text-2xl">Articles by topic</h2>
+
+      {allPosts.length > 0 && (
+        <div
+          class="mt-6 rounded-2xl border border-ink/10 bg-paper/90 p-4 shadow-elevated sm:mt-8 sm:p-5 md:p-6"
+        >
+          <p class="text-eyebrow text-[0.65rem] text-secondary">Topic</p>
+          <p class="mt-1 text-sm text-ink-600 sm:text-base">Our five subjects—plus All to see every section.</p>
+          <div
+            class="mt-4 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Filter by theme"
+            data-article-filters
+          >
+            {topicFilterValues.map((c) => (
+              <button
+                type="button"
+                class="btn-filter-pill"
+                data-article-filter={c === 'all' ? 'all' : c}
+                aria-pressed={c === 'all' ? 'true' : 'false'}
+              >
+                {c === 'all' ? 'All' : c}
+              </button>
+            ))}
+          </div>
+
+          {allTags.length > 0 && (
+            <>
+              <p class="mt-8 text-eyebrow text-[0.65rem] text-secondary">Keyword</p>
+              <p class="mt-1 text-sm text-ink-600 sm:text-base">Filter by a tag; combine with a topic above when you need both.</p>
+              <div
+                class="mt-4 flex flex-wrap gap-2"
+                role="group"
+                aria-label="Filter by tag"
+                data-article-keyword-filters
+              >
+                <button
+                  type="button"
+                  class="btn-filter-pill border-dashed border-ink/20 bg-paper/95"
+                  data-article-keyword="all"
+                  aria-pressed="true"
+                >
+                  All tags
+                </button>
+                {allTags.map((tag) => (
+                  <button
+                    type="button"
+                    class="btn-filter-pill border-dashed border-ink/20 bg-paper/95"
+                    data-article-keyword={tag}
+                    aria-pressed="false"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {allPosts.length > 0 && (
+        <div class="mt-10 space-y-14 sm:mt-10 sm:space-y-16" data-article-sections>
+          {pillarSections.map(({ category, slug, items }) => (
+            <section
+              id={slug}
+              class="scroll-mt-28"
+              data-article-section
+              data-topic={category}
+            >
+              <h2 class="font-display text-2xl font-medium text-ink sm:text-3xl">{category}</h2>
+              <ul
+                class="mt-6 grid list-none grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7"
+                role="list"
+                data-article-list
+              >
+                {items.map((entry) => (
+                  <li
+                    data-article-row
+                    data-article-tags={(entry.data.tags ?? []).join('|||')}
+                  >
+                    <ArticleCard entry={entry} showFeaturedBadge={false} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
+
+      {allPosts.length > 0 && (
+        <div
+          data-article-no-match
+          class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
+          role="status"
+          aria-live="polite"
+          aria-hidden="true"
+        >
+          <p class="font-display text-xl text-ink">Nothing matches right now</p>
+          <p class="mt-2 max-w-2xl text-charcoal">Try a different topic or tag, or show the full list.</p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button type="button" class="btn-primary" data-article-show-all>
+              Show all
+            </button>
+            <a class="btn-secondary" href="/contact">Get in touch</a>
+          </div>
+        </div>
+      )}
+
+      {allPosts.length === 0 && (
+        <EmptyState
+          title="Nothing published yet"
+          body="We are between pieces. You can still reach us by email, or check back soon."
+          actionHref="/contact"
+          actionLabel="Contact"
+          secondaryHref="/webinars"
+          secondaryLabel="Webinars"
+        />
+      )}
+    </Container>
+  </Section>
+  <div slot="prefooter">
+    <ConversionCallout topic="articles" />
+  </div>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  const topicRoot = document.querySelector('[data-article-filters]');
+  const kwRoot = document.querySelector('[data-article-keyword-filters]');
+  const noMatch = document.querySelector('[data-article-no-match]') as HTMLElement | null;
+  const sections = () => document.querySelectorAll<HTMLElement>('[data-article-section]');
+
+  const getSelectedTopic = () =>
+    (topicRoot?.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute(
+      'data-article-filter',
+    ) || 'all';
+
+  const getSelectedKeyword = () => {
+    if (!kwRoot) return 'all';
+    return (
+      (kwRoot.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute('data-article-keyword') || 'all'
+    );
+  };
+
+  const setShowAll = () => {
+    if (!topicRoot) return;
+    const firstT = topicRoot.querySelector('button[data-article-filter="all"]') as HTMLButtonElement | null;
+    firstT?.click();
+    if (kwRoot) {
+      const firstK = kwRoot.querySelector('button[data-article-keyword="all"]') as HTMLButtonElement | null;
+      firstK?.click();
+    }
+  };
+
+  const applyFilters = () => {
+    const topic = getSelectedTopic();
+    const kw = getSelectedKeyword();
+    let totalVisible = 0;
+
+    sections().forEach((sec) => {
+      const secTopic = sec.getAttribute('data-topic') || '';
+      const includeSection = topic === 'all' || secTopic === topic;
+      if (!includeSection) {
+        sec.classList.add('hidden');
+        return;
+      }
+      const rows = sec.querySelectorAll<HTMLElement>('[data-article-row]');
+      let count = 0;
+      rows.forEach((row) => {
+        const raw = row.getAttribute('data-article-tags') || '';
+        const tags = raw ? raw.split('|||') : [];
+        const kwMatch = kw === 'all' || tags.includes(kw);
+        row.classList.toggle('hidden', !kwMatch);
+        if (kwMatch) count += 1;
+      });
+      if (count === 0) {
+        sec.classList.add('hidden');
+      } else {
+        sec.classList.remove('hidden');
+        totalVisible += count;
+      }
+    });
+
+    if (noMatch) {
+      const hide = totalVisible > 0 || sections().length === 0;
+      noMatch.classList.toggle('hidden', hide);
+      noMatch.setAttribute('aria-hidden', hide ? 'true' : 'false');
+    }
+  };
+
+  document.querySelector('[data-article-show-all]')?.addEventListener('click', () => setShowAll());
+
+  if (topicRoot) {
+    topicRoot.querySelectorAll('button[data-article-filter]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const me = btn as HTMLButtonElement;
+        topicRoot.querySelectorAll('button[data-article-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        me.setAttribute('aria-pressed', 'true');
+        applyFilters();
+      });
+    });
+  }
+
+  if (kwRoot) {
+    kwRoot.querySelectorAll('button[data-article-keyword]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const me = btn as HTMLButtonElement;
+        kwRoot.querySelectorAll('button[data-article-keyword]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        me.setAttribute('aria-pressed', 'true');
+        applyFilters();
+      });
+    });
+  }
+
+  applyFilters();
+</script>
