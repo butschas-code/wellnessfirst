@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import CmsPageShell from '@/components/cms/CmsPageShell.astro';
+import { CMS_PATHS } from '@/lib/cms/paths';
+const [articles, webinars, consultations, products, pages] = await Promise.all([
+  getCollection('articles'),
+  getCollection('webinars'),
+  getCollection('consultations'),
+  getCollection('products'),
+  getCollection('pages'),
+]);
+
+const draft = (c: { data: { draft?: boolean } }[]) => c.filter((e) => e.data.draft).length;
+---
+
+<CmsPageShell title="Dashboard" description="Content overview and links to the Decap editor." active="dashboard">
+  <h1 class="font-display text-2xl text-ink md:text-3xl">Content dashboard</h1>
+  <p class="mt-2 max-w-2xl text-sm text-ink-600">
+    This hub lists entries from the Astro content layer. To create or edit files, use the Decap editor (Git-backed) or your IDE after pulling from Git.
+  </p>
+
+  <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+    <li class="rounded-xl border border-ink/10 bg-white p-5 shadow-elevated">
+      <a class="font-display text-lg text-primary hover:underline" href={CMS_PATHS.cmsArticles}>Journal articles</a>
+      <p class="mt-1 text-sm text-ink-600">{articles.length} entries · {draft(articles)} draft</p>
+    </li>
+    <li class="rounded-xl border border-ink/10 bg-white p-5 shadow-elevated">
+      <a class="font-display text-lg text-primary hover:underline" href={CMS_PATHS.cmsWebinars}>Webinars</a>
+      <p class="mt-1 text-sm text-ink-600">{webinars.length} entries · {draft(webinars)} draft</p>
+    </li>
+    <li class="rounded-xl border border-ink/10 bg-white p-5 shadow-elevated">
+      <a class="font-display text-lg text-primary hover:underline" href={CMS_PATHS.cmsConsultations}>Consultations</a>
+      <p class="mt-1 text-sm text-ink-600">{consultations.length} entries · {draft(consultations)} draft</p>
+    </li>
+    <li class="rounded-xl border border-ink/10 bg-white p-5 shadow-elevated">
+      <a class="font-display text-lg text-primary hover:underline" href={CMS_PATHS.cmsProducts}>Products</a>
+      <p class="mt-1 text-sm text-ink-600">{products.length} entries · {draft(products)} draft</p>
+    </li>
+    <li class="rounded-xl border border-ink/10 bg-white p-5 shadow-elevated sm:col-span-2">
+      <a class="font-display text-lg text-primary hover:underline" href={CMS_PATHS.cmsSitePages}>Site pages</a>
+      <p class="mt-1 text-sm text-ink-600">{pages.length} entries · {draft(pages)} draft</p>
+    </li>
+  </ul>
+
+  <div class="mt-10 max-w-2xl rounded-xl border border-ink/10 bg-paper-200/40 p-6">
+    <h2 class="font-display text-lg text-ink">Open the editor</h2>
+    <p class="mt-2 text-sm text-ink-600">
+      Decap runs at <a class="font-medium text-secondary underline" href={CMS_PATHS.decap} target="_blank" rel="noreferrer"
+        >{CMS_PATHS.decap}</a
+      >. Configure the GitHub (or local) backend in <code class="rounded bg-ink/5 px-1">public/admin/config.yml</code> and deploy
+      your OAuth app for production.
+    </p>
+    <a
+      class="btn-primary mt-4 inline-flex min-h-11 w-full items-center justify-center sm:w-auto"
+      href={CMS_PATHS.decap}
+      target="_blank"
+      rel="noreferrer"
+    >
+      Open Decap
+    </a>
+  </div>
+</CmsPageShell>

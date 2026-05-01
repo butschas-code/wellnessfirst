@@ -9,6 +9,30 @@ const ctaTarget = z.union([
   z.string().url(),
 ]);
 
+/**
+ * Decap CMS list fields often write `{ tag: "x" }` / `{ product: "id" }` style rows.
+ * Authoring by hand and most frontmatter use plain `string[]`. Accept both.
+ */
+function stringListFromDecap(val: unknown): string[] {
+  if (!Array.isArray(val)) return [];
+  const out: string[] = [];
+  for (const item of val) {
+    if (typeof item === 'string') {
+      out.push(item);
+      continue;
+    }
+    if (item && typeof item === 'object') {
+      const o = item as Record<string, unknown>;
+      const v = o.tag ?? o.product ?? o.aid ?? o.area;
+      if (typeof v === 'string') out.push(v);
+    }
+  }
+  return out;
+}
+
+const stringListField = z.preprocess(stringListFromDecap, z.array(z.string()).default([]));
+const focusAreasField = z.preprocess(stringListFromDecap, z.array(z.string()).min(1));
+
 /** Public URL segment; lowercase, hyphenated. If omitted, the file `id` is used. */
 const articleSlug = z
   .string()
@@ -32,7 +56,7 @@ const articles = defineCollection({
     /** Facet for the journal filter strip and browse UX. */
     category: z.string(),
     /** Topic labels; support related-article matching and future discovery. */
-    tags: z.array(z.string()).default([]),
+    tags: stringListField,
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
     /** Optional hero: path under `/public` (e.g. `/media/...` ) or full URL. */
@@ -40,7 +64,7 @@ const articles = defineCollection({
     /** Affects the article page hero only; list/card previews always use `cover`. */
     coverImageFit: z.enum(['cover', 'contain']).optional(),
     /** Product collection entry `id`s (file stem), e.g. `infinity-uno`. */
-    relatedProducts: z.array(z.string()).default([]),
+    relatedProducts: stringListField,
     /** Webinar entry `id` to surface in the related-offer block. */
     relatedWebinar: z.string().optional(),
     /** Consultation entry `id` for the related-offer block. */
@@ -77,7 +101,7 @@ const webinars = defineCollection({
     /** Registration or replay access; mailto, path, or external URL. */
     primaryLink: ctaTarget.optional(),
     coverImage: publicPathOrUrl.optional(),
-    relatedArticleIds: z.array(z.string()).default([]),
+    relatedArticleIds: stringListField,
     draft: z.boolean().default(false),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -97,7 +121,7 @@ const consultations = defineCollection({
     whatToExpect: z.string(),
     cadence: z.string(),
     leadTime: z.string(),
-    focusAreas: z.array(z.string()).min(1),
+    focusAreas: focusAreasField,
     ctaLabel: z.string().default('Begin a conversation'),
     ctaHref: ctaTarget,
     /** Optional hero: path under `/public` or full URL. */
@@ -110,7 +134,7 @@ const consultations = defineCollection({
       .enum(['geopathic', 'astrology', 'home', 'frequency', 'coaching', 'environment', 'ritual'])
       .default('coaching'),
     order: z.number().int().default(0),
-    relatedArticleIds: z.array(z.string()).default([]),
+    relatedArticleIds: stringListField,
     draft: z.boolean().default(false),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -136,7 +160,7 @@ const products = defineCollection({
     image: publicPathOrUrl.optional(),
     availability: z.enum(['available', 'waitlist', 'retired']),
     order: z.number().int().default(0),
-    relatedArticleIds: z.array(z.string()).default([]),
+    relatedArticleIds: stringListField,
     draft: z.boolean().default(false),
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -146,6 +170,8 @@ const products = defineCollection({
 const pages = defineCollection({
   loader: glob({ base: './src/content/pages', pattern: '**/*.{md,mdx}' }),
   schema: z.object({
+    /** Optional: editors using Decap may keep this in frontmatter; not used for routes (file `id` is the slug). */
+    slug: z.string().optional(),
     title: z.string(),
     description: z.string().optional(),
     showInNav: z.boolean().default(true),

@@ -1,0 +1,106 @@
+---
+import '@/styles/global.css';
+import { site } from '@/lib/site';
+import { CMS_PATHS } from '@/lib/cms/paths';
+
+interface Props {
+  title: string;
+  description?: string;
+  active?: 'dashboard' | 'articles' | 'webinars' | 'consultations' | 'products' | 'site-pages';
+}
+
+const { title, description = 'Content tools for Wellness First Global.', active } = Astro.props;
+const pageTitle = `${title} · CMS · ${site.name}`;
+
+const nav: { id: NonNullable<typeof active> | 'decap'; href: string; label: string; external?: boolean }[] = [
+  { id: 'dashboard', href: CMS_PATHS.cmsRoot, label: 'Dashboard' },
+  { id: 'decap', href: CMS_PATHS.decap, label: 'Open editor (Decap)', external: true },
+  { id: 'articles', href: CMS_PATHS.cmsArticles, label: 'Journal articles' },
+  { id: 'webinars', href: CMS_PATHS.cmsWebinars, label: 'Webinars' },
+  { id: 'consultations', href: CMS_PATHS.cmsConsultations, label: 'Consultations' },
+  { id: 'products', href: CMS_PATHS.cmsProducts, label: 'Products' },
+  { id: 'site-pages', href: CMS_PATHS.cmsSitePages, label: 'Site pages' },
+];
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0a2334" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body class="flex min-h-screen flex-col bg-paper font-sans text-charcoal antialiased">
+    <a
+      href="#cms-main"
+      class="skip-link-wfg fixed z-[100] -translate-y-24 bg-ink px-3 py-2 text-sm text-white opacity-0 transition-transform focus:translate-y-0 focus:opacity-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ink"
+    >
+      Skip to content
+    </a>
+    <header class="border-b border-ink/10 bg-primary text-white">
+      <div class="container-wfg flex h-14 flex-wrap items-center justify-between gap-3 sm:h-16">
+        <a href={CMS_PATHS.cmsRoot} class="font-display text-lg text-white/95 sm:text-xl">CMS</a>
+        <span class="text-xs font-medium uppercase tracking-[0.14em] text-white/80">Wellness First · editors</span>
+      </div>
+    </header>
+    <div class="flex min-h-0 flex-1 flex-col md:min-h-0 md:flex-row">
+      <aside
+        class="border-b border-ink/10 bg-white md:w-64 md:shrink-0 md:border-b-0 md:border-r"
+        aria-label="CMS navigation"
+      >
+        <nav class="flex flex-col gap-0.5 p-3 sm:p-4" role="navigation">
+          {
+            nav.map((item) => {
+              const on = !item.external && active === item.id;
+              const cls = on
+                ? 'bg-primary/10 text-primary'
+                : 'text-ink hover:bg-ink/5';
+              if (item.external) {
+                return (
+                  <a
+                    class:list={['block rounded-lg px-3 py-2.5 text-sm font-medium', cls]}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.label}
+                    <span class="ml-1 text-ink-500" aria-hidden="true">↗</span>
+                  </a>
+                );
+              }
+              return (
+                <a
+                  class:list={['block rounded-lg px-3 py-2.5 text-sm font-medium', cls]}
+                  href={item.href}
+                  aria-current={on ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              );
+            })
+          }
+        </nav>
+      </aside>
+      <main id="cms-main" class="min-w-0 flex-1" tabindex="-1">
+        <slot />
+      </main>
+    </div>
+    <footer class="mt-auto border-t border-ink/10 bg-white py-4">
+      <div class="container-wfg flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <a class="text-sm text-ink-600 underline decoration-line hover:text-secondary" href="/">Public site</a>
+        <a class="text-sm text-ink-600 underline decoration-line hover:text-secondary" href="/app/dashboard">Member area</a>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+# Decap CMS — Git-backed editor. Match `src/content.config.ts` when adding fields.
+#
+# Production (this file): GitHub OAuth uses server routes `/auth` + `/callback` (`src/pages/auth.ts`, `src/pages/callback.ts`).
+# Set env vars on Vercel: OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET (Settings → Environment Variables).
+# GitHub OAuth App → Authorization callback URL: https://wellnessfirstglobal.vercel.app/callback
+#
+# Local editing without GitHub login: temporarily set local_backend: true, run `npx decap-server`, then `npm run dev`.
+
+local_backend: false
+
+backend:
+  name: github
+  repo: butschas-code/wellnessfirst
+  branch: main
+  base_url: https://wellnessfirstglobal.vercel.app
+  auth_endpoint: auth
+
+media_folder: public
+public_folder: /
+
+editor:
+  preview: false
+
+collections:
+  - name: articles
+    label: Journal articles
+    label_singular: article
+    folder: src/content/articles
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    extension: mdx
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Slug, name: slug, required: false, widget: string, hint: "Lowercase hyphens; defaults to filename id" }
+      - { label: Excerpt, name: excerpt, widget: text }
+      - { label: Subtitle, name: subtitle, required: false, widget: string }
+      - { label: Author, name: author, widget: string }
+      - { label: Published, name: publishedAt, widget: datetime }
+      - { label: Updated, name: updatedAt, required: false, widget: datetime }
+      - { label: Reading minutes, name: readingMinutes, required: false, widget: number, value_type: int, min: 1, max: 120 }
+      - { label: Category, name: category, widget: string }
+      - label: Tags
+        name: tags
+        widget: list
+        default: []
+        field: { label: Tag, name: tag, widget: string }
+      - { label: Featured, name: featured, widget: boolean, default: false }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: Cover image, name: coverImage, required: false, widget: string, hint: "/media/... or https://..." }
+      - { label: Cover fit, name: coverImageFit, required: false, widget: select, options: [cover, contain] }
+      - label: Related product ids
+        name: relatedProducts
+        widget: list
+        default: []
+        field: { label: Id, name: product, widget: string }
+      - { label: Related webinar id, name: relatedWebinar, required: false, widget: string }
+      - { label: Related consultation id, name: relatedConsultation, required: false, widget: string }
+      - { label: SEO title, name: seoTitle, required: false, widget: string }
+      - { label: SEO description, name: seoDescription, required: false, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: webinars
+    label: Webinars
+    label_singular: webinar
+    folder: src/content/webinars
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    extension: mdx
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Slug, name: slug, required: false, widget: string }
+      - { label: Excerpt, name: excerpt, widget: text }
+      - { label: What it is, name: whatItIs, widget: text }
+      - { label: Who it is for, name: whoItIsFor, widget: text }
+      - { label: Why it matters, name: whyItMatters, widget: text }
+      - { label: What to expect, name: whatToExpect, widget: text }
+      - { label: Trust note, name: trustNote, required: false, widget: string }
+      - { label: Starts at, name: startAt, widget: datetime }
+      - { label: Duration (minutes), name: durationMinutes, widget: number, value_type: int, min: 15, max: 240 }
+      - { label: Format, name: format, widget: select, options: [live, replay] }
+      - { label: Host, name: host, widget: string }
+      - { label: Free, name: isFree, widget: boolean, default: true }
+      - { label: Primary link, name: primaryLink, required: false, widget: string }
+      - { label: Cover image, name: coverImage, required: false, widget: string }
+      - label: Related article ids
+        name: relatedArticleIds
+        widget: list
+        default: []
+        field: { label: Id, name: aid, widget: string }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: SEO title, name: seoTitle, required: false, widget: string }
+      - { label: SEO description, name: seoDescription, required: false, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: consultations
+    label: Consultations
+    label_singular: consultation
+    folder: src/content/consultations
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    extension: mdx
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Slug, name: slug, required: false, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - { label: What it is, name: whatItIs, widget: text }
+      - { label: Who it is for, name: whoItIsFor, widget: text }
+      - { label: Why it matters, name: whyItMatters, widget: text }
+      - { label: What to expect, name: whatToExpect, widget: text }
+      - { label: Cadence, name: cadence, widget: string }
+      - { label: Lead time, name: leadTime, widget: string }
+      - label: Focus areas
+        name: focusAreas
+        widget: list
+        min: 1
+        field: { label: Area, name: area, widget: string }
+      - { label: CTA label, name: ctaLabel, widget: string, default: "Begin a conversation" }
+      - { label: CTA href, name: ctaHref, widget: string }
+      - { label: Cover image, name: coverImage, required: false, widget: string }
+      - label: Group
+        name: group
+        widget: select
+        default: coaching
+        options:
+          - { label: Geopathic, value: geopathic }
+          - { label: Astrology, value: astrology }
+          - { label: Home, value: home }
+          - { label: Frequency, value: frequency }
+          - { label: Coaching, value: coaching }
+          - { label: Environment, value: environment }
+          - { label: Ritual, value: ritual }
+      - { label: Order, name: order, widget: number, value_type: int, default: 0 }
+      - label: Related article ids
+        name: relatedArticleIds
+        widget: list
+        default: []
+        field: { label: Id, name: aid, widget: string }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: SEO title, name: seoTitle, required: false, widget: string }
+      - { label: SEO description, name: seoDescription, required: false, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: products
+    label: Products
+    label_singular: product
+    folder: src/content/products
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    extension: mdx
+    fields:
+      - { label: Name, name: name, widget: string }
+      - { label: Slug, name: slug, required: false, widget: string }
+      - { label: One line, name: oneLine, widget: string }
+      - { label: Category, name: category, widget: string }
+      - { label: What it is, name: whatItIs, widget: text }
+      - { label: Who it is for, name: whoItIsFor, widget: text }
+      - { label: Why it matters, name: whyItMatters, widget: text }
+      - { label: What to expect, name: whatToExpect, widget: text }
+      - { label: Craft note, name: craftNote, required: false, widget: string }
+      - { label: Price note, name: priceNote, required: false, widget: string }
+      - { label: Learn more URL, name: learnMoreUrl, required: false, widget: string }
+      - { label: Image, name: image, required: false, widget: string }
+      - label: Availability
+        name: availability
+        widget: select
+        options: [available, waitlist, retired]
+      - { label: Order, name: order, widget: number, value_type: int, default: 0 }
+      - label: Related article ids
+        name: relatedArticleIds
+        widget: list
+        default: []
+        field: { label: Id, name: aid, widget: string }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: SEO title, name: seoTitle, required: false, widget: string }
+      - { label: SEO description, name: seoDescription, required: false, widget: text }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: site_pages
+    label: Site pages
+    label_singular: page
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    extension: md
+    fields:
+      - { label: Filename (id), name: slug, widget: string, hint: "Lowercase hyphens; becomes file name and /p/{id}" }
+      - { label: Title, name: title, widget: string }
+      - { label: Description, name: description, required: false, widget: text }
+      - { label: Show in nav, name: showInNav, widget: boolean, default: true }
+      - { label: Nav label, name: navLabel, required: false, widget: string }
+      - { label: Order, name: order, widget: number, value_type: int, default: 100 }
+      - label: Hero
+        name: hero
+        required: false
+        widget: object
+        collapsed: true
+        fields:
+          - { label: Eyebrow, name: eyebrow, required: false, widget: string }
+          - { label: Align, name: align, widget: select, default: left, options: [left, center] }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+      - { label: Body, name: body, widget: markdown }
