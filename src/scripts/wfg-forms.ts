@@ -65,7 +65,9 @@ function getBoxes(form: HTMLFormElement) {
 
 /**
  * Binds public marketing forms. `data-contact-email` on `body` is used for mailto + copy.
- * API: Cloudflare Pages Functions. Set `PUBLIC_FORM_MODE=mailto` for local mailto without `wrangler pages dev`.
+ *
+ * API POST `/api/*` only exists when `isFormApiMode()` is true (Cloudflare Pages `functions/`).
+ * On Vercel and in local `astro dev`, defaults use mailto unless `PUBLIC_FORM_MODE` overrides — see `forms-config.ts`.
  */
 export function initWfgForms(): void {
   const useApi = isFormApiMode();

@@ -1,6 +1,6 @@
 # Wellness First Global
 
-Editorial-first marketing site and member shell: **Astro 6**, **Tailwind CSS 4**, **Cloudflare Pages** (static + Functions + optional KV), **Supabase** for email/password auth on member routes.
+Editorial-first marketing site and member shell: **Astro 6**, **Tailwind CSS 4**, **Vercel** or **Cloudflare Pages**, **Supabase** for auth, member data, catalog-backed webinars/resources, and optional transactional hooks.
 
 ## Requirements
 
@@ -24,7 +24,7 @@ npm run dev
 
 Opens the Vite dev server (default [http://localhost:4321](http://localhost:4321)).
 
-- **Marketing forms** default to **API mode** unless you set `PUBLIC_FORM_MODE=mailto` in `.env`. Plain `astro dev` does not run Cloudflare Pages Functions; use `mailto` for local form testing without `/api`, or test forms on a **Cloudflare Preview** deployment.
+- **Marketing forms:** With plain `astro dev`, submissions default to **mailto** (no `/api` on the dev server). To POST against `/api/*` locally, run **`wrangler pages dev`** (Cloudflare) and set **`PUBLIC_FORM_MODE=api`**. Production behavior depends on host — see [Deployment (Vercel)](#deployment-vercel) and [`forms-config.ts`](./src/lib/forms-config.ts).
 - **Supabase auth** needs `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` for sign-in/up and member `/app` + `/community/*` flows.
 
 ### Quality checks
@@ -51,6 +51,19 @@ Content lives under `src/content/` and is registered in `src/content.config.ts`.
 
 **URLs:** articles and offers use public slugs where set; see `src/lib/offer-paths.ts` and collection schema for `slug` vs file `id`.
 
+### Where articles and media live (especially on Vercel)
+
+| Kind | Storage | Notes |
+|------|---------|--------|
+| **Journal copy (markdown)** | **Git** — `src/content/articles/` | Built into static HTML at `npm run build`. Editing is via Git (or Decap `/admin` committing to this repo). **Not** stored in Supabase as blobs. |
+| **Hero / cover images** | **`public/`** (paths like `/media/...`) or **any HTTPS URL** in frontmatter (`coverImage`) | Served as static assets from Vercel or externally; choose URLs suitable for production caching/CDN. |
+| **Shop copy, pages, legacy webinars MD** | **Git** — `src/content/*` | Same build-time pipeline. |
+| **Live webinars list, bookings, seats** | **Supabase** (Postgres + RLS) | Listing/detail shells can be built with optional **`SUPABASE_SERVICE_ROLE_KEY`** at build time (CI secret only). |
+| **Resources library, profiles, consultations** | **Supabase** | Member flows read/write via anon client + RLS. |
+| **Optional uploads / large binaries** | Not wired by default | Add **Supabase Storage** (or another bucket) if editors need browser uploads instead of Git + `public/`. |
+
+Member-gated article **metadata** can align with Supabase `journal_article_catalog` (see `supabase/` migrations); the **canonical authored body** for public builds remains the Markdown in this repo unless you extend the stack.
+
 ## Deployment (Cloudflare Pages)
 
 1. **Connect** the Git repository to **Cloudflare Pages**.
@@ -66,7 +79,9 @@ Content lives under `src/content/` and is registered in `src/content.config.ts`.
 
 [Vercel](https://vercel.com) sets `VERCEL=1` during the build, which makes `astro.config.mjs` use **`@astrojs/vercel`** instead of `@astrojs/cloudflare`. The site builds as a **static** Astro app suitable for Vercel.
 
-**Important:** the **`/functions` Cloudflare Pages Functions** (e.g. `/api/contact`) are **not** deployed to Vercel. For a Vercel preview, set **`PUBLIC_FORM_MODE=mailto`** in the project environment so contact/newsletter interest forms use mailto; production form APIs and KV should stay on **Cloudflare Pages** as above.
+**Marketing forms:** Cloudflare **`/functions`** (e.g. `/api/contact`) are **not** deployed here. Unless you add your own Vercel serverless routes for `/api/contact`, `/api/newsletter`, and `/api/webinar-interest`, the client defaults to **mailto** on Vercel builds (`src/lib/forms-config.ts`). You can still force **`PUBLIC_FORM_MODE=api`** if you proxy those paths elsewhere.
+
+**Optional:** set **`PUBLIC_FORM_MODE=mailto`** explicitly in Vercel env if you want to document intent; behavior matches the default for Vercel builds.
 
 ### Environment variables
 
@@ -74,7 +89,7 @@ Content lives under `src/content/` and is registered in `src/content.config.ts`.
 |----------|--------|---------|
 | `PUBLIC_SUPABASE_URL` | Build + browser | Supabase project URL |
 | `PUBLIC_SUPABASE_ANON_KEY` | Build + browser | Supabase anon key (RLS protects data) |
-| `PUBLIC_FORM_MODE` | Build + browser | Omit or set to anything **other than** `mailto` for API forms. Use `mailto` only for local mailto handoff without `/api`. |
+| `PUBLIC_FORM_MODE` | Build + browser | `mailto` → mailto only. Any other non-empty value → POST `/api/*` (Cloudflare Functions). **Unset:** Vercel production → mailto; Cloudflare production → API; `astro dev` → mailto. |
 | `FORM_KV` | Worker / Functions | (Optional) KV namespace binding name in Cloudflare for form storage — not a `PUBLIC_*` var |
 
 Copy from `.env.example` and mirror names in **Pages → Settings → Environment variables**.

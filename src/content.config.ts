@@ -59,7 +59,10 @@ const articles = defineCollection({
     tags: stringListField,
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
-    /** Optional hero: path under `/public` (e.g. `/media/...` ) or full URL. */
+    /**
+     * Optional hero: path under `/public` (e.g. `/media/...`) or HTTPS URL.
+     * Article bodies live in Git under `src/content/articles/` (built statically); Supabase backs catalog/access where gated — README “Where articles and media live”.
+     */
     coverImage: publicPathOrUrl.optional(),
     /** Affects the article page hero only; list/card previews always use `cover`. */
     coverImageFit: z.enum(['cover', 'contain']).optional(),

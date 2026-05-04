@@ -22,6 +22,10 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   vite: {
+    define: {
+      /** Used by `src/lib/forms-config.ts` — Vercel has no `/functions` form APIs by default. */
+      __WFG_DEPLOY_TARGET__: JSON.stringify(useVercel ? 'vercel' : 'cloudflare'),
+    },
     resolve: {
       alias: {
         '@': resolve(_dirname, 'src'),

@@ -7,8 +7,9 @@ interface ImportMetaEnv {
   /** Supabase anonymous key (public, protected by RLS in Supabase) */
   readonly PUBLIC_SUPABASE_ANON_KEY?: string;
   /**
-   * Public marketing forms: default (unset) uses Cloudflare Pages Functions (`/api/*`).
-   * Set to `mailto` for local dev without `wrangler pages dev` (mailto handoff).
+   * Marketing forms: `mailto` → mailto handoff. Any other non-empty value → POST `/api/*`
+   * (Cloudflare Pages Functions only). When unset, see `isFormApiMode()` in `forms-config.ts`
+   * (Vercel + local dev default to mailto; Cloudflare production defaults to API).
    */
   readonly PUBLIC_FORM_MODE?: 'mailto' | 'api' | string;
 }
@@ -16,3 +17,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Build-time deploy family — injected in `astro.config.mjs` (`vite.define`). */
+declare const __WFG_DEPLOY_TARGET__: 'vercel' | 'cloudflare';
