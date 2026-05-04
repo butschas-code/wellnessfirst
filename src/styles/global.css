@@ -713,3 +713,10 @@
   @apply aria-pressed:border-secondary aria-pressed:bg-secondary/5 aria-pressed:text-primary;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
 }
+
+/* My Wellness Space — editorial calm surface */
+@layer components {
+  .member-wellness-main {
+    background: linear-gradient(180deg, #fafbf9 0%, #f2f5f2 36%, #ffffff 78%);
+  }
+}

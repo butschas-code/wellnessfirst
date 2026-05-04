@@ -1,0 +1,610 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSection from '@/components/member/MemberSection.astro';
+---
+
+<AppLayout
+  title="My Wellness Space"
+  description="Your private library and practice space at Wellness First Global."
+  memberShell={true}
+  memberNav="overview"
+>
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-ms-boot" class="text-sm text-ink-500">Opening your space…</p>
+
+    <div id="w-ms-root" class="hidden">
+      <p id="w-ms-fetch-err" class="mb-10 hidden rounded-lg border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-ink-800"></p>
+
+      <header class="max-w-3xl border-b border-ink/[0.06] pb-12">
+        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Welcome back</p>
+        <h1 class="font-display mt-4 text-[2rem] leading-[1.15] tracking-tight text-ink sm:text-[2.35rem]">
+          <span id="w-ms-welcome-line">Good to see you, </span><span id="w-ms-name" class="italic text-ink/90">…</span>
+        </h1>
+        <p class="mt-5 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+          This corner gathers what you save, book, and tell us matters — suggestions stay gentle and easy to skip.
+        </p>
+      </header>
+
+      <MemberSection
+        eyebrow="Calendar"
+        title="Your next webinar"
+        anchor="next-webinar"
+        lede="Your booked sessions first; if none yet, upcoming openings from the catalog."
+      >
+        <div class="w-ms-async" data-section="next-webinar">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-24 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-16 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="Discovery"
+        title="Continue exploring"
+        anchor="explore"
+        lede="A light mix of articles, live sessions, and resources — tuned to your interests when you have shared them."
+      >
+        <div class="w-ms-async" data-section="explore">
+          <div data-skel class="animate-pulse grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+            <div class="h-36 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-36 rounded-lg bg-ink/[0.04]"></div>
+            <div class="h-36 rounded-lg bg-ink/[0.03]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="Reading"
+        title="Saved reading"
+        anchor="saved"
+        lede="Articles you marked to return to — or suggestions from our catalog when your shelf is still empty."
+      >
+        <div class="w-ms-async" data-section="saved">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-14 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-14 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="For you"
+        title="Recommended for your interests"
+        anchor="recommended"
+        lede="When you choose topics, we align articles, webinars, and library picks — never noisy."
+      >
+        <div class="w-ms-async" data-section="recommended">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-14 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-14 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="Library"
+        title="New resources"
+        anchor="resources"
+        lede="Recently added guides and references — your topics surface first when we know them."
+      >
+        <div class="w-ms-async" data-section="resources">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-20 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-20 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="Support"
+        title="Consultation request status"
+        anchor="consultation"
+        lede="Private requests you have sent — we read with care and reply when there is something fitting to offer."
+      >
+        <div class="w-ms-async" data-section="consultation">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-16 rounded-lg bg-ink/[0.05]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <MemberSection
+        eyebrow="Your space"
+        title="Complete your Wellness Space"
+        anchor="complete"
+        lede="Topics, profile polish, and doors to the wider library."
+      >
+        <div class="w-ms-async" data-section="complete">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-10 w-full max-w-lg rounded-full bg-ink/[0.05]"></div>
+            <div class="h-24 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      <p class="mt-16 text-sm text-ink-500">
+        <button type="button" id="w-ms-signout" class="link-wfg-ghost">Sign out</button>
+      </p>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { LOGIN_PATH } from '@/lib/auth/constants';
+  import { consultationStatusLabel, formatConsultationIso } from '@/lib/consultation/status-display';
+  import { fetchMemberOverview } from '@/lib/member/overview-data';
+  import { formatMemberSessionInstant } from '@/lib/member/format-dates';
+  import { topicLabel } from '@/lib/member/topic-labels';
+
+  function esc(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function revealSection(slug: string, html: string) {
+    const root = document.querySelector(`[data-section="${slug}"]`);
+    if (!root) return;
+    root.querySelector('[data-skel]')?.classList.add('hidden');
+    const mount = root.querySelector('[data-mount]');
+    if (mount) {
+      mount.innerHTML = html;
+      mount.classList.remove('hidden');
+    }
+  }
+
+  function displayName(profile: { full_name: string | null; display_name: string | null } | null, email: string | undefined): string {
+    const n = profile?.full_name?.trim() || profile?.display_name?.trim();
+    if (n) return n;
+    const local = (email ?? '').split('@')[0];
+    return local || 'friend';
+  }
+
+  function articleListItem(a: {
+    slug: string;
+    title: string | null;
+    excerpt: string | null;
+    topic_key: string | null;
+  }): string {
+    const meta = a.topic_key ? esc(topicLabel(a.topic_key)) : '';
+    const ex = a.excerpt ? `<span class="mt-2 line-clamp-2 block text-sm text-ink-500">${esc(a.excerpt)}</span>` : '';
+    return `<li class="border-b border-ink/[0.06] py-6 first:pt-0">
+      <a class="group block" href="/articles/${esc(a.slug)}">
+        <span class="font-display text-xl text-ink transition-colors group-hover:text-secondary">${esc(a.title ?? '')}</span>
+        ${meta ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${meta}</span>` : ''}
+        ${ex}
+      </a>
+    </li>`;
+  }
+
+  (async () => {
+    const boot = document.getElementById('w-ms-boot');
+    const root = document.getElementById('w-ms-root');
+
+    if (!isSupabaseConfigured()) {
+      if (boot) boot.textContent = 'Supabase keys are missing. Add PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY.';
+      return;
+    }
+
+    const session = await guardSessionOrRedirect();
+    if (!session) return;
+
+    if (boot) boot.classList.add('hidden');
+    root?.classList.remove('hidden');
+
+    const supabase = getSupabaseBrowser();
+    const data = await fetchMemberOverview(supabase, session.user.id);
+
+    const errEl = document.getElementById('w-ms-fetch-err');
+    if (data.fetchError && errEl) {
+      errEl.textContent = `We could not load everything just now (${data.fetchError}). Refresh when you have a moment.`;
+      errEl.classList.remove('hidden');
+    }
+
+    const name = displayName(data.profile, session.user.email ?? undefined);
+    const nameEl = document.getElementById('w-ms-name');
+    if (nameEl) nameEl.textContent = name;
+
+    const fullNameOk = Boolean(data.profile?.full_name?.trim());
+    const hasInterests = data.topicKeys.length > 0;
+    const onboardingOk = data.profile?.onboarding_completed === true;
+
+    /* ─── Next webinar ─── */
+    if (data.upcomingBookings.length > 0) {
+      const next = data.upcomingBookings[0];
+      const w = next.webinars!;
+      const when = esc(formatMemberSessionInstant(w.starts_at, w.timezone));
+      const title = esc(w.title);
+      const href = `/webinars/${esc(w.slug)}`;
+      let hero = `<div class="max-w-2xl rounded-xl border border-ink/[0.08] bg-white/80 p-8 shadow-sm shadow-ink/[0.03]">
+        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Next for you</p>
+        <a class="group mt-4 block" href="${href}">
+          <span class="font-display text-2xl tracking-tight text-ink transition-colors group-hover:text-secondary sm:text-[1.85rem]">${title}</span>
+          <span class="mt-3 block text-sm text-ink-500">${when}</span>
+          <span class="mt-6 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4">Session details →</span>
+        </a>
+      </div>`;
+      if (data.upcomingBookings.length > 1) {
+        const rest = data.upcomingBookings
+          .slice(1)
+          .map((b) => {
+            const ww = b.webinars;
+            if (!ww) return '';
+            const wh = esc(formatMemberSessionInstant(ww.starts_at, ww.timezone));
+            return `<li class="border-b border-ink/[0.06] py-5 first:pt-2">
+              <a class="group flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between" href="/webinars/${esc(ww.slug)}">
+                <span class="font-display text-lg text-ink transition-colors group-hover:text-secondary">${esc(ww.title)}</span>
+                <span class="text-sm text-ink-500">${wh}</span>
+              </a>
+            </li>`;
+          })
+          .join('');
+        hero += `<div class="mt-10"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Also booked</p><ul class="mt-4 max-w-2xl">${rest}</ul></div>`;
+      }
+      revealSection('next-webinar', hero);
+    } else if (data.catalogWebinarsUpcoming.length === 0) {
+      revealSection(
+        'next-webinar',
+        `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">No upcoming webinars scheduled</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">When new sessions open, they will appear here and on the webinars page.</p>
+          <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">Browse webinars</a>
+        </div>`,
+      );
+    } else {
+      const rows = data.catalogWebinarsUpcoming
+        .slice(0, 6)
+        .map((w) => {
+          const tz = w.timezone ?? 'Europe/Riga';
+          const when = esc(formatMemberSessionInstant(w.starts_at!, tz));
+          const meta = w.topic_key ? esc(topicLabel(w.topic_key)) : '';
+          return `<li class="border-b border-ink/[0.06] py-6 first:pt-0">
+            <a class="group block" href="/webinars/${esc(w.slug)}">
+              <span class="font-display text-xl text-ink transition-colors group-hover:text-secondary">${esc(w.title ?? '')}</span>
+              ${meta ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${meta}</span>` : ''}
+              <span class="mt-1.5 block text-sm text-ink-500">${when}</span>
+            </a>
+          </li>`;
+        })
+        .join('');
+      revealSection(
+        'next-webinar',
+        `<div class="max-w-xl border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">Nothing booked yet — open sessions</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">Reserve a seat when one speaks to you; until then, here is what is coming up.</p>
+        </div>
+        <ul class="mt-10 max-w-2xl">${rows}</ul>
+        <p class="mt-8"><a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">All webinars</a></p>`,
+      );
+    }
+
+    /* ─── Continue exploring ─── */
+    type ExplorePiece =
+      | { kind: 'article'; slug: string; title: string; subtitle: string; href: string; external?: boolean }
+      | { kind: 'webinar'; slug: string; title: string; subtitle: string; href: string; external?: boolean }
+      | { kind: 'resource'; slug: string; title: string; subtitle: string; href: string; external?: boolean };
+
+    const explorePieces: ExplorePiece[] = [];
+    for (const a of data.exploreArticles) {
+      const label = a.topic_key ? topicLabel(a.topic_key) : 'Article';
+      explorePieces.push({
+        kind: 'article',
+        slug: a.slug,
+        title: a.title ?? 'Article',
+        subtitle: label,
+        href: `/articles/${a.slug}`,
+      });
+    }
+    for (const w of data.exploreWebinars) {
+      const tz = w.timezone ?? 'Europe/Riga';
+      explorePieces.push({
+        kind: 'webinar',
+        slug: w.slug,
+        title: w.title ?? 'Webinar',
+        subtitle: formatMemberSessionInstant(w.starts_at!, tz),
+        href: `/webinars/${w.slug}`,
+      });
+    }
+    for (const r of data.exploreResources) {
+      const url = r.external_url || r.file_url;
+      explorePieces.push({
+        kind: 'resource',
+        slug: r.slug,
+        title: r.title,
+        subtitle: r.topic_key ? topicLabel(r.topic_key) : 'Resource',
+        href: url ?? `/my-wellness-space/resources`,
+        external: Boolean(url),
+      });
+    }
+
+    if (explorePieces.length === 0) {
+      revealSection(
+        'explore',
+        `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">Nothing to surface yet</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">Articles and the library will fill this strip as content grows.</p>
+          <div class="mt-6 flex flex-wrap gap-4">
+            <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Articles</a>
+            <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">Webinars</a>
+            <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/resources">Resources</a>
+          </div>
+        </div>`,
+      );
+    } else {
+      const badge = (k: ExplorePiece['kind']) => {
+        if (k === 'article') return 'Article';
+        if (k === 'webinar') return 'Live';
+        return 'Library';
+      };
+      const cards = explorePieces
+        .map((p) => {
+          const tag = esc(badge(p.kind));
+          const linkAttrs =
+            p.external && p.href.startsWith('http')
+              ? `href="${esc(p.href)}" target="_blank" rel="noopener noreferrer"`
+              : `href="${esc(p.href)}"`;
+          return `<li class="flex h-full flex-col rounded-xl border border-ink/[0.07] bg-white/85 p-6 shadow-sm shadow-ink/[0.02] transition-shadow hover:shadow-md hover:shadow-ink/[0.04]">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">${tag}</span>
+            <a class="group mt-3 flex flex-1 flex-col" ${linkAttrs}>
+              <span class="font-display text-lg leading-snug text-ink transition-colors group-hover:text-secondary">${esc(p.title)}</span>
+              <span class="mt-2 text-sm text-ink-500">${esc(p.subtitle)}</span>
+              <span class="mt-auto pt-6 text-sm font-medium text-secondary underline decoration-line underline-offset-4">Open →</span>
+            </a>
+          </li>`;
+        })
+        .join('');
+      revealSection('explore', `<ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">${cards}</ul>`);
+    }
+
+    /* ─── Saved reading ─── */
+    const saved = data.savedArticles.filter((f) => f.articles);
+    if (saved.length > 0) {
+      const rows = saved.map((f) => articleListItem(f.articles!)).join('');
+      revealSection(
+        'saved',
+        `<ul class="max-w-2xl">${rows}</ul><p class="mt-8"><a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/saved-articles">All saved articles</a></p>`,
+      );
+    } else if (data.suggestedArticlesWhenNoSaves.length > 0) {
+      const rows = data.suggestedArticlesWhenNoSaves.map((a) => articleListItem(a)).join('');
+      revealSection(
+        'saved',
+        `<p class="mb-6 max-w-xl text-sm leading-relaxed text-ink-600">You have not saved anything yet — here are gentle starting points from our articles.</p>
+        <ul class="max-w-2xl">${rows}</ul>
+        <p class="mt-8"><a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Browse all articles</a></p>`,
+      );
+    } else {
+      revealSection(
+        'saved',
+        `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">Nothing saved yet</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">Use save on articles when you find a piece worth returning to.</p>
+          <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Browse articles</a>
+        </div>`,
+      );
+    }
+
+    /* ─── Recommended for your interests ─── */
+    if (data.topicKeys.length === 0) {
+      revealSection(
+        'recommended',
+        `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">Tell us what draws you</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">Choose a few topics and we will align suggestions across articles, webinars, and the library — calm and optional.</p>
+          <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">Choose interests</a>
+        </div>`,
+      );
+    } else {
+      const blocks: string[] = [];
+
+      if (data.recommendedArticles.length > 0) {
+        const recRows = data.recommendedArticles.map((a) => articleListItem(a)).join('');
+        blocks.push(`<div><h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Articles</h3><ul class="mt-4 max-w-2xl">${recRows}</ul></div>`);
+      }
+
+      if (data.recommendedWebinars.length > 0) {
+        const wRows = data.recommendedWebinars
+          .map((w) => {
+            const tz = w.timezone ?? 'Europe/Riga';
+            const when = esc(formatMemberSessionInstant(w.starts_at!, tz));
+            const meta = w.topic_key ? esc(topicLabel(w.topic_key)) : '';
+            return `<li class="border-b border-ink/[0.06] py-6 first:pt-0">
+              <a class="group block" href="/webinars/${esc(w.slug)}">
+                <span class="font-display text-xl text-ink transition-colors group-hover:text-secondary">${esc(w.title ?? '')}</span>
+                ${meta ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${meta}</span>` : ''}
+                <span class="mt-1.5 block text-sm text-ink-500">${when}</span>
+              </a>
+            </li>`;
+          })
+          .join('');
+        blocks.push(`<div><h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Live webinars</h3><ul class="mt-4 max-w-2xl">${wRows}</ul></div>`);
+      }
+
+      const recRes = data.recommendedResources;
+      if (recRes.length > 0) {
+        const resRows = recRes
+          .map((r) => {
+            const topic = r.topic_key ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${esc(topicLabel(r.topic_key))}</span>` : '';
+            const desc = r.description
+              ? `<p class="mt-2 line-clamp-2 text-sm text-ink-600">${esc(r.description)}</p>`
+              : '';
+            const url = r.external_url || r.file_url;
+            const link = url
+              ? `<a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Open</a>`
+              : `<span class="text-sm text-ink-400">Link coming soon</span>`;
+            return `<li class="border-b border-ink/[0.06] py-7 first:pt-0">
+              <div class="max-w-2xl">
+                <span class="font-display text-xl text-ink">${esc(r.title)}</span>
+                ${topic}
+                ${desc}
+                <div class="mt-4">${link}</div>
+              </div>
+            </li>`;
+          })
+          .join('');
+        blocks.push(`<div><h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Resources</h3><ul class="mt-4">${resRows}</ul></div>`);
+      }
+
+      if (blocks.length === 0) {
+        revealSection(
+          'recommended',
+          `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+            <p class="font-display text-lg text-ink">Nothing extra matched yet</p>
+            <p class="mt-2 text-sm leading-relaxed text-ink-600">Published pieces and sessions aligned with your topics will appear here.</p>
+            <div class="mt-6 flex flex-wrap gap-4">
+              <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Articles</a>
+              <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">Webinars</a>
+            </div>
+          </div>`,
+        );
+      } else {
+        revealSection(
+          'recommended',
+          `<div class="space-y-14">${blocks.join('')}</div>
+          <p class="mt-10 flex flex-wrap gap-6">
+            <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">All articles</a>
+            <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">All webinars</a>
+          </p>`,
+        );
+      }
+    }
+
+    /* ─── New resources ─── */
+    if (data.recentResources.length === 0) {
+      revealSection(
+        'resources',
+        `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">No resources visible yet</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">Published member resources will appear here as they arrive.</p>
+          <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/resources">Open resources</a>
+        </div>`,
+      );
+    } else {
+      const rows = data.recentResources
+        .map((r) => {
+          const topic = r.topic_key ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${esc(topicLabel(r.topic_key))}</span>` : '';
+          const desc = r.description
+            ? `<p class="mt-2 line-clamp-2 text-sm text-ink-600">${esc(r.description)}</p>`
+            : '';
+          return `<li class="border-b border-ink/[0.06] py-7 first:pt-0">
+            <div class="max-w-2xl">
+              <span class="font-display text-xl text-ink">${esc(r.title)}</span>
+              ${topic}
+              ${desc}
+              <div class="mt-4">
+                ${
+                  r.external_url
+                    ? `<a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="${esc(r.external_url)}" target="_blank" rel="noopener noreferrer">Open link</a>`
+                    : r.file_url
+                      ? `<a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="${esc(r.file_url)}" target="_blank" rel="noopener noreferrer">View file</a>`
+                      : `<span class="text-sm text-ink-400">Link coming soon</span>`
+                }
+              </div>
+            </div>
+          </li>`;
+        })
+        .join('');
+      const resourcesLead =
+        data.topicKeys.length > 0
+          ? `<p class="mb-8 max-w-xl text-sm leading-relaxed text-ink-600">Topics you follow rise to the top; we quietly round out from the wider shelf.</p>`
+          : '';
+      revealSection(
+        'resources',
+        `${resourcesLead}<ul>${rows}</ul><p class="mt-10"><a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/resources">All resources</a></p>`,
+      );
+    }
+
+    /* ─── Consultation status ─── */
+    if (data.consultations.length === 0) {
+      revealSection(
+        'consultation',
+        `<div class="max-w-xl border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+          <p class="font-display text-lg text-ink">No requests yet</p>
+          <p class="mt-2 text-sm leading-relaxed text-ink-600">When you would like human guidance alongside the written work, tell us in a few sentences — we read with care.</p>
+          <a class="btn-primary mt-8 inline-flex min-h-11 items-center justify-center px-8" href="/my-wellness-space/consultation">Request a consultation</a>
+        </div>`,
+      );
+    } else {
+      const rows = data.consultations
+        .map((c) => {
+          const topicLine = c.topic ? `<p class="mt-1 text-sm text-ink-600">${esc(c.topic)}</p>` : '';
+          return `<li class="border-b border-ink/[0.06] py-6 first:pt-0">
+            <p class="text-xs font-medium uppercase tracking-wider text-ink-400">${esc(formatConsultationIso(c.created_at))}</p>
+            ${topicLine}
+            <p class="mt-2 text-sm font-medium text-ink">${esc(consultationStatusLabel(c.status))}</p>
+          </li>`;
+        })
+        .join('');
+      revealSection(
+        'consultation',
+        `<ul class="max-w-2xl">${rows}</ul>
+        <p class="mt-10"><a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/consultation">Update or send another request →</a></p>`,
+      );
+    }
+
+    /* ─── Complete your Wellness Space ─── */
+    let topicsBlock = '';
+    if (data.topicKeys.length === 0) {
+      topicsBlock = `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Topics you follow</p>
+        <p class="font-display mt-3 text-lg text-ink">None chosen yet</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">Tell us which areas you want this space to hold.</p>
+        <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">Choose interests</a>
+      </div>`;
+    } else {
+      const chips = data.topicKeys
+        .map((k) => {
+          const label = esc(topicLabel(k));
+          return `<span class="inline-flex items-center rounded-full border border-ink/10 bg-white/90 px-4 py-2 text-sm text-ink-700 shadow-sm shadow-ink/[0.02]">${label}</span>`;
+        })
+        .join('');
+      topicsBlock = `<div>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Topics you follow</p>
+        <div class="mt-4 flex max-w-2xl flex-wrap gap-2.5">${chips}</div>
+        <p class="mt-6 text-sm text-ink-500"><a class="font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">Refine interests</a></p>
+      </div>`;
+    }
+
+    const reasons: string[] = [];
+    if (!hasInterests) reasons.push('choose a few topics you are drawn toward');
+    if (!fullNameOk) reasons.push('add how you would like to be named');
+    if (!onboardingOk) reasons.push('mark onboarding complete when this space feels ready');
+
+    let nudgeBlock = '';
+    if (reasons.length > 0) {
+      nudgeBlock = `<div class="max-w-2xl border-l-[3px] border-secondary/40 pl-5 sm:pl-6">
+        <p class="font-display text-lg text-ink">A little more polish</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">Whenever you have a quiet minute, you might ${reasons.join(', ')} — it helps us meet you gently.</p>
+      </div>`;
+    }
+
+    const completeHtml = `<div class="space-y-12">
+      ${topicsBlock}
+      ${nudgeBlock}
+      <div class="flex flex-wrap gap-x-8 gap-y-3 border-t border-ink/[0.06] pt-10">
+        <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">My interests</a>
+        <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/account">Account settings</a>
+        <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/community/dashboard">Community library →</a>
+      </div>
+    </div>`;
+    revealSection('complete', completeHtml);
+  })();
+
+  document.getElementById('w-ms-signout')?.addEventListener('click', async () => {
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabaseBrowser();
+    await supabase.auth.signOut();
+    window.location.replace(LOGIN_PATH);
+  });
+</script>

@@ -1,134 +1,161 @@
 ---
-import { getCollection, render } from 'astro:content';
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import MarketingHero from '@/components/layout/MarketingHero.astro';
 import HomePageFooter from '@/components/home/HomePageFooter.astro';
 import { marketingPageLayout } from '@/lib/marketing-page';
-import RichText from '@/components/content/RichText.astro';
 import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
-import OfferNarrativeSections from '@/components/offer/OfferNarrativeSections.astro';
-import RelatedJournal from '@/components/offer/RelatedJournal.astro';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
 import WebinarInterestForm from '@/components/forms/WebinarInterestForm.astro';
-import { publishedOnly } from '@/lib/content-filters';
-import { formatDate, formatTime } from '@/lib/format';
-import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
-import { resolveRelatedArticles } from '@/lib/related-journal';
 import { webinarEventJsonLd } from '@/lib/seo';
+import { fetchWebinarsForBuild } from '@/lib/supabase/webinar-build-fetch';
+import { topicLabel } from '@/lib/member/topic-labels';
+import { formatWebinarScheduleStart } from '@/lib/webinars/format-schedule';
+
 export async function getStaticPaths() {
-  const items = await getCollection('webinars', publishedOnly);
-  const used = new Map<string, string>();
-  for (const e of items) {
-    const key = e.data.slug ?? e.id;
-    const prev = used.get(key);
-    if (prev && prev !== e.id) throw new Error(`Duplicate webinar public slug "${key}"`);
-    used.set(key, e.id);
-  }
-  return items.map((entry) => ({ params: { slug: entry.data.slug ?? entry.id } }));
+  const rows = await fetchWebinarsForBuild();
+  return rows.map((row) => ({ params: { slug: row.slug } }));
 }
 
 const { slug } = Astro.params;
-const items = await getCollection('webinars', publishedOnly);
-const entry = resolveByPublicSlug(items, slug!);
-if (!entry) throw new Error(`Webinar not found: ${slug}`);
-const publicSlug = entry.data.slug ?? entry.id;
-const { Content } = await render(entry);
-const w = entry.data;
-const related = await resolveRelatedArticles(w.relatedArticleIds);
-const eyebrow = `${w.isFree ? 'Free · ' : ''}${w.format === 'live' ? 'Live session' : 'Recorded session'} · ${w.durationMinutes} minutes`;
-const metaTitle = w.seoTitle ?? w.title;
-const metaDescription = w.seoDescription ?? w.excerpt;
-const canonical = offerPath('webinars', entry);
-const blocks = [
-  { id: 'what', title: 'What it is', body: w.whatItIs },
-  { id: 'who', title: 'Who it is for', body: w.whoItIsFor },
-  { id: 'why', title: 'Why it matters', body: w.whyItMatters },
-  { id: 'expect', title: 'What to expect', body: w.whatToExpect },
-];
+const rows = await fetchWebinarsForBuild();
+const row = rows.find((r) => r.slug === slug);
+if (!row) throw new Error(`Webinar not found: ${slug}`);
+
+const topic = row.topic_key ? topicLabel(row.topic_key) : '';
+const ended =
+  row.ends_at != null ? new Date(row.ends_at).getTime() < Date.now() : new Date(row.starts_at).getTime() < Date.now();
+
+const eyebrow = ended
+  ? 'Gathering archive'
+  : row.booking_open
+    ? topic
+      ? `Open invitation · ${topic}`
+      : 'Open invitation · Live gathering'
+    : topic
+      ? `Invitation paused · ${topic}`
+      : 'Invitation paused';
+
+const metaTitle = row.title;
+const metaDescription =
+  row.description?.replace(/\s+/g, ' ').trim().slice(0, 155) ??
+  'A slower tempo for learning — clear framing and honest uncertainty.';
+const canonicalPath = `/webinars/${row.slug}`;
+
+const durMin = row.ends_at
+  ? Math.max(15, Math.round((new Date(row.ends_at).getTime() - new Date(row.starts_at).getTime()) / 60_000))
+  : 90;
 
 const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
-const webinarPageUrl = new URL(canonical, siteBase).toString();
+const webinarPageUrl = new URL(canonicalPath, siteBase).toString();
 const webinarLd = webinarEventJsonLd({
-  name: w.title,
+  name: row.title,
   description: metaDescription,
   url: webinarPageUrl,
-  startDate: w.startAt,
-  durationMinutes: w.durationMinutes,
-  imageUrl: w.coverImage,
+  startDate: new Date(row.starts_at),
+  durationMinutes: durMin,
   isOnline: true,
 });
+
+const paragraphs = (row.description ?? '')
+  .split(/\n\n+/)
+  .map((p) => p.trim())
+  .filter(Boolean);
+
+const webinarDetailPayload = {
+  id: row.id,
+  slug: row.slug,
+  title: row.title,
+  topicLabel: topic || null,
+  startsAt: row.starts_at,
+  endsAt: row.ends_at,
+  timezone: row.timezone,
+  timezoneLabel: row.timezone.replace(/_/g, ' '),
+  seatLimit: row.seat_limit,
+  bookingOpen: row.booking_open,
+  replayUrl: row.replay_url,
+};
+
+const schedulePreview = formatWebinarScheduleStart(row);
 ---
 
 <BaseLayout
   title={metaTitle}
   description={metaDescription}
-  canonicalPath={canonical}
-  ogImagePath={w.coverImage}
-  ogImageAlt={w.coverImage ? `Session image: ${w.title}` : undefined}
+  canonicalPath={canonicalPath}
   jsonLd={webinarLd}
   {...marketingPageLayout}
 >
   <article>
     <MarketingHero
       eyebrow={eyebrow}
-      title={w.title}
-      description={w.excerpt}
-      imageUrl={w.coverImage}
-      imageAlt={w.coverImage ? `Session image: ${w.title}` : `Session: ${w.title}`}
+      title={row.title}
+      description={metaDescription}
+      compact
     >
       <div slot="actions" class="space-y-4">
         <p class="wfg-hero-line text-sm text-white/80 [text-shadow:0_1px_1px_rgba(0,0,0,0.12)]">
-          {formatDate(w.startAt)}
-          {w.format === 'live' && ` · ${formatTime(w.startAt)}`} · {w.host}
+          {schedulePreview}
         </p>
-        {w.trustNote && (
-          <p class="max-w-2xl border-l-2 border-white/25 pl-4 text-sm leading-relaxed text-white/90 [text-shadow:0_1px_1px_rgba(0,0,0,0.1)] sm:text-base">
-            {w.trustNote}
-          </p>
-        )}
         <div class="flex flex-wrap gap-3">
-          {w.primaryLink && (
-            <a class="btn-cta-invert" href={w.primaryLink}>
-              {w.format === 'live' ? (w.isFree ? 'Save your place' : 'Register') : 'Access or recording'}
-            </a>
-          )}
-          <a class="btn-cta-invert-ghost" href="/webinars">
-            All sessions
-          </a>
+          <a class="btn-cta-invert-ghost" href="/webinars"> All gatherings </a>
         </div>
       </div>
     </MarketingHero>
+
     <Section tone="default" spacing="comfortable" class="!pt-0">
       <Container>
-        <OfferNarrativeSections blocks={blocks} />
+        <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] lg:gap-14 xl:gap-16">
+          <div class="max-w-3xl">
+            <h2 class="text-eyebrow">About this hour</h2>
+            <div class="mt-4 space-y-5 text-lg leading-relaxed text-ink-700">
+              {paragraphs.length > 0 ? paragraphs.map((p) => <p>{p}</p>) : <p>{metaDescription}</p>}
+            </div>
+          </div>
+
+          <aside class="lg:sticky lg:top-28 lg:self-start">
+            <div id="w-webinar-meta-slot" class="rounded-2xl border border-ink/10 bg-paper/90 px-6 py-8 shadow-elevated sm:px-8">
+              <p class="text-sm text-ink-500">Schedule & availability load here.</p>
+            </div>
+            <div id="w-webinar-book-root" class="mt-6"></div>
+          </aside>
+        </div>
       </Container>
     </Section>
+
     <Section tone="contrast" spacing="comfortable" class="!pt-0">
       <Container narrow>
-        <h2 class="text-eyebrow">A little more context</h2>
-        <RichText as="div" variant="article" class="mt-2">
-          <Content />
-        </RichText>
-      </Container>
-    </Section>
-    <Section tone="default" spacing="comfortable" class="!pt-0">
-      <Container narrow>
-        <h2 class="text-eyebrow">Stay close to this session</h2>
-        <p class="mt-2 font-display text-2xl text-ink-800 sm:text-3xl">Reminders &amp; replays</p>
-        <p class="mt-2 text-ink-600 leading-relaxed max-w-2xl">
-          Low volume. Unsubscribe anytime.
+        <h2 class="text-eyebrow">Stay close</h2>
+        <p class="mt-2 font-display text-2xl text-ink-800 sm:text-3xl">Reminders outside the room</p>
+        <p class="mt-2 max-w-2xl leading-relaxed text-ink-600">
+          Low volume. Unsubscribe anytime — another gentle thread if you cannot join live.
         </p>
         <WebinarInterestForm
-          id={`webinar-interest-${publicSlug}`}
-          webinarSlug={publicSlug}
-          webinarTitle={w.title}
+          id={`webinar-interest-${row.slug}`}
+          webinarSlug={row.slug}
+          webinarTitle={row.title}
           class="mt-6"
         />
       </Container>
     </Section>
-    <RelatedJournal entries={related} />
+
     <CommunitySpine page="webinar" compact id="spine-after-webinar" />
   </article>
   <HomePageFooter slot="footer" />
 </BaseLayout>
+
+  <div id="w-webinar-bootstrap" class="hidden" data-json={JSON.stringify(webinarDetailPayload)} aria-hidden="true"></div>
+  <script>
+    import { initWebinarDetailBooking } from '@/scripts/webinar-detail-booking';
+    import type { WebinarDetailPayload } from '@/scripts/webinar-detail-booking';
+
+    const el = document.getElementById('w-webinar-bootstrap');
+    const raw = el?.dataset.json;
+    if (raw) {
+      try {
+        initWebinarDetailBooking(JSON.parse(raw) as WebinarDetailPayload);
+      } catch {
+        console.warn('[webinar-detail] invalid bootstrap payload');
+      }
+    }
+  </script>

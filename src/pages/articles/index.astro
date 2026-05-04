@@ -79,7 +79,7 @@ const topicFilterValues = ['all', ...activePillars] as const;
       <p
         class="max-w-3xl text-balance text-base leading-[1.75] text-charcoal sm:text-lg"
       >
-        Welcome. The journal is organized around <strong class="font-medium text-ink">five themes</strong>—Clarity, Regulation, Environment, Energy
+        Welcome. Articles here are organized around <strong class="font-medium text-ink">five themes</strong>—Clarity, Regulation, Environment, Energy
         &amp; Frequency, and Practices &amp; Rituals. Use the topic chips to focus one theme, or add a keyword to narrow further. There is
         no race; follow what fits your week.
       </p>
@@ -301,4 +301,9 @@ const topicFilterValues = ['all', ...activePillars] as const;
   }
 
   applyFilters();
+</script>
+
+<script>
+  import { initArticleFavorites } from '@/scripts/article-favorites';
+  initArticleFavorites();
 </script>

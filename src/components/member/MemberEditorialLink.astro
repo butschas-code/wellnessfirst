@@ -1,0 +1,18 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  /** Secondary line under title */
+  meta?: string;
+}
+
+const { href, title, meta } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group block border-b border-ink/[0.06] py-5 transition-colors first:border-t first:border-ink/[0.06] sm:first:border-t-0"
+>
+  <span class="font-display text-[1.15rem] text-ink transition-colors group-hover:text-secondary sm:text-xl">{title}</span>
+  {meta && <span class="mt-1.5 block text-sm text-ink-500">{meta}</span>}
+</a>

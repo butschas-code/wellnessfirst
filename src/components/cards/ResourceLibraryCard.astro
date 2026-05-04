@@ -1,0 +1,60 @@
+---
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string | null;
+  shelfLabel: string;
+  topicLabel: string;
+  /** IANA-style topic key or empty when uncategorised */
+  topicKey: string;
+  typeKey: string;
+}
+
+const { slug, title, description, shelfLabel, topicLabel, topicKey, typeKey } = Astro.props;
+const href = `/resources/${slug}`;
+const excerpt =
+  (description ?? '').replace(/\s+/g, ' ').trim().slice(0, 200) ||
+  'A quiet reference to open in your own tempo.';
+---
+
+<article
+  class="resource-card group flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 shadow-elevated transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-secondary/25 hover:shadow-md"
+  data-resource-card
+  data-topic={topicKey}
+  data-type={typeKey}
+>
+  <a href={href} class="block no-underline" tabindex="-1" aria-hidden="true">
+    <div class="relative aspect-[4/3] overflow-hidden border-b border-ink/5 sm:aspect-[16/10]">
+      <EditorialImageSlot
+        src={undefined}
+        alt=""
+        frame="card"
+        ratio="3-2"
+        heroVariant="article"
+        showPlaceholderWhenEmpty
+        fillFrame
+        class="absolute inset-0 h-full w-full min-h-0 opacity-95 transition duration-500 group-hover:scale-[1.02]"
+      />
+    </div>
+  </a>
+  <div class="flex flex-1 flex-col p-5 sm:p-6">
+    <p class="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-secondary">{shelfLabel}</p>
+    <h3 class="mt-2 font-display text-lg font-medium leading-snug text-ink sm:text-xl">
+      <a class="text-inherit no-underline transition group-hover:text-secondary" href={href}>{title}</a>
+    </h3>
+    {
+      topicLabel && (
+        <p class="mt-2 text-xs font-medium uppercase tracking-wider text-ink-400">{topicLabel}</p>
+      )
+    }
+    <p class="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-ink-600 sm:text-base">{excerpt}</p>
+    <a
+      class="mt-5 inline-flex w-fit text-sm font-medium text-secondary underline decoration-line underline-offset-4 no-underline transition hover:text-ink"
+      href={href}
+    >
+      Open in the library →
+    </a>
+  </div>
+</article>

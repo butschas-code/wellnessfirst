@@ -1,0 +1,66 @@
+---
+interface Props {
+  catalogSlug: string;
+}
+
+const { catalogSlug } = Astro.props;
+---
+
+<section
+  id="private-reflection"
+  class="scroll-mt-28 border-t border-ink/[0.07] bg-[linear-gradient(180deg,_rgba(250,248,245,0.92)_0%,_rgba(255,255,255,1)_100%)] py-12 sm:py-14"
+  aria-label="Private reflection"
+>
+  <div class="container-wfg max-w-3xl">
+    <div data-article-reflection-root data-catalog-slug={catalogSlug}>
+      <div data-w-ar-loading class="rounded-2xl border border-ink/10 bg-paper/80 px-5 py-6 sm:px-7">
+        <p class="text-sm text-ink-500">Checking sign-in…</p>
+      </div>
+
+      <div data-w-ar-no-config class="hidden rounded-2xl border border-ink/10 bg-paper/80 px-5 py-6 sm:px-7">
+        <p class="font-display text-lg text-ink">Reflections unavailable</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">Article notes require the live catalog connection.</p>
+      </div>
+
+      <div data-w-ar-no-catalog class="hidden rounded-2xl border border-amber-200/80 bg-amber-50/60 px-5 py-6 sm:px-7">
+        <p class="text-sm leading-relaxed text-ink-700">
+          This piece is not linked to the member catalog yet, so private notes cannot attach here.
+        </p>
+      </div>
+
+      <div data-w-ar-logged-out class="hidden rounded-2xl border border-ink/10 bg-paper/95 px-5 py-7 shadow-elevated sm:px-8">
+        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Private notes</p>
+        <p class="mt-3 font-display text-xl text-ink">Your space beside this article</p>
+        <p class="mt-3 text-sm leading-relaxed text-ink-600">
+          Keep notes only you can see—quiet sentences for another reading, not comments or conversation.
+        </p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <a class="btn-primary inline-flex justify-center no-underline" href="#" data-w-ar-login>Log in</a>
+          <a class="btn-secondary inline-flex justify-center no-underline" href="#" data-w-ar-signup>Create free account</a>
+        </div>
+      </div>
+
+      <div data-w-ar-private class="hidden rounded-2xl border border-secondary/15 bg-paper px-5 py-7 shadow-elevated sm:px-8">
+        <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Private reflection</p>
+        <p class="mt-2 font-display text-xl text-ink">Only you see this</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-600">
+          Not shared with anyone — your notes beside this piece. Edit anytime from here or from My Wellness Space.
+        </p>
+        <label class="mt-6 block">
+          <span class="sr-only">Reflection</span>
+          <textarea
+            data-w-ar-textarea
+            rows={8}
+            maxlength={12000}
+            class="mt-1 w-full resize-y rounded-xl border border-ink/12 bg-white px-4 py-3 text-[0.95rem] leading-relaxed text-ink shadow-inner placeholder:text-ink-400 focus:border-secondary/35 focus:outline-none focus:ring-2 focus:ring-secondary/20"
+            placeholder="What landed for you—honestly, plainly…"></textarea>
+        </label>
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button type="button" data-w-ar-save class="btn-primary">Save</button>
+          <button type="button" data-w-ar-delete class="btn-secondary hidden">Delete</button>
+        </div>
+        <p data-w-ar-status class="mt-3 hidden text-sm" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>

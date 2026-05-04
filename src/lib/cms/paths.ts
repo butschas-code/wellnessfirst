@@ -2,7 +2,7 @@
  * Admin routes (mirrors a compact “abexis-style” map: one hub + tools + Decap on `/admin/`).
  */
 export const CMS_PATHS = {
-  authLogin: '/app/sign-in',
+  authLogin: '/login',
   cmsRoot: '/app/cms',
   cmsArticles: '/app/cms/articles',
   cmsWebinars: '/app/cms/webinars',

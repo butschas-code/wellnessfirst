@@ -11,7 +11,7 @@ import { getUnsplashPlaceholderUrl } from '@/lib/unsplash-placeholders';
 import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
 import {
   homeFeaturedArticleIds,
-  homeJournalDisplay,
+  homeFeaturedArticleDisplay,
   homeMetaDescription,
 } from '@/lib/homepage-marketing';
 import { marketingPageLayout } from '@/lib/marketing-page';
@@ -30,9 +30,9 @@ const fiveSubjectsParallaxUrl = '/images/home-parallax.jpg';
 
 const [articles] = await Promise.all([getPublished('articles')]);
 
-const journalBlocks = homeFeaturedArticleIds.map((id) => {
+const featuredArticleBlocks = homeFeaturedArticleIds.map((id) => {
   const entry = articles.find((a) => a.id === id);
-  const fallback = homeJournalDisplay[id];
+  const fallback = homeFeaturedArticleDisplay[id];
   const display = entry
     ? { category: entry.data.category, title: entry.data.title, summary: entry.data.excerpt }
     : fallback;
@@ -397,13 +397,13 @@ function exploreHash(id: HomePillarId): string {
   <section
     class="wfg-home-band wfg-home-skin"
     data-skin="journal"
-    id="journal"
+    id="home-articles"
     data-bg="#d7e2da"
-    aria-labelledby="h-journal"
+    aria-labelledby="h-home-articles"
   >
     <div class="wfg-home-skin-inner container-wfg max-w-[88rem] py-16 md:py-24" data-reveal>
       <div class="wfg-reveal-child" style="--stagger: 0">
-        <h2 id="h-journal" class="font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl">
+        <h2 id="h-home-articles" class="font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl">
           Explore our articles
         </h2>
       </div>
@@ -411,7 +411,7 @@ function exploreHash(id: HomePillarId): string {
         class="mt-12 grid list-none grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 md:mt-14 lg:grid-cols-3 lg:gap-8"
         role="list"
       >
-        {journalBlocks.map((row, i) => (
+        {featuredArticleBlocks.map((row, i) => (
           <li class="min-h-0 wfg-reveal-child" style={`--stagger: ${1 + (i % 5)}`}>
             <article
               class="group flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 shadow-elevated transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:border-secondary/20 hover:shadow-md"
@@ -560,7 +560,7 @@ function exploreHash(id: HomePillarId): string {
         id="h-home-slow-close"
         class="text-pretty text-center font-display text-lg font-medium leading-relaxed text-white sm:text-xl"
       >
-        Take your time—journal, live hours, and the desk are not going anywhere. When you are ready, the next step is
+        Take your time — articles, live hours, and the desk are not going anywhere. When you are ready, the next step is
         still yours to choose.
       </h2>
     </div>

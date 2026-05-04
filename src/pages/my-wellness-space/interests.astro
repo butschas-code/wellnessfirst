@@ -1,0 +1,195 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import { TOPIC_KEYS, TOPIC_LABELS } from '@/lib/member/topic-labels';
+---
+
+<AppLayout title="My interests" description="Themes your Wellness Space holds for you." memberShell={true} memberNav="interests">
+  <div class="container-wfg max-w-4xl pb-24 pt-10 sm:pt-14">
+    <p id="w-int-state" class="text-sm text-ink-500">Opening…</p>
+
+    <div id="w-int-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Your space</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">My interests</h1>
+      <p class="mt-5 max-w-2xl text-[1.05rem] leading-relaxed text-ink-600">
+        Choose the areas you want your Wellness Space to quietly hold for you — not a marketing list, only gentle orientation for readings and resources.
+      </p>
+
+      <form id="w-int-form" class="mt-12">
+        <fieldset class="border-0 p-0">
+          <legend class="sr-only">Areas to hold in your Wellness Space</legend>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            {
+              TOPIC_KEYS.map((key) => (
+                <label
+                  class:list={[
+                    'group relative flex min-h-[5.75rem] cursor-pointer flex-col justify-center rounded-2xl border border-ink/[0.08] bg-white/95 px-5 py-4 shadow-sm shadow-ink/[0.02]',
+                    'transition-[border-color,background-color,box-shadow] hover:border-secondary/30 hover:bg-white',
+                    'has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-secondary/35',
+                    'has-[:checked]:border-secondary/50 has-[:checked]:bg-secondary/[0.07]',
+                  ]}
+                >
+                  <input type="checkbox" name="topic" value={key} class="peer sr-only" data-topic-checkbox />
+                  <span class="pointer-events-none font-display text-[1.15rem] leading-snug text-ink">{TOPIC_LABELS[key]}</span>
+                  <span class="pointer-events-none mt-2 text-xs text-ink-500 opacity-0 transition-opacity peer-checked:opacity-100">
+                    Held for you
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <p id="w-int-count" class="mt-8 text-sm text-ink-500" aria-live="polite"></p>
+
+        <p id="w-int-error" class="mt-6 hidden text-sm text-red-800" role="alert"></p>
+        <p id="w-int-ok" class="mt-6 hidden rounded-lg border border-secondary/25 bg-white/95 px-4 py-3 text-sm leading-relaxed text-ink-800" role="status"></p>
+
+        <button type="submit" id="w-int-submit" class="btn-primary mt-8 min-h-11 px-10">
+          Save choices
+        </button>
+      </form>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+
+  function selectedKeys(form: HTMLFormElement): string[] {
+    return Array.from(form.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]:checked')).map((b) => b.value);
+  }
+
+  function updateCount(form: HTMLFormElement, el: HTMLElement | null) {
+    if (!el) return;
+    const n = selectedKeys(form).length;
+    el.textContent =
+      n === 0 ? 'No areas selected yet — choose whenever it feels right.' : `${n} ${n === 1 ? 'area' : 'areas'} selected.`;
+  }
+
+  (async () => {
+    const state = document.getElementById('w-int-state');
+    const panel = document.getElementById('w-int-panel');
+    const form = document.getElementById('w-int-form') as HTMLFormElement | null;
+    const err = document.getElementById('w-int-error');
+    const ok = document.getElementById('w-int-ok');
+    const countEl = document.getElementById('w-int-count');
+    const submitBtn = document.getElementById('w-int-submit') as HTMLButtonElement | null;
+
+    if (!isSupabaseConfigured() || !form) {
+      state!.textContent = 'Supabase is not configured.';
+      return;
+    }
+
+    const session = await guardSessionOrRedirect();
+    if (!session) return;
+
+    const userId = session.user.id;
+    const formEl = form;
+
+    const supabase = getSupabaseBrowser();
+    let existingKeys = new Set<string>();
+
+    async function loadPrefs() {
+      const { data: prefs, error } = await supabase.from('topic_preferences').select('topic_key').eq('user_id', userId);
+      if (error) {
+        state!.textContent = error.message;
+        return false;
+      }
+      existingKeys = new Set((prefs ?? []).map((p) => p.topic_key));
+      formEl.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]').forEach((cb) => {
+        cb.checked = existingKeys.has(cb.value);
+      });
+      updateCount(formEl, countEl);
+      return true;
+    }
+
+    const loaded = await loadPrefs();
+    if (!loaded) return;
+
+    state?.classList.add('hidden');
+    panel?.classList.remove('hidden');
+
+    formEl.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]').forEach((cb) => {
+      cb.addEventListener('change', () => updateCount(formEl, countEl));
+    });
+
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err?.classList.add('hidden');
+      ok?.classList.add('hidden');
+
+      const keys = selectedKeys(formEl);
+      const selectedSet = new Set(keys);
+
+      const toRemove = [...existingKeys].filter((k) => !selectedSet.has(k));
+      const toAdd = [...selectedSet].filter((k) => !existingKeys.has(k));
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving…';
+      }
+
+      if (toRemove.length > 0) {
+        const { error: delErr } = await supabase.from('topic_preferences').delete().eq('user_id', userId).in('topic_key', toRemove);
+        if (delErr) {
+          if (err) {
+            err.textContent = delErr.message;
+            err.classList.remove('hidden');
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save choices';
+          }
+          return;
+        }
+      }
+
+      if (toAdd.length > 0) {
+        const { error: insErr } = await supabase
+          .from('topic_preferences')
+          .insert(toAdd.map((topic_key) => ({ user_id: userId, topic_key })));
+        if (insErr) {
+          if (err) {
+            err.textContent = insErr.message;
+            err.classList.remove('hidden');
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save choices';
+          }
+          return;
+        }
+      }
+
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ onboarding_completed: keys.length >= 1 })
+        .eq('id', userId);
+
+      if (profileErr) {
+        if (err) {
+          err.textContent = `Topics saved, but profile could not be updated: ${profileErr.message}`;
+          err.classList.remove('hidden');
+        }
+      }
+
+      existingKeys = selectedSet;
+
+      if (ok) {
+        ok.textContent =
+          keys.length === 0
+            ? 'Saved. Your overview will offer general suggestions until you choose areas again.'
+            : 'Saved. Your overview will quietly favour readings and resources that honour these themes.';
+        ok.classList.remove('hidden');
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save choices';
+      }
+      updateCount(formEl, countEl);
+    });
+  })();
+</script>

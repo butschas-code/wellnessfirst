@@ -1,0 +1,53 @@
+---
+import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
+import { topicLabel } from '@/lib/member/topic-labels';
+import { formatWebinarScheduleStart } from '@/lib/webinars/format-schedule';
+import type { WebinarBuildRow } from '@/lib/supabase/webinar-build-fetch';
+
+interface Props {
+  row: WebinarBuildRow;
+}
+
+const { row } = Astro.props;
+const href = `/webinars/${row.slug}`;
+const when = formatWebinarScheduleStart(row);
+const topic = row.topic_key ? topicLabel(row.topic_key) : '';
+const excerptRaw = (row.description ?? '').replace(/\s+/g, ' ').trim().slice(0, 220);
+const excerpt = excerptRaw.length > 0 ? excerptRaw : 'A calm gathering — arrive as you are.';
+const ended =
+  row.ends_at != null ? new Date(row.ends_at).getTime() < Date.now() : new Date(row.starts_at).getTime() < Date.now();
+const eyebrow = ended ? 'Past session' : row.booking_open ? 'Upcoming invitation' : 'On-demand replay';
+---
+
+<article
+  class="group flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-ink/10 bg-paper/95 shadow-elevated transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:border-secondary/25 hover:shadow-md"
+>
+  <a href={href} class="block no-underline" tabindex="-1" aria-hidden="true">
+    <div class="relative aspect-[4/3] overflow-hidden border-b border-ink/5 sm:aspect-[3/2]">
+      <EditorialImageSlot
+        src={undefined}
+        alt=""
+        frame="card"
+        ratio="3-2"
+        heroVariant="webinar"
+        showPlaceholderWhenEmpty
+        fillFrame
+        class="absolute inset-0 h-full w-full min-h-0 transition duration-500 group-hover:scale-[1.03]"
+      />
+    </div>
+  </a>
+  <div class="flex flex-1 flex-col p-5 sm:p-6 md:p-7">
+    <p class="text-eyebrow text-[0.65rem] text-secondary">{eyebrow}{topic ? ` · ${topic}` : ''}</p>
+    <h3 class="mt-2 font-display text-lg font-medium leading-snug text-ink sm:text-xl">
+      <a class="text-inherit no-underline transition group-hover:text-secondary" href={href}>{row.title}</a>
+    </h3>
+    <p class="mt-3 line-clamp-4 flex-1 text-base leading-relaxed text-charcoal sm:line-clamp-5">{excerpt}</p>
+    <p class="mt-3 text-sm font-medium text-ink-600">{when}</p>
+    <a
+      class="mt-5 inline-flex w-fit text-sm font-medium text-secondary underline decoration-line underline-offset-4 no-underline transition hover:text-ink"
+      href={href}
+    >
+      View invitation →
+    </a>
+  </div>
+</article>

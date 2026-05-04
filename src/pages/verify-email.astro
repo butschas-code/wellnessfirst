@@ -1,0 +1,279 @@
+---
+/**
+ * Default Supabase signup sends a confirmation link (implicit redirect).
+ * Optional OTP: enable `{{ .Token }}` in the “Confirm signup” template — code entry lives under <details>.
+ */
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Confirm your email · Wellness First Global"
+  description="Confirm your email to finish joining."
+  noIndex={true}
+  bodyClass=""
+>
+  <div class="container-wfg max-w-md py-12 sm:py-16">
+    <p class="text-eyebrow text-secondary">Almost there</p>
+    <h1 class="font-display mt-2 text-3xl tracking-tight text-ink-800 sm:text-4xl">Confirm your email</h1>
+
+    <p class="mt-6 text-ink-600 leading-relaxed">
+      Open the message we sent and tap <strong>Confirm</strong>. When you return here, you should be signed in automatically.
+    </p>
+
+    <div class="mt-10 grid gap-6">
+      <div>
+        <label for="wfg-v-email" class="label-wfg">Email</label>
+        <input id="wfg-v-email" name="email" type="email" autocomplete="email" required class="input-wfg" />
+      </div>
+
+      <p id="wfg-v-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900" role="alert"></p>
+      <p id="wfg-v-status" class="hidden rounded-lg bg-white px-3 py-2 text-sm text-ink-700 ring-1 ring-ink/10" role="status"></p>
+
+      <button type="button" id="wfg-v-resend" class="btn-primary min-h-11 w-full justify-center">
+        Send confirmation email again
+      </button>
+
+      <details id="wfg-v-code-details" class="group rounded-xl border border-ink/10 bg-ivory-50/60 ring-1 ring-ink/5">
+        <summary
+          class="cursor-pointer list-none px-4 py-3 text-sm font-medium text-ink-800 [&::-webkit-details-marker]:hidden [&::marker]:hidden"
+        >
+          <span class="flex items-center justify-between gap-2">
+            <span>I received a numeric code (not just a link)</span>
+            <span class="text-ink-400 transition-transform group-open:rotate-180" aria-hidden="true">▼</span>
+          </span>
+        </summary>
+        <div class="border-t border-ink/10 px-4 pb-4 pt-4">
+          <p class="text-sm text-ink-600 leading-relaxed">
+            Only some Supabase templates include a code. If yours shows digits, enter them here — otherwise keep this closed and use the link in your mail.
+          </p>
+          <div class="mt-4 grid gap-4">
+            <div>
+              <label for="wfg-v-code" class="label-wfg">Code from email</label>
+              <input
+                id="wfg-v-code"
+                name="code"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="one-time-code"
+                maxlength="12"
+                class="input-wfg font-mono tracking-widest"
+                placeholder="e.g. 123456"
+              />
+            </div>
+            <button type="button" id="wfg-v-code-submit" class="btn-secondary min-h-11 w-full justify-center">
+              Verify with code
+            </button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <p class="mt-10 text-sm text-ink-500">
+      Wrong address?
+      <a class="text-secondary underline decoration-line underline-offset-2" href="/signup">Start again</a>
+      ·
+      <a class="text-secondary underline decoration-line underline-offset-2" href="/login">Sign in</a>
+    </p>
+
+    <div
+      id="wfg-config-missing"
+      class="mt-10 hidden border-t border-dashed border-ink/25 pt-6 text-sm text-ink-600 leading-relaxed"
+    />
+  </div>
+</BaseLayout>
+
+<script>
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { formatAuthError } from '@/lib/auth/auth-errors';
+  import { authEmailRedirectUrl } from '@/lib/auth/email-redirect';
+  import { MEMBER_HOME_PATH, PENDING_VERIFY_EMAIL_KEY, VERIFY_EMAIL_PATH } from '@/lib/auth/constants';
+  import { syncMemberProfileFromUser } from '@/lib/auth/sync-member-profile';
+  import { redirectIfAuthenticatedSession } from '@/lib/auth/guest-redirect';
+
+  const missing = document.getElementById('wfg-config-missing');
+  if (missing && !isSupabaseConfigured()) {
+    missing.classList.remove('hidden');
+    missing.textContent =
+      'Verification needs Supabase keys (PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY) in your environment.';
+  }
+
+  const emailInput = document.getElementById('wfg-v-email') as HTMLInputElement | null;
+  const codeInput = document.getElementById('wfg-v-code') as HTMLInputElement | null;
+  const errEl = document.getElementById('wfg-v-error');
+  const statusEl = document.getElementById('wfg-v-status');
+  const resendBtn = document.getElementById('wfg-v-resend') as HTMLButtonElement | null;
+  const codeSubmitBtn = document.getElementById('wfg-v-code-submit') as HTMLButtonElement | null;
+
+  function hideMessages() {
+    errEl?.classList.add('hidden');
+    statusEl?.classList.add('hidden');
+  }
+
+  function setResendLoading(loading: boolean) {
+    if (!resendBtn) return;
+    resendBtn.disabled = loading;
+    resendBtn.textContent = loading ? 'Sending…' : 'Send confirmation email again';
+  }
+
+  function setCodeLoading(loading: boolean) {
+    if (!codeSubmitBtn) return;
+    codeSubmitBtn.disabled = loading;
+    codeSubmitBtn.setAttribute('aria-busy', loading ? 'true' : 'false');
+    codeSubmitBtn.textContent = loading ? 'Checking…' : 'Verify with code';
+  }
+
+  function prefillEmailAndSignupBanner() {
+    const sp = new URLSearchParams(window.location.search);
+    const q = sp.get('email');
+    const stored = sessionStorage.getItem(PENDING_VERIFY_EMAIL_KEY);
+    const val = (q && q.trim()) || stored || '';
+    if (emailInput && val) emailInput.value = val;
+
+    if (sp.get('from') === 'signup' && statusEl) {
+      statusEl.textContent =
+        'Thanks for joining — finish by confirming the message we sent to your inbox. Use the button below if you need another copy.';
+      statusEl.classList.remove('hidden');
+      try {
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete('from');
+        window.history.replaceState({}, '', clean.pathname + clean.search + clean.hash);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  /** Supabase may append ?error= / #error_description when the confirmation link fails or is reused. */
+  function readAuthRedirectError(): string | null {
+    try {
+      const u = new URL(window.location.href);
+      const fromSearch = (name: string) => u.searchParams.get(name);
+      const hashParams = u.hash.length > 1 ? new URLSearchParams(u.hash.slice(1)) : new URLSearchParams();
+      const raw =
+        fromSearch('error_description') ||
+        hashParams.get('error_description') ||
+        fromSearch('error') ||
+        hashParams.get('error');
+      if (!raw) return null;
+      return decodeURIComponent(raw.replace(/\+/g, ' '));
+    } catch {
+      return null;
+    }
+  }
+
+  async function finishIfSession(supabase: ReturnType<typeof getSupabaseBrowser>): Promise<boolean> {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user?.email_confirmed_at) return false;
+    const sync = await syncMemberProfileFromUser(supabase, session.user);
+    if (sync.error && errEl) {
+      errEl.textContent = sync.error;
+      errEl.classList.remove('hidden');
+      return true;
+    }
+    sessionStorage.removeItem(PENDING_VERIFY_EMAIL_KEY);
+    window.location.replace(MEMBER_HOME_PATH);
+    return true;
+  }
+
+  (async () => {
+    if (!isSupabaseConfigured()) return;
+    prefillEmailAndSignupBanner();
+    const redirectErr = readAuthRedirectError();
+    if (redirectErr && errEl) {
+      errEl.textContent = formatAuthError({ message: redirectErr });
+      errEl.classList.remove('hidden');
+    }
+
+    const supabase = getSupabaseBrowser();
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (redirectIfAuthenticatedSession(session)) return;
+
+    await finishIfSession(supabase);
+
+    supabase.auth.onAuthStateChange(async (_evt, sess) => {
+      if (sess?.user?.email_confirmed_at) {
+        await finishIfSession(supabase);
+      }
+    });
+  })();
+
+  codeSubmitBtn?.addEventListener('click', async () => {
+    if (!isSupabaseConfigured() || !errEl || !emailInput || !codeInput) return;
+    hideMessages();
+
+    const email = emailInput.value.trim().toLowerCase();
+    const raw = codeInput.value.replace(/\s+/g, '');
+    if (!email) {
+      errEl.textContent = 'Please enter the email you used to join.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (raw.length < 6) {
+      errEl.textContent = 'Enter every digit from the email, or use the confirmation link instead.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    setCodeLoading(true);
+    try {
+      const supabase = getSupabaseBrowser();
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: raw,
+        type: 'signup',
+      });
+      if (error) {
+        errEl.textContent = formatAuthError(error);
+        errEl.classList.remove('hidden');
+        return;
+      }
+      sessionStorage.setItem(PENDING_VERIFY_EMAIL_KEY, email);
+      await finishIfSession(supabase);
+    } catch {
+      errEl.textContent = formatAuthError(null);
+      errEl.classList.remove('hidden');
+    } finally {
+      setCodeLoading(false);
+    }
+  });
+
+  resendBtn?.addEventListener('click', async () => {
+    if (!isSupabaseConfigured() || !emailInput || !errEl || !statusEl) return;
+    hideMessages();
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email) {
+      errEl.textContent = 'Enter your email so we know where to send.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const supabase = getSupabaseBrowser();
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: authEmailRedirectUrl(VERIFY_EMAIL_PATH),
+        },
+      });
+      if (error) {
+        errEl.textContent = formatAuthError(error);
+        errEl.classList.remove('hidden');
+        return;
+      }
+      statusEl.textContent = 'If another message does not arrive within a few minutes, wait a little and try once more.';
+      statusEl.classList.remove('hidden');
+    } catch {
+      errEl.textContent = formatAuthError(null);
+      errEl.classList.remove('hidden');
+    } finally {
+      setResendLoading(false);
+    }
+  });
+</script>

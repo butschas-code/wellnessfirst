@@ -13,7 +13,12 @@ import ArticleRelatedOffers from '@/components/content/ArticleRelatedOffers.astr
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
 import { publishedOnly } from '@/lib/content-filters';
 import { formatDate } from '@/lib/format';
+import ArticleFavoriteButton from '@/components/articles/ArticleFavoriteButton.astro';
+import ArticleReflectionPanel from '@/components/articles/ArticleReflectionPanel.astro';
+import AccessGate from '@/components/access/AccessGate.astro';
 import { getArticleByParamSlug, fillRelatedArticles, articlePath } from '@/lib/articles';
+import { journalCatalogSlug } from '@/lib/articles/journal-catalog-slug';
+import { normalizeAccessLevel } from '@/lib/content/access-level';
 import { articleJsonLd } from '@/lib/seo';
 import type { ProductEntry, WebinarEntry, ConsultationEntry } from '@/types/content';
 export async function getStaticPaths() {
@@ -35,8 +40,6 @@ const allArticles = await getCollection('articles', publishedOnly);
 const post = getArticleByParamSlug(allArticles, slug!);
 if (!post) throw new Error(`Article not found: ${slug}`);
 
-const { Content } = await render(post);
-
 const {
   title,
   excerpt,
@@ -54,9 +57,15 @@ const {
   relatedConsultation: relatedConsultationId,
 } = post.data;
 
+const accessLevel = normalizeAccessLevel(post.data.accessLevel);
+const allowFavoriteReflection = accessLevel === 'public' || accessLevel === 'member';
+const renderPublic = accessLevel === 'public' ? await render(post) : null;
+const Content = renderPublic?.Content;
+
 const metaTitle = seoTitle ?? title;
 const metaDescription = seoDescription ?? excerpt;
 const publicPath = articlePath(post);
+const catalogSlug = journalCatalogSlug(post);
 
 const productEntries: ProductEntry[] = [];
 for (const id of relatedProductIds) {
@@ -115,38 +124,80 @@ const articleLd = articleJsonLd({
       imageAlt={coverImage ? `Cover image: ${title}` : `Article: ${title}`}
       imageObjectFit={coverImageFit === 'contain' ? 'contain' : 'cover'}
     >
-      <p
-        slot="actions"
-        class="wfg-hero-line text-sm text-white/85 [text-shadow:0_1px_1px_rgba(0,0,0,0.15)]"
-      >
-        By {author} · {formatDate(publishedAt)}
-        {updatedAt && ` · Updated ${formatDate(updatedAt)}`}
-      </p>
-    </MarketingHero>
-    <Section tone="contrast" spacing="comfortable" class="!pt-8 sm:!pt-10 md:!pt-12">
-      <Container narrow>
-        <p
-          class="mb-8 max-w-prose border-b border-ink/10 pb-8 text-balance text-base leading-[1.75] text-charcoal sm:mb-10 sm:pb-10 sm:text-lg"
-        >
-          Welcome. This is long-form writing—meant to be read in a calm stretch, and to revisit when the questions in your
-          life resurface. There is no score here; only language you can use in a real week.
+      <div slot="actions" class="flex flex-col gap-4">
+        <p class="wfg-hero-line text-sm text-white/85 [text-shadow:0_1px_1px_rgba(0,0,0,0.15)]">
+          By {author} · {formatDate(publishedAt)}
+          {updatedAt && ` · Updated ${formatDate(updatedAt)}`}
         </p>
-        <RichText as="div" variant="article">
-          <Content
-            components={{
-              Cta: ArticleCta,
-              ArticleCta: ArticleCta,
-            }}
-          />
-        </RichText>
-      </Container>
-    </Section>
+        {allowFavoriteReflection && <ArticleFavoriteButton slug={catalogSlug} variant="detail" />}
+      </div>
+    </MarketingHero>
+    {
+      accessLevel === 'public' && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-8 sm:!pt-10 md:!pt-12">
+          <Container narrow>
+            <p
+              class="mb-8 max-w-prose border-b border-ink/10 pb-8 text-balance text-base leading-[1.75] text-charcoal sm:mb-10 sm:pb-10 sm:text-lg"
+            >
+              Welcome. This is long-form writing—meant to be read in a calm stretch, and to revisit when the questions in your
+              life resurface. There is no score here; only language you can use in a real week.
+            </p>
+            <RichText as="div" variant="article">
+              {Content ? (
+                <Content
+                  components={{
+                    Cta: ArticleCta,
+                    ArticleCta: ArticleCta,
+                  }}
+                />
+              ) : null}
+            </RichText>
+          </Container>
+        </Section>
+      )
+    }
+    {
+      accessLevel === 'member' && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-8 sm:!pt-10 md:!pt-12">
+          <Container narrow>
+            <div data-member-article-root data-catalog-slug={catalogSlug} data-access-level="member">
+              <div data-member-soft-gate>
+                <AccessGate variant="member_soft_gate" nextPath={publicPath} lead={excerpt} />
+              </div>
+              <div data-member-body-wrap class="hidden">
+                <p
+                  data-member-article-status
+                  class="mb-4 hidden text-sm text-ink-600"
+                  role="status"
+                  aria-live="polite"
+                />
+                <div data-member-article-html class="rich-text max-w-[var(--width-prose)]"></div>
+              </div>
+            </div>
+          </Container>
+        </Section>
+      )
+    }
+    {
+      (accessLevel === 'paid' || accessLevel === 'webinar_participants') && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-8 sm:!pt-10 md:!pt-12">
+          <Container narrow>
+            <AccessGate
+              variant={accessLevel === 'paid' ? 'paid_locked' : 'webinar_locked'}
+              nextPath={publicPath}
+              lead={excerpt}
+            />
+          </Container>
+        </Section>
+      )
+    }
+    {allowFavoriteReflection && <ArticleReflectionPanel catalogSlug={catalogSlug} />}
     {
       related.length > 0 && (
         <Section tone="default" spacing="comfortable" class="!pt-0" aria-label="Related reading">
           <Container>
             <h2 class="text-eyebrow">Related reading</h2>
-            <p class="mt-1 font-display text-2xl text-ink-800 md:text-3xl">Elsewhere in the journal</p>
+            <p class="mt-1 font-display text-2xl text-ink-800 md:text-3xl">More articles</p>
             <ul
               class="mt-8 grid list-none grid-cols-1 gap-6 sm:gap-7 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
               role="list"
@@ -166,3 +217,12 @@ const articleLd = articleJsonLd({
   </article>
   <HomePageFooter slot="footer" />
 </BaseLayout>
+
+<script>
+  import { initArticleFavorites } from '@/scripts/article-favorites';
+  import { initArticleReflectionPanel } from '@/scripts/article-reflection-panel';
+  import { initArticleMemberAccess } from '@/scripts/article-member-access';
+  initArticleFavorites();
+  initArticleReflectionPanel();
+  initArticleMemberAccess();
+</script>

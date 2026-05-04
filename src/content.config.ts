@@ -53,7 +53,7 @@ const articles = defineCollection({
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     readingMinutes: z.number().int().min(1).max(120).optional(),
-    /** Facet for the journal filter strip and browse UX. */
+    /** Facet for the article topic filter strip and browse UX. */
     category: z.string(),
     /** Topic labels; support related-article matching and future discovery. */
     tags: stringListField,
@@ -73,6 +73,8 @@ const articles = defineCollection({
     seoTitle: z.string().optional(),
     /** Overwrites default meta/OG description. */
     seoDescription: z.string().optional(),
+    /** Matches Supabase catalog (`public` fully open in HTML; others gated — member body loads from catalog when logged in). */
+    accessLevel: z.enum(['public', 'member', 'webinar_participants', 'paid']).default('public'),
   }),
 });
 

@@ -1,0 +1,33 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
+---
+
+<AppLayout title="Library" description="Guides and worksheets inside My Wellness Space." memberShell={true} memberNav="resources">
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-rs-state" class="text-sm text-ink-500">Walking to the shelves…</p>
+    <div id="w-rs-skel" class="hidden"><MemberSkeletonBlock rows={5} /></div>
+    <div id="w-rs-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Library</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">Your resources</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        What you can open now, what you have visited lately, and a few suggestions shaped by your interests — still calm,
+        still without dashboards.
+      </p>
+
+      <div class="mt-14 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">On your shelf</div>
+      <div id="w-rs-available" class="mt-5"></div>
+
+      <div class="mt-16 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">Recently opened</div>
+      <div id="w-rs-recent" class="mt-5"></div>
+
+      <div class="mt-16 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">Suggested from your themes</div>
+      <div id="w-rs-suggested" class="mt-5"></div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { initResourceMemberHub } from '@/scripts/resource-member-hub';
+  void initResourceMemberHub();
+</script>

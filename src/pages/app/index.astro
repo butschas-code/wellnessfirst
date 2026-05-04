@@ -22,9 +22,9 @@ import AppLayout from '@/components/app/AppLayout.astro';
         data: { session },
       } = await supabase.auth.getSession();
       if (session) {
-        window.location.replace('/app/dashboard');
+        window.location.replace('/my-wellness-space');
       } else {
-        window.location.replace('/app/sign-in');
+        window.location.replace('/login');
       }
     } catch {
       if (el) el.textContent = 'Something went wrong. Try again from the sign-in page.';

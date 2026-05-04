@@ -1,0 +1,13 @@
+# Supabase CLI — `project_id` is set automatically by `supabase link`.
+
+project_id = "ernnivcfkxyejltxsbrn"
+
+[api]
+enabled = true
+
+# JWT is enforced inside each handler where needed (member JWT vs service role).
+[functions.send-webinar-confirmation]
+verify_jwt = false
+
+[functions.send-webinar-reminders]
+verify_jwt = false

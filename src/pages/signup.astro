@@ -1,0 +1,237 @@
+---
+/**
+ * Supabase Dashboard — enable **Email** provider, turn on **Confirm email**, add redirect URLs,
+ * tune templates / SMTP as noted in `src/lib/auth/email-redirect.ts`.
+ */
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Join · Wellness First Global"
+  description="Create your member account — gentle wellbeing for home and everyday rhythm."
+  noIndex={true}
+  bodyClass=""
+>
+  <div class="container-wfg max-w-md py-12 sm:py-16">
+    <p class="text-eyebrow text-secondary">Members</p>
+    <h1 class="font-display mt-2 text-3xl tracking-tight text-ink-800 sm:text-4xl">Begin quietly here</h1>
+    <p class="mt-3 text-ink-600 leading-relaxed">
+      Your email stays private; we use it only for access and what you choose to hear from us.
+    </p>
+
+    <form id="wfg-signup-form" class="mt-10 grid gap-6" novalidate>
+      <div>
+        <label for="wfg-su-name" class="label-wfg">Full name</label>
+        <input
+          id="wfg-su-name"
+          name="full_name"
+          type="text"
+          autocomplete="name"
+          required
+          minlength="2"
+          maxlength="120"
+          class="input-wfg"
+        />
+      </div>
+      <div>
+        <label for="wfg-su-email" class="label-wfg">Email</label>
+        <input
+          id="wfg-su-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          class="input-wfg"
+        />
+      </div>
+      <div>
+        <label for="wfg-su-password" class="label-wfg">Password</label>
+        <input
+          id="wfg-su-password"
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          required
+          minlength="8"
+          maxlength="128"
+          class="input-wfg"
+        />
+        <p class="mt-1.5 text-sm text-ink-500">At least eight characters — a phrase you remember is welcome.</p>
+      </div>
+
+      <label class="flex cursor-pointer items-start gap-3 text-sm text-ink-700 leading-snug">
+        <input id="wfg-su-newsletter" name="newsletter" type="checkbox" class="mt-1 size-4 rounded border-ink/25 text-secondary focus:ring-secondary" />
+        <span>
+          Send me occasional notes from Wellness First — reflections and invitations, never noisy.
+          <span class="text-ink-500"> (optional)</span>
+        </span>
+      </label>
+
+      <label class="flex cursor-pointer items-start gap-3 text-sm text-ink-700 leading-snug">
+        <input id="wfg-su-terms" name="terms" type="checkbox" required class="mt-1 size-4 rounded border-ink/25 text-secondary focus:ring-secondary" />
+        <span>
+          I have read and agree to the <a class="text-secondary underline decoration-line underline-offset-2" href="/legal/terms">Terms</a>
+          and <a class="text-secondary underline decoration-line underline-offset-2" href="/legal/privacy">Privacy</a> statements.
+        </span>
+      </label>
+
+      <p id="wfg-su-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900" role="alert"></p>
+
+      <button type="submit" id="wfg-su-submit" class="btn-primary min-h-11 w-full justify-center">
+        Create account
+      </button>
+
+      <p id="wfg-su-duplicate-next" class="hidden text-sm text-ink-600 leading-relaxed">
+        Continue on the
+        <a class="font-medium text-secondary underline underline-offset-4" href="/verify-email">confirmation page</a>
+        to resend mail or finish verifying.
+      </p>
+    </form>
+
+    <p class="mt-8 text-sm text-ink-500">
+      Already part of this circle?
+      <a class="text-secondary underline decoration-line underline-offset-2" href="/login">Sign in</a>
+    </p>
+
+    <div
+      id="wfg-config-missing"
+      class="mt-10 hidden border-t border-dashed border-ink/25 pt-6 text-sm text-ink-600 leading-relaxed"
+    />
+  </div>
+</BaseLayout>
+
+<script>
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { formatAuthError } from '@/lib/auth/auth-errors';
+  import { authEmailRedirectUrl } from '@/lib/auth/email-redirect';
+  import {
+    MEMBER_HOME_PATH,
+    PENDING_VERIFY_EMAIL_KEY,
+    VERIFY_EMAIL_PATH,
+  } from '@/lib/auth/constants';
+  import { syncMemberProfileFromUser } from '@/lib/auth/sync-member-profile';
+  import { redirectIfAuthenticatedSession } from '@/lib/auth/guest-redirect';
+
+  const missing = document.getElementById('wfg-config-missing');
+  if (missing && !isSupabaseConfigured()) {
+    missing.classList.remove('hidden');
+    missing.textContent =
+      'Member sign-up is not wired yet here. Add PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY (see .env.example), restart the dev server, and try again.';
+  }
+
+  const form = document.getElementById('wfg-signup-form') as HTMLFormElement | null;
+  const errEl = document.getElementById('wfg-su-error');
+  const submitBtn = document.getElementById('wfg-su-submit') as HTMLButtonElement | null;
+
+  function setLoading(loading: boolean) {
+    if (!submitBtn) return;
+    submitBtn.disabled = loading;
+    submitBtn.setAttribute('aria-busy', loading ? 'true' : 'false');
+    submitBtn.textContent = loading ? 'One moment…' : 'Create account';
+  }
+
+  (async () => {
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabaseBrowser();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    redirectIfAuthenticatedSession(session);
+  })();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!isSupabaseConfigured() || !form || !errEl) return;
+    errEl.classList.add('hidden');
+    document.getElementById('wfg-su-duplicate-next')?.classList.add('hidden');
+
+    const fd = new FormData(form);
+    const full_name = String(fd.get('full_name') ?? '').trim();
+    const email = String(fd.get('email') ?? '').trim().toLowerCase();
+    const password = String(fd.get('password') ?? '');
+    const newsletter = Boolean(form.querySelector<HTMLInputElement>('#wfg-su-newsletter')?.checked);
+    const terms = Boolean(form.querySelector<HTMLInputElement>('#wfg-su-terms')?.checked);
+
+    if (full_name.length < 2) {
+      errEl.textContent = 'Please share your name — even a gentle shortening is fine.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (!terms) {
+      errEl.textContent = 'Please confirm you have read the Terms and Privacy statements.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const supabase = getSupabaseBrowser();
+      const termsAcceptedAt = new Date().toISOString();
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: authEmailRedirectUrl(VERIFY_EMAIL_PATH),
+          data: {
+            full_name,
+            newsletter_opt_in: newsletter,
+            terms_accepted_at: termsAcceptedAt,
+          },
+        },
+      });
+
+      if (error) {
+        errEl.textContent = formatAuthError(error);
+        errEl.classList.remove('hidden');
+        setLoading(false);
+        return;
+      }
+
+      /** Supabase returns a user with `identities: []` when this email already exists (no new row). No second confirmation email is sent. */
+      const stubUser = data.user;
+      if (
+        stubUser &&
+        Array.isArray(stubUser.identities) &&
+        stubUser.identities.length === 0
+      ) {
+        sessionStorage.setItem(PENDING_VERIFY_EMAIL_KEY, email);
+        errEl.textContent =
+          'This email already has an account or a pending invitation — we did not start a duplicate signup. Use the confirmation page to send another email, try signing in, or use Forgot password.';
+        errEl.classList.remove('hidden');
+        setLoading(false);
+        const hint = document.getElementById('wfg-su-duplicate-next');
+        if (hint) {
+          hint.classList.remove('hidden');
+          const a = hint.querySelector('a');
+          if (a) a.setAttribute('href', `${VERIFY_EMAIL_PATH}?${new URLSearchParams({ email }).toString()}`);
+        }
+        return;
+      }
+
+      sessionStorage.setItem(PENDING_VERIFY_EMAIL_KEY, email);
+
+      if (data.session?.user) {
+        const pe = await syncMemberProfileFromUser(supabase, data.session.user, {
+          full_name,
+          newsletter_opt_in: newsletter,
+        });
+        if (pe.error) {
+          errEl.textContent = pe.error;
+          errEl.classList.remove('hidden');
+          setLoading(false);
+          return;
+        }
+        window.location.replace(MEMBER_HOME_PATH);
+        return;
+      }
+
+      const qs = new URLSearchParams({ email, from: 'signup' });
+      window.location.replace(`${VERIFY_EMAIL_PATH}?${qs.toString()}`);
+    } catch {
+      errEl.textContent = formatAuthError(null);
+      errEl.classList.remove('hidden');
+      setLoading(false);
+    }
+  });
+</script>

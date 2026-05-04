@@ -30,7 +30,9 @@ export function getSupabaseBrowser(): SupabaseClient {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        flowType: 'pkce',
+        // Default GoTrue flow is `implicit` (tokens in URL hash). Supabase “confirm signup” emails
+        // commonly redirect that way. `pkce` rejects hash-token redirects (“Not a valid PKCE flow url”),
+        // which leaves users stuck on `/verify-email` while the email only contains a link.
       },
     });
   }

@@ -1,0 +1,24 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
+---
+
+<AppLayout title="Reflections" description="Notes you have written alongside articles." memberShell={true} memberNav="reflections">
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-ref-state" class="text-sm text-ink-500">Gathering reflections…</p>
+    <div id="w-ref-skel" class="hidden"><MemberSkeletonBlock rows={4} /></div>
+    <div id="w-ref-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Practice</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">Reflections</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        Private notes beside articles—nothing shared, nothing performed. Edit or remove anytime.
+      </p>
+      <div id="w-ref-mount" class="mt-12"></div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { initMemberReflectionsList } from '@/scripts/member-reflections-list';
+  void initMemberReflectionsList();
+</script>

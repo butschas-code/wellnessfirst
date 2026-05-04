@@ -1,31 +1,32 @@
 ---
-/** Slim wayfinding between account and library (no marketing chrome). */
+import { MEMBER_NAV_ITEMS, type MemberNavKey } from '@/lib/member/nav';
+
 interface Props {
-  current: 'account' | 'library';
+  current: MemberNavKey | null;
 }
 const { current } = Astro.props;
-const link = 'text-sm text-charcoal transition-colors hover:text-ink';
-const currentCls = 'font-medium text-ink border-b-2 border-ink';
+
+const link = 'rounded-md px-1.5 py-1 text-sm text-ink-600 transition-colors hover:bg-ink/[0.04] hover:text-ink';
+const currentCls = 'font-medium text-ink underline decoration-secondary decoration-[2px] underline-offset-[6px]';
 ---
 
-<nav
-  class="border-b border-ink/10 bg-white"
-  aria-label="Member navigation"
->
-  <div class="container-wfg flex h-12 items-center gap-6 sm:gap-8">
-    <a
-      href="/app/dashboard"
-      class:list={[link, current === 'account' && currentCls]}
-      aria-current={current === 'account' ? 'page' : undefined}
-    >
-      Account
-    </a>
-    <a
-      href="/community/dashboard"
-      class:list={[link, current === 'library' && currentCls]}
-      aria-current={current === 'library' ? 'page' : undefined}
-    >
-      Library
-    </a>
+<nav class="border-b border-ink/[0.07] bg-white/95 backdrop-blur-sm" aria-label="My Wellness Space">
+  <div class="container-wfg py-5">
+    <div class="flex flex-wrap gap-x-7 gap-y-2.5">
+      {
+        MEMBER_NAV_ITEMS.map((item) => {
+          const on = current === item.key;
+          return (
+            <a
+              href={item.href}
+              class:list={[link, on && currentCls]}
+              aria-current={on ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </div>
   </div>
 </nav>

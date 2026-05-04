@@ -7,147 +7,157 @@ import Section from '@/components/layout/Section.astro';
 import Container from '@/components/layout/Container.astro';
 import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
 import EmptyState from '@/components/conversion/EmptyState.astro';
-import { getPublished } from '@/lib/content-filters';
-import { offerPath } from '@/lib/offer-paths';
-import { formatDate, formatTime } from '@/lib/format';
-import WebinarCard from '@/components/cards/WebinarCard.astro';
+import WebinarCardDb from '@/components/cards/WebinarCardDb.astro';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { fetchWebinarsForBuild } from '@/lib/supabase/webinar-build-fetch';
+import { formatWebinarScheduleStart } from '@/lib/webinars/format-schedule';
 
-const webinars = (await getPublished('webinars')).sort((a, b) => +b.data.startAt - +a.data.startAt);
-const now = Date.now();
-const nextWebinar =
-  webinars
-    .filter((w) => w.data.format === 'live' && +w.data.startAt >= now)
-    .sort((a, b) => +a.data.startAt - +b.data.startAt)[0] ??
-  webinars.filter((w) => w.data.format === 'replay').sort((a, b) => +b.data.startAt - +a.data.startAt)[0] ??
-  null;
-const nextWebinarMeta = nextWebinar
-  ? `${formatDate(nextWebinar.data.startAt)}${
-      nextWebinar.data.format === 'live' ? ` · ${formatTime(nextWebinar.data.startAt)}` : ''
-    } · ${nextWebinar.data.durationMinutes} min`
-  : null;
+const webinars = await fetchWebinarsForBuild();
 
-const spineSpotlight = nextWebinar
+function webinarEndedRow(r: (typeof webinars)[0]): boolean {
+  const t = r.ends_at ? new Date(r.ends_at).getTime() : new Date(r.starts_at).getTime();
+  return t < Date.now();
+}
+
+const nextLive = webinars
+  .filter((w) => w.booking_open && !webinarEndedRow(w))
+  .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0];
+
+const fallbackSpotlight = webinars
+  .filter((w) => webinarEndedRow(w))
+  .sort((a, b) => new Date(b.starts_at).getTime() - new Date(a.starts_at).getTime())[0];
+
+const spotlight = nextLive ?? fallbackSpotlight ?? null;
+
+const spotlightMeta = spotlight ? formatWebinarScheduleStart(spotlight) : null;
+
+const spineSpotlight = spotlight
   ? {
       kicker:
-        nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
-          ? 'Next live hour'
-          : nextWebinar.data.format === 'live'
-            ? 'Live session'
-            : 'Recent replay',
-      title: nextWebinar.data.title,
-      meta: nextWebinarMeta ?? undefined,
-      body: nextWebinar.data.excerpt,
+        spotlight.booking_open && !webinarEndedRow(spotlight)
+          ? 'Next invitation'
+          : spotlight.booking_open
+            ? 'Gathering'
+            : 'Earlier gathering',
+      title: spotlight.title,
+      meta: spotlightMeta ?? undefined,
+      body:
+        spotlight.description?.replace(/\s+/g, ' ').trim().slice(0, 260) ??
+        'Teaching with patience — space for honest questions.',
       primary: {
-        href: offerPath('webinars', nextWebinar),
-        label:
-          nextWebinar.data.format === 'live' && +nextWebinar.data.startAt >= now
-            ? nextWebinar.data.isFree
-              ? 'Save a seat'
-              : 'Register'
-            : 'Open the session',
+        href: `/webinars/${spotlight.slug}`,
+        label: spotlight.booking_open && !webinarEndedRow(spotlight) ? 'Open invitation' : 'View session',
       },
-      secondary: { href: '/articles', label: 'Read the journal first' },
+      secondary: { href: '/articles', label: 'Read articles first' },
     }
   : {
       kicker: 'Read first',
       title: 'Arrive at the hour with context',
-      body: 'The journal carries the same care as the live room. Pick a theme, then scroll the list below.',
-      primary: { href: '/articles', label: 'Open the journal' },
+      body: 'Articles carry the same care as the live room. Pick a theme, then scroll the list below.',
+      primary: { href: '/articles', label: 'Browse articles' },
       secondary: { href: '/contact', label: 'Write the desk' },
     };
+
 const filters = [
   { id: 'all', label: 'All' },
-  { id: 'free', label: 'Free' },
-  { id: 'live', label: 'Live' },
-  { id: 'replay', label: 'Replay' },
+  { id: 'live', label: 'Open invitations' },
+  { id: 'replay', label: 'Archive' },
 ] as const;
 ---
 
 <BaseLayout
   title="Webinars"
-  description="Live and recorded sessions with room for questions—teaching with patience and adult attention."
+  description="Live and recorded sessions with room for questions — teaching with patience and adult attention."
   canonicalPath="/webinars"
   {...marketingPageLayout}
 >
   <MarketingHero
     compact
     eyebrow="Gatherings"
-    title="Webinars & live sessions"
-    description='A slower tempo for learning. Clear takeaways, honest uncertainty, and no pressure to be “optimised” by the end of the hour. Free sessions stay clearly marked; paid formats will say so in plain language when they arrive.'
+    title="Invitations to learn together"
+    description="A slower tempo for learning. Clear takeaways, honest uncertainty, and no pressure to be “optimised” by the end of the hour."
   >
     <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-      <a class="btn-cta-invert" href="#sessions">Browse sessions</a>
-      <a class="btn-cta-invert-ghost" href="/articles">Read the journal first</a>
+      <a class="btn-cta-invert" href="#sessions">Browse gatherings</a>
+      <a class="btn-cta-invert-ghost" href="/articles">Read articles first</a>
     </div>
   </MarketingHero>
 
   <CommunitySpine page="webinars" id="spine-webinars" spotlight={spineSpotlight} />
   <Section id="sessions" tone="minimal" spacing="comfortable" class="scroll-mt-28 !pt-0 sm:!pt-2">
     <Container>
-      {webinars.length > 0 && (
-        <>
-          <p class="text-label">Filter</p>
-          <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter sessions" data-webinar-filters>
-            {filters.map((f) => (
-              <button
-                type="button"
-                class="btn-filter-pill"
-                data-webinar-filter={f.id}
-                aria-pressed={f.id === 'all' ? 'true' : 'false'}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      {
+        webinars.length > 0 && (
+          <>
+            <p class="text-label">Filter</p>
+            <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter sessions" data-webinar-filters>
+              {filters.map((f) => (
+                <button
+                  type="button"
+                  class="btn-filter-pill"
+                  data-webinar-filter={f.id}
+                  aria-pressed={f.id === 'all' ? 'true' : 'false'}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )
+      }
 
-      {webinars.length === 0 && (
-        <EmptyState
-          title="Sessions are between seasons"
-          body="When the next live or replay is ready, it will sit here with full context—no countdown theatre. Meanwhile, the journal carries the same care in writing."
-          actionHref="/articles"
-          actionLabel="Read the journal"
-          secondaryHref="/contact"
-          secondaryLabel="Ask to be notified"
-        />
-      )}
-      {webinars.length > 0 && (
-        <ul
-          class="mt-8 list-none grid grid-cols-1 gap-6 sm:mt-10 sm:grid-cols-2 sm:gap-7"
-          role="list"
-          data-webinar-list
-        >
-          {webinars.map((w) => (
-            <li
-              class="min-h-0"
-              data-webinar-item
-              data-webinar-format={w.data.format}
-              data-webinar-free={w.data.isFree ? 'true' : 'false'}
-            >
-              <WebinarCard entry={w} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {webinars.length > 0 && (
-        <div
-          data-webinar-no-match
-          class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
-          role="status"
-          aria-live="polite"
-        >
-          <p class="font-display text-xl text-ink-800">No sessions match this filter</p>
-          <p class="mt-2 text-ink-600">Try &ldquo;All&rdquo; or another option—or write if you are looking for something specific.</p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button type="button" class="btn-primary" data-webinar-show-all>
-              Show all
-            </button>
-            <a class="btn-secondary" href="/contact">Write the desk</a>
+      {
+        webinars.length === 0 && (
+          <EmptyState
+            title="Gatherings rest between seasons"
+            body="When the next invitation is ready, it will sit here with full context — no countdown theatre. Meanwhile, articles carry the same care in writing."
+            actionHref="/articles"
+            actionLabel="Read articles"
+            secondaryHref="/contact"
+            secondaryLabel="Ask to be notified"
+          />
+        )
+      }
+      {
+        webinars.length > 0 && (
+          <ul
+            class="mt-8 list-none grid grid-cols-1 gap-6 sm:mt-10 sm:grid-cols-2 sm:gap-7"
+            role="list"
+            data-webinar-list
+          >
+            {webinars.map((w) => {
+              const ended = webinarEndedRow(w);
+              const fmt = w.booking_open && !ended ? 'live' : 'replay';
+              return (
+                <li class="min-h-0" data-webinar-item data-webinar-format={fmt}>
+                  <WebinarCardDb row={w} />
+                </li>
+              );
+            })}
+          </ul>
+        )
+      }
+      {
+        webinars.length > 0 && (
+          <div
+            data-webinar-no-match
+            class="mt-2 hidden border-0 border-t-2 border-dashed border-ink/25 bg-white py-10"
+            role="status"
+            aria-live="polite"
+          >
+            <p class="font-display text-xl text-ink-800">Nothing matches this filter</p>
+            <p class="mt-2 text-ink-600">Try “All” — or write if you are looking for something specific.</p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <button type="button" class="btn-primary" data-webinar-show-all>
+                Show all
+              </button>
+              <a class="btn-secondary" href="/contact">
+                Write the desk
+              </a>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </Container>
   </Section>
   <div slot="prefooter">
@@ -162,10 +172,8 @@ const filters = [
   const applyFilter = (raw: string) => {
     document.querySelectorAll('[data-webinar-item]').forEach((li) => {
       const f = (li as HTMLElement).dataset.webinarFormat;
-      const isFree = (li as HTMLElement).dataset.webinarFree === 'true';
       let show = raw === 'all';
       if (raw === 'live' || raw === 'replay') show = f === raw;
-      if (raw === 'free') show = isFree;
       li.classList.toggle('hidden', !show);
     });
   };

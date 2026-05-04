@@ -1,0 +1,381 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+---
+
+<AppLayout title="Account settings" description="Your member account." memberShell={true} memberNav="account">
+  <div class="container-wfg max-w-xl pb-24 pt-10 sm:pt-14">
+    <p id="w-ac-state" class="text-sm text-ink-500">Opening settings…</p>
+
+    <div id="w-ac-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Identity</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">Account settings</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        A few calm fields — save when it feels right. Nothing here rushes you.
+      </p>
+
+      <div class="mt-10 border-t border-ink/[0.06] pt-10">
+        <h2 class="text-sm font-medium text-ink-500">Email</h2>
+        <p id="w-ac-email" class="mt-2 text-[1.05rem] text-ink"></p>
+        <p id="w-ac-email-verify" class="mt-3 text-sm leading-relaxed text-ink-600"></p>
+      </div>
+
+      <div
+        id="w-ac-profile-success"
+        class="mt-10 hidden rounded-lg border border-secondary/25 bg-white/90 px-4 py-3 text-sm text-ink-800 shadow-sm shadow-ink/[0.03]"
+        role="status"
+      >
+      </div>
+      <p id="w-ac-profile-error" class="mt-6 hidden text-sm text-red-800" role="alert"></p>
+
+      <form id="w-ac-profile-form" class="mt-10 grid gap-7 border-t border-ink/[0.06] pt-10">
+        <h2 class="text-sm font-medium text-ink-500">Profile</h2>
+
+        <div>
+          <label class="label-wfg" for="w-ac-full-name">Full name</label>
+          <input id="w-ac-full-name" name="full_name" type="text" autocomplete="name" maxlength="120" class="input-wfg" />
+          <p class="mt-1.5 text-xs text-ink-500">Legal or everyday name — whichever you use with us.</p>
+        </div>
+
+        <div>
+          <label class="label-wfg" for="w-ac-display-name">Display name</label>
+          <input id="w-ac-display-name" name="display_name" type="text" maxlength="120" class="input-wfg" />
+          <p class="mt-1.5 text-xs text-ink-500">How we greet you on the overview (optional).</p>
+        </div>
+
+        <div>
+          <label class="label-wfg" for="w-ac-country">Country</label>
+          <input id="w-ac-country" name="country" type="text" autocomplete="country-name" maxlength="100" class="input-wfg" />
+        </div>
+
+        <div>
+          <label class="label-wfg" for="w-ac-timezone">Timezone</label>
+          <input
+            id="w-ac-timezone"
+            name="timezone"
+            type="text"
+            maxlength="64"
+            placeholder="e.g. Europe/Riga"
+            class="input-wfg"
+          />
+          <p class="mt-1.5 text-xs text-ink-500">IANA name if you know it — otherwise a region is fine.</p>
+        </div>
+
+        <div>
+          <label class="label-wfg" for="w-ac-lang">Preferred language</label>
+          <input id="w-ac-lang" name="preferred_language" type="text" required maxlength="32" class="input-wfg" placeholder="en" />
+          <p class="mt-1.5 text-xs text-ink-500">Short code or language name (required).</p>
+        </div>
+
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-ink-700 leading-snug">
+          <input id="w-ac-newsletter" name="newsletter_opt_in" type="checkbox" class="mt-1 size-4 rounded border-ink/25 text-secondary focus:ring-secondary" />
+          <span>I am happy to receive occasional notes from Wellness First (reflections and invitations).</span>
+        </label>
+
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-ink-700 leading-snug">
+          <input id="w-ac-onboarding" name="onboarding_completed" type="checkbox" class="mt-1 size-4 rounded border-ink/25 text-secondary focus:ring-secondary" />
+          <span>I have finished the essentials — soften reminders on my overview.</span>
+        </label>
+
+        <button type="submit" id="w-ac-save-profile" class="btn-primary min-h-11 w-fit px-10">Save profile</button>
+      </form>
+
+      <div class="mt-16 border-t border-ink/[0.06] pt-12">
+        <h2 class="text-sm font-medium text-ink-500">Password</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-600">
+          Choose a new password below while signed in, or ask for a reset link by email — whichever feels steadier.
+        </p>
+
+        <p id="w-ac-pw-error" class="mt-6 hidden text-sm text-red-800" role="alert"></p>
+        <p id="w-ac-pw-success" class="mt-6 hidden text-sm text-ink-700" role="status"></p>
+
+        <form id="w-ac-password-form" class="mt-8 grid max-w-lg gap-6">
+          <div>
+            <label class="label-wfg" for="w-ac-pw-new">New password</label>
+            <input id="w-ac-pw-new" type="password" autocomplete="new-password" maxlength="128" class="input-wfg" />
+          </div>
+          <div>
+            <label class="label-wfg" for="w-ac-pw-confirm">Confirm new password</label>
+            <input id="w-ac-pw-confirm" type="password" autocomplete="new-password" maxlength="128" class="input-wfg" />
+          </div>
+          <button type="submit" id="w-ac-save-pw" class="btn-secondary min-h-11 w-fit px-8">Update password</button>
+        </form>
+
+        <p class="mt-8 text-sm text-ink-500">
+          <a id="w-ac-forgot-link" class="font-medium text-secondary underline decoration-line underline-offset-4" href="/forgot-password">
+            Email me a reset link instead
+          </a>
+        </p>
+      </div>
+
+      <div class="mt-14 border-t border-ink/[0.06] pt-12">
+        <h2 class="text-sm font-medium text-ink-500">Session</h2>
+        <button type="button" id="w-ac-signout" class="btn-secondary mt-5 min-h-11">Sign out</button>
+      </div>
+
+      <div class="mt-14 border-t border-ink/[0.06] pt-12">
+        <h2 class="text-sm font-medium text-ink-500">Account closure</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-600">
+          Leaving permanently is not offered through this page yet — when it is, it will be explicit and reversible where possible.
+        </p>
+        <button type="button" disabled class="mt-6 cursor-not-allowed rounded-lg border border-ink/15 bg-ink/[0.03] px-4 py-2.5 text-sm text-ink-400">
+          Delete account (coming soon)
+        </button>
+      </div>
+
+      <div class="mt-14 border-t border-ink/[0.06] pt-10">
+        <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">
+          Edit topic interests
+        </a>
+        <span class="mx-2 text-taupe-300">·</span>
+        <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/contact">Human help</a>
+      </div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { LOGIN_PATH } from '@/lib/auth/constants';
+  import { formatAuthError } from '@/lib/auth/auth-errors';
+
+  function trimStr(v: unknown, max: number): string | null {
+    const s = typeof v === 'string' ? v.trim() : '';
+    if (!s) return null;
+    return s.slice(0, max);
+  }
+
+  function validateTimezone(raw: string): string | null {
+    const s = raw.trim();
+    if (!s) return null;
+    if (s.length > 64) return null;
+    if (!/^[A-Za-z0-9_/+\-]+$/.test(s)) return null;
+    return s;
+  }
+
+  function fmtConfirmed(iso: string): string {
+    try {
+      return new Intl.DateTimeFormat('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(new Date(iso));
+    } catch {
+      return iso;
+    }
+  }
+
+  (async () => {
+    const state = document.getElementById('w-ac-state');
+    const panel = document.getElementById('w-ac-panel');
+    const emailEl = document.getElementById('w-ac-email');
+    const verifyEl = document.getElementById('w-ac-email-verify');
+    const forgotLink = document.getElementById('w-ac-forgot-link') as HTMLAnchorElement | null;
+
+    const profileForm = document.getElementById('w-ac-profile-form') as HTMLFormElement | null;
+    const pwForm = document.getElementById('w-ac-password-form') as HTMLFormElement | null;
+
+    const profileSuccess = document.getElementById('w-ac-profile-success');
+    const profileErr = document.getElementById('w-ac-profile-error');
+    const pwErr = document.getElementById('w-ac-pw-error');
+    const pwOk = document.getElementById('w-ac-pw-success');
+
+    const fullName = document.getElementById('w-ac-full-name') as HTMLInputElement | null;
+    const displayName = document.getElementById('w-ac-display-name') as HTMLInputElement | null;
+    const country = document.getElementById('w-ac-country') as HTMLInputElement | null;
+    const timezone = document.getElementById('w-ac-timezone') as HTMLInputElement | null;
+    const lang = document.getElementById('w-ac-lang') as HTMLInputElement | null;
+    const newsletter = document.getElementById('w-ac-newsletter') as HTMLInputElement | null;
+    const onboarding = document.getElementById('w-ac-onboarding') as HTMLInputElement | null;
+    const saveProfileBtn = document.getElementById('w-ac-save-profile') as HTMLButtonElement | null;
+
+    const pwNew = document.getElementById('w-ac-pw-new') as HTMLInputElement | null;
+    const pwConfirm = document.getElementById('w-ac-pw-confirm') as HTMLInputElement | null;
+    const savePwBtn = document.getElementById('w-ac-save-pw') as HTMLButtonElement | null;
+
+    if (!isSupabaseConfigured() || !profileForm || !pwForm) {
+      state!.textContent =
+        'Supabase keys are missing (PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY).';
+      return;
+    }
+
+    const session = await guardSessionOrRedirect();
+    if (!session) return;
+
+    const supabase = getSupabaseBrowser();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select(
+        'full_name, display_name, country, timezone, preferred_language, newsletter_opt_in, onboarding_completed'
+      )
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    state?.classList.add('hidden');
+    panel?.classList.remove('hidden');
+
+    const authEmail = session.user.email ?? '';
+    if (emailEl) emailEl.textContent = authEmail || '—';
+
+    if (verifyEl) {
+      const at = session.user.email_confirmed_at;
+      if (at) {
+        verifyEl.innerHTML = `<span class="text-ink">Email verified</span> · <span class="text-ink-500">${fmtConfirmed(at)}</span>`;
+      } else {
+        verifyEl.innerHTML = `<span class="text-amber-900">Not verified yet.</span> Check your inbox or <a class="font-medium text-secondary underline underline-offset-4" href="/verify-email">complete verification</a>.`;
+      }
+    }
+
+    if (forgotLink && authEmail) {
+      forgotLink.href = `/forgot-password?email=${encodeURIComponent(authEmail)}`;
+    }
+
+    if (profile) {
+      if (fullName) fullName.value = profile.full_name ?? '';
+      if (displayName) displayName.value = profile.display_name ?? '';
+      if (country) country.value = profile.country ?? '';
+      if (timezone) timezone.value = profile.timezone ?? '';
+      if (lang) lang.value = profile.preferred_language ?? 'en';
+      if (newsletter) newsletter.checked = Boolean(profile.newsletter_opt_in);
+      if (onboarding) onboarding.checked = profile.onboarding_completed === true;
+    } else {
+      const meta = session.user.user_metadata as Record<string, unknown> | undefined;
+      if (fullName && typeof meta?.full_name === 'string') fullName.value = meta.full_name;
+      if (lang) lang.value = 'en';
+    }
+
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      profileSuccess?.classList.add('hidden');
+      profileErr?.classList.add('hidden');
+
+      const langVal = trimStr(lang?.value, 32);
+      if (!langVal || langVal.length < 2) {
+        if (profileErr) {
+          profileErr.textContent = 'Preferred language must be at least two characters.';
+          profileErr.classList.remove('hidden');
+        }
+        lang?.focus();
+        return;
+      }
+
+      const tzRaw = (timezone?.value ?? '').trim();
+      let tz: string | null = null;
+      if (tzRaw) {
+        const valid = validateTimezone(tzRaw);
+        if (!valid) {
+          if (profileErr) {
+            profileErr.textContent =
+              'Timezone looks unusual — use letters, slashes and underscores only (e.g. Europe/Riga), or leave blank.';
+            profileErr.classList.remove('hidden');
+          }
+          timezone?.focus();
+          return;
+        }
+        tz = valid;
+      }
+
+      if (saveProfileBtn) {
+        saveProfileBtn.disabled = true;
+        saveProfileBtn.textContent = 'Saving…';
+      }
+
+      const payload = {
+        full_name: trimStr(fullName?.value, 120),
+        display_name: trimStr(displayName?.value, 120),
+        country: trimStr(country?.value, 100),
+        timezone: tz,
+        preferred_language: langVal,
+        newsletter_opt_in: Boolean(newsletter?.checked),
+        onboarding_completed: Boolean(onboarding?.checked),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(
+        {
+          id: session.user.id,
+          email: authEmail || null,
+          ...payload,
+        },
+        { onConflict: 'id' }
+      );
+
+      if (saveProfileBtn) {
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.textContent = 'Save profile';
+      }
+
+      if (error) {
+        if (profileErr) {
+          profileErr.textContent = error.message;
+          profileErr.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (profileSuccess) {
+        profileSuccess.textContent =
+          'Saved. Your profile is updated — thank you for keeping it gentle and accurate.';
+        profileSuccess.classList.remove('hidden');
+      }
+      profileSuccess?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    pwForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      pwErr?.classList.add('hidden');
+      pwOk?.classList.add('hidden');
+
+      const a = pwNew?.value ?? '';
+      const b = pwConfirm?.value ?? '';
+      if (!a && !b) return;
+
+      if (a.length < 8) {
+        if (pwErr) {
+          pwErr.textContent = 'Password needs at least eight characters.';
+          pwErr.classList.remove('hidden');
+        }
+        pwNew?.focus();
+        return;
+      }
+      if (a !== b) {
+        if (pwErr) {
+          pwErr.textContent = 'The two password fields do not match.';
+          pwErr.classList.remove('hidden');
+        }
+        pwConfirm?.focus();
+        return;
+      }
+
+      if (savePwBtn) {
+        savePwBtn.disabled = true;
+        savePwBtn.textContent = 'Updating…';
+      }
+
+      const { error } = await supabase.auth.updateUser({ password: a });
+
+      if (savePwBtn) {
+        savePwBtn.disabled = false;
+        savePwBtn.textContent = 'Update password';
+      }
+
+      if (error) {
+        if (pwErr) {
+          pwErr.textContent = formatAuthError(error);
+          pwErr.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (pwNew) pwNew.value = '';
+      if (pwConfirm) pwConfirm.value = '';
+      if (pwOk) {
+        pwOk.textContent = 'Password updated. You remain signed in.';
+        pwOk.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('w-ac-signout')?.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.replace(LOGIN_PATH);
+    });
+  })();
+</script>

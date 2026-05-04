@@ -15,7 +15,7 @@ const pageTitle = `${title} · CMS · ${site.name}`;
 const nav: { id: NonNullable<typeof active> | 'decap'; href: string; label: string; external?: boolean }[] = [
   { id: 'dashboard', href: CMS_PATHS.cmsRoot, label: 'Dashboard' },
   { id: 'decap', href: CMS_PATHS.decap, label: 'Open editor (Decap)', external: true },
-  { id: 'articles', href: CMS_PATHS.cmsArticles, label: 'Journal articles' },
+  { id: 'articles', href: CMS_PATHS.cmsArticles, label: 'Articles' },
   { id: 'webinars', href: CMS_PATHS.cmsWebinars, label: 'Webinars' },
   { id: 'consultations', href: CMS_PATHS.cmsConsultations, label: 'Consultations' },
   { id: 'products', href: CMS_PATHS.cmsProducts, label: 'Products' },
@@ -99,7 +99,7 @@ const nav: { id: NonNullable<typeof active> | 'decap'; href: string; label: stri
     <footer class="mt-auto border-t border-ink/10 bg-white py-4">
       <div class="container-wfg flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <a class="text-sm text-ink-600 underline decoration-line hover:text-secondary" href="/">Public site</a>
-        <a class="text-sm text-ink-600 underline decoration-line hover:text-secondary" href="/app/dashboard">Member area</a>
+        <a class="text-sm text-ink-600 underline decoration-line hover:text-secondary" href="/my-wellness-space">Member area</a>
       </div>
     </footer>
   </body>

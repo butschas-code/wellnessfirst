@@ -1,5 +1,8 @@
 ---
 import { articlePath } from '@/lib/articles';
+import { journalCatalogSlug } from '@/lib/articles/journal-catalog-slug';
+import { accessBadgeLabel, normalizeAccessLevel } from '@/lib/content/access-level';
+import ArticleFavoriteButton from '@/components/articles/ArticleFavoriteButton.astro';
 import type { ArticleEntry } from '@/types/content';
 import EditorialImageSlot from '@/components/media/EditorialImageSlot.astro';
 
@@ -10,7 +13,9 @@ interface Props {
 
 const { entry, showFeaturedBadge } = Astro.props;
 const { title, excerpt, category, featured, coverImage } = entry.data;
+const accessBadge = accessBadgeLabel(normalizeAccessLevel(entry.data.accessLevel));
 const href = articlePath(entry);
+const catalogSlug = journalCatalogSlug(entry);
 ---
 
 <article
@@ -39,6 +44,13 @@ const href = articlePath(entry);
           <span class="text-[0.65rem] font-medium uppercase tracking-[0.2em] text-secondary">Featured</span>
         )
       }
+      {
+        accessBadge && (
+          <span class="rounded-full border border-ink/12 bg-paper px-2 py-0.5 text-[0.6rem] font-semibold uppercase tracking-wider text-ink-500">
+            {accessBadge}
+          </span>
+        )
+      }
     </div>
     <h3 class="mt-2 font-display text-lg font-medium leading-snug text-ink sm:text-xl">
       <a class="text-inherit no-underline transition group-hover:text-secondary" href={href}>{title}</a>
@@ -46,11 +58,14 @@ const href = articlePath(entry);
     <p class="mt-3 line-clamp-4 flex-1 text-base leading-relaxed text-charcoal sm:line-clamp-5">
       {excerpt}
     </p>
-    <a
-      class="mt-4 inline-flex w-fit text-sm font-medium text-ink no-underline transition group-hover:text-secondary"
-      href={href}
-    >
-      Read
-    </a>
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+      <a
+        class="inline-flex w-fit text-sm font-medium text-ink no-underline transition group-hover:text-secondary"
+        href={href}
+      >
+        Read
+      </a>
+      <ArticleFavoriteButton slug={catalogSlug} variant="card" />
+    </div>
   </div>
 </article>

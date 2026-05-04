@@ -9,8 +9,8 @@ const items = (await getCollection('articles')).sort(
 );
 ---
 
-<CmsPageShell title="Journal articles" description="List of journal content entries." active="articles">
-  <h1 class="font-display text-2xl text-ink md:text-3xl">Journal articles</h1>
+<CmsPageShell title="Articles" description="List of article entries from the catalog." active="articles">
+  <h1 class="font-display text-2xl text-ink md:text-3xl">Articles</h1>
   <p class="mt-2 text-sm text-ink-600">Source: <code class="rounded bg-ink/5 px-1">src/content/articles</code></p>
   <div class="mt-6 overflow-x-auto rounded-xl border border-ink/10 bg-white shadow-elevated">
     <table class="w-full min-w-[36rem] text-left text-sm">

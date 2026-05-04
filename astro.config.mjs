@@ -38,6 +38,16 @@ export default defineConfig({
         try {
           const p = new URL(page).pathname.replace(/\/$/, '') || '/';
           if (p === '/community/dashboard' || p.startsWith('/community/')) return false;
+          if (
+            p === '/login' ||
+            p === '/signup' ||
+            p === '/verify-email' ||
+            p === '/forgot-password' ||
+            p === '/reset-password' ||
+            p.startsWith('/my-wellness-space')
+          ) {
+            return false;
+          }
         } catch {
           return true;
         }

@@ -24,13 +24,18 @@ const lede = TRACK_CARD_LEDE[trackId];
 <AppLayout
   title={track.label}
   description={`Member track · ${track.label}`}
-  memberNav="library"
+  memberShell={true}
+  memberNav={null}
 >
   <div class="container-wfg py-10 sm:py-14">
     <p id="comm-track-state" class="text-sm text-ink-500">Loading…</p>
 
     <div id="comm-track-panel" class="hidden">
-      <a class="link-wfg-ghost text-sm" href="/community/dashboard">← Library</a>
+      <p class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-500">
+        <a class="link-wfg-ghost font-medium text-secondary" href="/my-wellness-space">My Wellness Space</a>
+        <span class="text-taupe-300" aria-hidden="true">·</span>
+        <a class="link-wfg-ghost" href="/community/dashboard">Library</a>
+      </p>
       <div class="mt-8 sm:mt-10">
         <TrackContentSection
           label={track.label}
@@ -72,6 +77,6 @@ const lede = TRACK_CARD_LEDE[trackId];
     if (!isSupabaseConfigured()) return;
     const supabase = getSupabaseBrowser();
     await supabase.auth.signOut();
-    window.location.replace('/app/sign-in');
+    window.location.replace('/login');
   });
 </script>

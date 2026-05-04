@@ -1,0 +1,151 @@
+---
+/**
+ * Supabase Dashboard: Email provider + redirect URLs (+ optional SMTP). See `src/lib/auth/email-redirect.ts`.
+ */
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Sign in · Wellness First Global"
+  description="Sign in to My Wellness Space."
+  noIndex={true}
+  bodyClass=""
+>
+  <div class="container-wfg max-w-md py-12 sm:py-16">
+    <p class="text-eyebrow text-secondary">Members</p>
+    <h1 class="font-display mt-2 text-3xl tracking-tight text-ink-800 sm:text-4xl">Welcome back</h1>
+    <p class="mt-3 text-ink-600 leading-relaxed">
+      This entrance is separate from the public newsletter — here we hold your library and rhythm.
+    </p>
+
+    <p
+      id="wfg-li-reset-banner"
+      class="mt-6 hidden rounded-xl bg-white px-4 py-3 text-sm text-ink-700 ring-1 ring-ink/10"
+      role="status"
+    >
+      Your password has been refreshed — you can sign in below whenever it feels right.
+    </p>
+
+    <form id="wfg-login-form" class="mt-10 grid gap-6" novalidate>
+      <div>
+        <label for="wfg-li-email" class="label-wfg">Email</label>
+        <input
+          id="wfg-li-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          class="input-wfg"
+        />
+      </div>
+      <div>
+        <label for="wfg-li-password" class="label-wfg">Password</label>
+        <input
+          id="wfg-li-password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          minlength="6"
+          class="input-wfg"
+        />
+      </div>
+
+      <p id="wfg-li-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900" role="alert"></p>
+
+      <button type="submit" id="wfg-li-submit" class="btn-primary min-h-11 w-full justify-center">Sign in</button>
+    </form>
+
+    <p class="mt-6 text-center text-sm">
+      <a class="text-secondary underline decoration-line underline-offset-2" href="/forgot-password">Forgot password</a>
+    </p>
+
+    <p class="mt-8 text-sm text-ink-500">
+      New here?
+      <a class="text-secondary underline decoration-line underline-offset-2" href="/signup">Create an account</a>
+    </p>
+
+    <div
+      id="wfg-config-missing"
+      class="mt-10 hidden border-t border-dashed border-ink/25 pt-6 text-sm text-ink-600 leading-relaxed"
+    />
+  </div>
+</BaseLayout>
+
+<script>
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { formatAuthError } from '@/lib/auth/auth-errors';
+  import { safeMemberNextParam } from '@/lib/app/redirects';
+  import { syncMemberProfileFromUser } from '@/lib/auth/sync-member-profile';
+  import { redirectIfAuthenticatedSession } from '@/lib/auth/guest-redirect';
+
+  const missing = document.getElementById('wfg-config-missing');
+  if (missing && !isSupabaseConfigured()) {
+    missing.classList.remove('hidden');
+    missing.textContent =
+      'Sign-in is not configured here. Add PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then restart the dev server.';
+  }
+
+  const form = document.getElementById('wfg-login-form') as HTMLFormElement | null;
+  const errEl = document.getElementById('wfg-li-error');
+  const submitBtn = document.getElementById('wfg-li-submit') as HTMLButtonElement | null;
+  const resetBanner = document.getElementById('wfg-li-reset-banner');
+
+  const spInit = new URLSearchParams(window.location.search);
+  if (spInit.get('reset') === 'done') resetBanner?.classList.remove('hidden');
+
+  function setLoading(loading: boolean) {
+    if (!submitBtn) return;
+    submitBtn.disabled = loading;
+    submitBtn.setAttribute('aria-busy', loading ? 'true' : 'false');
+    submitBtn.textContent = loading ? 'Signing in…' : 'Sign in';
+  }
+
+  (async () => {
+    if (!isSupabaseConfigured()) return;
+    const supabase = getSupabaseBrowser();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    redirectIfAuthenticatedSession(session);
+  })();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!isSupabaseConfigured() || !form || !errEl) return;
+    errEl.classList.add('hidden');
+
+    const fd = new FormData(form);
+    const email = String(fd.get('email') ?? '').trim().toLowerCase();
+    const password = String(fd.get('password') ?? '');
+
+    setLoading(true);
+
+    try {
+      const supabase = getSupabaseBrowser();
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = formatAuthError(error);
+        errEl.classList.remove('hidden');
+        setLoading(false);
+        return;
+      }
+      if (data.user) {
+        const sync = await syncMemberProfileFromUser(supabase, data.user);
+        if (sync.error) {
+          errEl.textContent = sync.error;
+          errEl.classList.remove('hidden');
+          setLoading(false);
+          return;
+        }
+      }
+      const sp = new URLSearchParams(window.location.search);
+      const next = safeMemberNextParam(sp.get('next'));
+      window.location.replace(next);
+    } catch {
+      errEl.textContent = formatAuthError(null);
+      errEl.classList.remove('hidden');
+      setLoading(false);
+    }
+  });
+</script>

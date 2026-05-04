@@ -47,7 +47,7 @@ const spineSpotlight = nextWebinar
               : 'Register'
             : 'Open the session',
       },
-      secondary: { href: '/articles', label: 'Read the journal' },
+      secondary: { href: '/articles', label: 'Read articles' },
     }
   : null;
 const groups = [
@@ -119,9 +119,9 @@ const groups = [
       {list.length === 0 && (
         <EmptyState
           title="Consults on pause"
-          body="When new lines open, we will list them here with lead times. Until then: journal and public sessions."
+          body="When new lines open, we will list them here with lead times. Until then: articles and public sessions."
           actionHref="/articles"
-          actionLabel="Open the journal"
+          actionLabel="Browse articles"
           secondaryHref="/contact"
           secondaryLabel="Write the desk"
         />

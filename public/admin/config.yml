@@ -23,7 +23,7 @@ editor:
 
 collections:
   - name: articles
-    label: Journal articles
+    label: Articles
     label_singular: article
     folder: src/content/articles
     create: true

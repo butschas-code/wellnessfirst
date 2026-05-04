@@ -1,0 +1,41 @@
+---
+interface Props {
+  slug: string;
+  variant?: 'card' | 'detail';
+}
+
+const { slug, variant = 'card' } = Astro.props;
+
+const base =
+  'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2';
+
+const cardCls = `${base} border-ink/15 bg-paper/95 text-ink hover:border-secondary/35 hover:text-secondary`;
+
+const detailCls = `${base} border-white/35 bg-white/10 text-white shadow-sm backdrop-blur-sm hover:border-white/55 hover:bg-white/15`;
+---
+
+<button
+  type="button"
+  data-article-favorite
+  data-article-slug={slug}
+  class:list={[variant === 'card' ? cardCls : detailCls]}
+  aria-pressed="false"
+  aria-label="Save article"
+>
+  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      class="transition-[fill]"
+      d="M12 21s-7-4.85-7-10a5 5 0 0 1 9.09-2.91A5 5 0 0 1 19 11c0 5.15-7 10-7 10Z"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linejoin="round"
+      fill="transparent"></path>
+  </svg>
+  <span data-fav-visible-label>Save</span>
+</button>
+
+<style>
+  button[data-article-favorite][aria-pressed='true'] svg path {
+    fill: currentColor;
+  }
+</style>

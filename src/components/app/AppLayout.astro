@@ -2,14 +2,23 @@
 import '@/styles/global.css';
 import { site } from '@/lib/site';
 import MemberShellNav from '@/components/member/MemberShellNav.astro';
+import type { MemberNavKey } from '@/lib/member/nav';
 
 interface Props {
   title: string;
   description?: string;
-  memberNav?: 'account' | 'library';
+  /** Full My Wellness Space chrome (nav + calm backdrop). Community library uses nav with no active tab. */
+  memberShell?: boolean;
+  /** Active nav label; `null` shows navigation without a selected item. */
+  memberNav?: MemberNavKey | null;
 }
 
-const { title, description = 'Member sign-in and account for Wellness First Global.', memberNav } = Astro.props;
+const {
+  title,
+  description = 'Member sign-in and account for Wellness First Global.',
+  memberShell = false,
+  memberNav = null,
+} = Astro.props;
 const pageTitle = `${title} · ${site.name}`;
 ---
 
@@ -66,11 +75,13 @@ const pageTitle = `${title} · ${site.name}`;
             Wellness First
           </a>
         </div>
-        <span class="text-sm font-medium uppercase tracking-[0.12em] text-ink-500">Member</span>
+        <span class="text-sm font-medium uppercase tracking-[0.12em] text-ink-500">
+          {memberShell ? 'My Wellness Space' : 'Member'}
+        </span>
       </div>
     </header>
-    {memberNav && <MemberShellNav current={memberNav} />}
-    <main id="app-main" class="flex-1" tabindex="-1">
+    {memberShell && <MemberShellNav current={memberNav} />}
+    <main id="app-main" class:list={['flex-1', memberShell && 'member-wellness-main']} tabindex="-1">
       <slot />
     </main>
     <footer class="mt-auto border-t border-ink/10 py-6">

@@ -1,0 +1,128 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import AccessGate from '@/components/access/AccessGate.astro';
+import {
+  fetchPublishedResourcesForBuild,
+  type ResourceBuildRow,
+} from '@/lib/supabase/resource-build-fetch';
+import { topicLabel } from '@/lib/member/topic-labels';
+import { resourceTypeLabel } from '@/lib/resources/resource-types';
+
+export async function getStaticPaths() {
+  const rows = await fetchPublishedResourcesForBuild();
+  return rows.map((row) => ({ params: { slug: row.slug }, props: { row } }));
+}
+
+interface Props {
+  row: ResourceBuildRow;
+}
+
+const { row } = Astro.props;
+const canonicalPath = `/resources/${row.slug}`;
+const metaTitle = `${row.title} · Library`;
+const metaDescription = row.description?.trim() || row.title;
+
+const isPublic = row.access_level === 'public';
+const isMember = row.access_level === 'member';
+const isPaid = row.access_level === 'paid';
+const isWebinar = row.access_level === 'webinar_participants';
+
+const publicLink = isPublic ? row.external_url || row.file_url : null;
+
+const shelfEyebrow = resourceTypeLabel(row.resource_type);
+const topicEyebrow = row.topic_key ? topicLabel(row.topic_key) : '';
+const heroEyebrow = [shelfEyebrow, topicEyebrow].filter(Boolean).join(' · ');
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={metaDescription}
+  canonicalPath={canonicalPath}
+  {...marketingPageLayout}
+>
+  <article>
+    <MarketingHero compact title={row.title} description={row.description ?? undefined} eyebrow={heroEyebrow || undefined} />
+    {
+      isPublic && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-6 sm:!pt-8">
+          <Container narrow>
+            <p class="max-w-2xl text-base leading-relaxed text-ink-700">
+              Take what helps — leave the rest. If you are signed in, we note that you opened this piece once, quietly.
+            </p>
+            {publicLink ? (
+              <p class="mt-8">
+                <a
+                  class="btn-primary inline-flex no-underline"
+                  href={publicLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-resource-download-id={row.id}
+                >
+                  {row.external_url ? 'Open link' : 'Open file'}
+                </a>
+              </p>
+            ) : (
+              <p class="mt-8 text-sm text-ink-600">Something will be linked here soon.</p>
+            )}
+          </Container>
+        </Section>
+      )
+    }
+    {
+      isMember && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-6 sm:!pt-8">
+          <Container narrow>
+            <div data-resource-detail-root data-access-level="member" data-resource-slug={row.slug}>
+              <div data-resource-soft-gate>
+                <AccessGate variant="member_soft_gate" nextPath={canonicalPath} lead={metaDescription} />
+              </div>
+              <p data-resource-status class="mt-4 hidden text-sm text-ink-600" role="status" aria-live="polite" />
+              <div data-resource-actions class="mt-6 hidden" />
+            </div>
+          </Container>
+        </Section>
+      )
+    }
+    {
+      isPaid && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-6 sm:!pt-8">
+          <Container narrow>
+            <AccessGate variant="paid_locked" nextPath={canonicalPath} lead={metaDescription} />
+          </Container>
+        </Section>
+      )
+    }
+    {
+      isWebinar && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-6 sm:!pt-8">
+          <Container narrow>
+            <AccessGate variant="webinar_locked" nextPath={canonicalPath} lead={metaDescription} />
+          </Container>
+        </Section>
+      )
+    }
+    {
+      !isPublic && !isMember && !isPaid && !isWebinar && (
+        <Section tone="contrast" spacing="comfortable" class="!pt-6 sm:!pt-8">
+          <Container narrow>
+            <p class="text-sm text-ink-600">This piece uses an unknown access path.</p>
+          </Container>
+        </Section>
+      )
+    }
+  </article>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  import { initResourceDetailAccess } from '@/scripts/resource-detail-access';
+  import { initResourceDownloadTracking } from '@/scripts/resource-download-track';
+
+  initResourceDetailAccess();
+  initResourceDownloadTracking();
+</script>

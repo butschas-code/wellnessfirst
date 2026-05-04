@@ -1,0 +1,152 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import Section from '@/components/layout/Section.astro';
+import Container from '@/components/layout/Container.astro';
+import ResourceLibraryCard from '@/components/cards/ResourceLibraryCard.astro';
+import EmptyState from '@/components/conversion/EmptyState.astro';
+import { fetchPublishedResourcesForBuild } from '@/lib/supabase/resource-build-fetch';
+import { topicLabel, TOPIC_KEYS, type TopicKey } from '@/lib/member/topic-labels';
+import {
+  RESOURCE_LIBRARY_SECTION_ORDER,
+  RESOURCE_TYPE_SECTION_LABEL,
+  isResourceTypeKey,
+} from '@/lib/resources/resource-types';
+
+const allPublished = await fetchPublishedResourcesForBuild();
+const libraryRows = allPublished.filter((r) => r.access_level === 'public');
+
+const topicsPresent = new Set(
+  libraryRows.map((r) => r.topic_key).filter((k): k is string => typeof k === 'string' && k.length > 0),
+);
+const topicFilters = (TOPIC_KEYS as readonly TopicKey[]).filter((k) => topicsPresent.has(k));
+
+function normalisedType(t: string | null | undefined): keyof typeof RESOURCE_TYPE_SECTION_LABEL {
+  return isResourceTypeKey(t) ? t : 'guide';
+}
+
+const bySection = new Map<string, typeof libraryRows>();
+for (const key of RESOURCE_LIBRARY_SECTION_ORDER) {
+  bySection.set(key, []);
+}
+for (const row of libraryRows) {
+  const k = normalisedType(row.resource_type);
+  const bucket = bySection.get(k);
+  if (bucket) bucket.push(row);
+  else bySection.set(k, [row]);
+}
+---
+
+<BaseLayout
+  title="Library"
+  description="Curated guides, worksheets, and references — shared openly where we can."
+  canonicalPath="/resources"
+  {...marketingPageLayout}
+>
+  <MarketingHero
+    compact
+    eyebrow="Library"
+    title="A shelf for careful reading"
+    description="Guides, worksheets, rituals, and lists — gathered slowly, without a checkout gate. Everything here is offered openly; member-only pieces wait inside My Wellness Space."
+  />
+
+  <Section id="library-resources" tone="minimal" spacing="comfortable" class="!pt-6 sm:!pt-8 scroll-mt-24">
+    <Container>
+      {
+        libraryRows.length === 0 ? (
+          <EmptyState
+            title="The shelf is resting"
+            body="When we publish something for everyone, it will appear here with room to breathe — not as a pile of files."
+            actionHref="/articles"
+            actionLabel="Read articles"
+            secondaryHref="/signup"
+            secondaryLabel="Open My Wellness Space"
+          />
+        ) : (
+          <>
+            <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+              <div>
+                <p class="text-label">Themes</p>
+                <p class="mt-2 max-w-xl text-sm leading-relaxed text-ink-600">
+                  Filter by thread — or wander the shelves below.
+                </p>
+              </div>
+            </div>
+            <div class="mt-5 flex flex-wrap gap-2" role="group" aria-label="Filter by theme" data-resource-topic-filters>
+              <button type="button" class="btn-filter-pill" data-resource-topic-filter="all" aria-pressed="true">
+                All themes
+              </button>
+              {topicFilters.map((key) => (
+                <button type="button" class="btn-filter-pill" data-resource-topic-filter={key} aria-pressed="false">
+                  {topicLabel(key)}
+                </button>
+              ))}
+            </div>
+
+            <div class="mt-14 space-y-16 sm:space-y-20" data-resource-sections>
+              {RESOURCE_LIBRARY_SECTION_ORDER.map((sectionKey) => {
+                const rows = bySection.get(sectionKey) ?? [];
+                if (rows.length === 0) return null;
+                const label = RESOURCE_TYPE_SECTION_LABEL[sectionKey];
+                return (
+                  <section class="scroll-mt-28" data-resource-section={sectionKey} aria-labelledby={`shelf-${sectionKey}`}>
+                    <h2 id={`shelf-${sectionKey}`} class="font-display text-2xl tracking-tight text-ink sm:text-3xl">
+                      {label}
+                    </h2>
+                    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-ink-600">
+                      {sectionKey === 'guide' && 'Longer framings — context before action.'}
+                      {sectionKey === 'worksheet' && 'Paper-friendly spaces to think with your hands.'}
+                      {sectionKey === 'checklist' && 'Small, finite steps when the week feels full.'}
+                      {sectionKey === 'ritual' && 'Rhythms and pauses worth returning to.'}
+                      {sectionKey === 'reading_list' && 'Texts to sit with — no completion bar.'}
+                      {sectionKey === 'webinar_notes' && 'Echoes from live hours, when we offer them.'}
+                    </p>
+                    <ul
+                      class="mt-8 list-none grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:grid-cols-3"
+                      role="list"
+                    >
+                      {rows.map((r) => (
+                        <li class="min-h-0" data-resource-item>
+                          <ResourceLibraryCard
+                            slug={r.slug}
+                            title={r.title}
+                            description={r.description}
+                            shelfLabel={label}
+                            topicLabel={r.topic_key ? topicLabel(r.topic_key) : ''}
+                            topicKey={r.topic_key ?? ''}
+                            typeKey={normalisedType(r.resource_type)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
+            </div>
+
+            <div
+              data-resource-no-match
+              class="mt-12 hidden rounded-2xl border border-dashed border-ink/20 bg-white/80 px-6 py-10 sm:px-10"
+              role="status"
+              aria-live="polite"
+            >
+              <p class="font-display text-xl text-ink-800">Nothing on this theme yet</p>
+              <p class="mt-2 text-ink-600">Try another thread, or open &ldquo;All themes&rdquo;.</p>
+              <button type="button" class="btn-primary mt-6" data-resource-show-all>
+                All themes
+              </button>
+            </div>
+          </>
+        )
+      }
+    </Container>
+  </Section>
+  <HomePageFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  import { initResourcesTopicFilters } from '@/scripts/resources-topic-filter';
+  initResourcesTopicFilters();
+</script>

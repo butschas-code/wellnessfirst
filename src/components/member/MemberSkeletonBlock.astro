@@ -1,0 +1,19 @@
+---
+interface Props {
+  /** Number of placeholder rows */
+  rows?: number;
+}
+
+const rows = Astro.props.rows ?? 3;
+---
+
+<div class="animate-pulse space-y-5" aria-hidden="true">
+  <div class="h-3 w-24 rounded-full bg-ink/10"></div>
+  <div class="h-7 max-w-md rounded-md bg-ink/[0.08]"></div>
+  <div class="h-4 max-w-xl rounded-md bg-ink/[0.06]"></div>
+  {
+    Array.from({ length: rows }).map(() => (
+      <div class="h-14 rounded-lg bg-ink/[0.05]"></div>
+    ))
+  }
+</div>

@@ -16,7 +16,7 @@ export const homeFeaturedArticleIds = [
   'practices-rituals-structure-for-soul',
 ] as const;
 
-export const homeJournalDisplay: Record<
+export const homeFeaturedArticleDisplay: Record<
   (typeof homeFeaturedArticleIds)[number],
   { category: string; title: string; summary: string }
 > = {

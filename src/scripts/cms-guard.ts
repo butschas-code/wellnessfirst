@@ -30,7 +30,7 @@ export function initCmsAuthGate(): void {
 
     if (!session?.user?.email) {
       const next = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.replace(`/app/sign-in?next=${next}`);
+      window.location.replace(`/login?next=${next}`);
       return;
     }
 

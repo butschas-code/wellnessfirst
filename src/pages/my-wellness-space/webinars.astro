@@ -1,0 +1,34 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
+---
+
+<AppLayout title="My webinars" description="Gatherings you have responded to." memberShell={true} memberNav="webinars">
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-wb-state" class="text-sm text-ink-500">Gathering your invitations…</p>
+    <div id="w-wb-skel" class="hidden"><MemberSkeletonBlock rows={4} /></div>
+    <div id="w-wb-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Live rhythm</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">My webinars</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        What is ahead, what you have already sat with, and invitations you chose to release — kept in one calm list.
+      </p>
+
+      <div id="w-wb-upcoming-label" class="mt-14 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">
+        Upcoming
+      </div>
+      <div id="w-wb-upcoming" class="mt-4"></div>
+
+      <div class="mt-16 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">Earlier</div>
+      <div id="w-wb-past" class="mt-4"></div>
+
+      <div class="mt-16 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink-400">Released invitations</div>
+      <div id="w-wb-cancelled" class="mt-4"></div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { initWebinarMyHub } from '@/scripts/webinar-my-hub';
+  void initWebinarMyHub();
+</script>

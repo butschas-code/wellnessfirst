@@ -7,7 +7,18 @@
  * **Community (member):** `/community/dashboard` and `/community/{trackId}` (see
  * `src/lib/community-tracks.ts` for `trackId` values) — all client-guarded.
  */
-export const protectedAppPaths = ['/app/dashboard'] as const;
+export const protectedAppPaths = ['/app/dashboard', '/my-wellness-space'] as const;
+
+/** Nested routes under `/my-wellness-space` (client-guarded). */
+export const protectedWellnessSpacePaths = [
+  '/my-wellness-space/account',
+  '/my-wellness-space/saved-articles',
+  '/my-wellness-space/webinars',
+  '/my-wellness-space/resources',
+  '/my-wellness-space/interests',
+  '/my-wellness-space/reflections',
+  '/my-wellness-space/consultation',
+] as const;
 
 export type ProtectedAppPath = (typeof protectedAppPaths)[number];
 

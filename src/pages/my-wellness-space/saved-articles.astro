@@ -1,0 +1,99 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
+---
+
+<AppLayout title="Saved articles" description="Articles you have saved." memberShell={true} memberNav="saved-articles">
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-sa-state" class="text-sm text-ink-500">Gathering saved pieces…</p>
+    <div id="w-sa-skel" class="hidden"><MemberSkeletonBlock rows={5} /></div>
+    <div id="w-sa-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Reading</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">Saved articles</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        Your shelf — nothing flashy, only what you chose to revisit.
+      </p>
+      <div id="w-sa-mount" class="mt-12"></div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { topicLabel } from '@/lib/member/topic-labels';
+
+  function esc(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  }
+
+  (async () => {
+    const state = document.getElementById('w-sa-state');
+    const skel = document.getElementById('w-sa-skel');
+    const panel = document.getElementById('w-sa-panel');
+    const mount = document.getElementById('w-sa-mount');
+
+    if (!isSupabaseConfigured() || !mount) {
+      state!.textContent = 'Supabase is not configured.';
+      return;
+    }
+
+    const session = await guardSessionOrRedirect();
+    if (!session) return;
+
+    state?.classList.add('hidden');
+    skel?.classList.remove('hidden');
+
+    const supabase = getSupabaseBrowser();
+    const { data, error } = await supabase
+      .from('article_favorites')
+      .select('created_at, articles ( slug, title, excerpt, topic_key, published )')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false })
+      .limit(48);
+
+    skel?.classList.add('hidden');
+    panel?.classList.remove('hidden');
+
+    if (error) {
+      mount.innerHTML = `<p class="text-sm text-red-800">${esc(error.message)}</p>`;
+      return;
+    }
+
+    const rows = (
+      (data ?? []) as unknown as {
+        articles: {
+          slug: string;
+          title: string;
+          excerpt: string | null;
+          topic_key: string | null;
+          published: boolean | null;
+        } | null;
+      }[]
+    ).filter((r) => r.articles && r.articles.published === true);
+
+    if (rows.length === 0) {
+      mount.innerHTML = `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
+        <p class="text-sm leading-relaxed text-ink-600">Your saved reading will appear here.</p>
+        <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Browse articles</a>
+      </div>`;
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'max-w-2xl';
+    for (const r of rows) {
+      const a = r.articles!;
+      const li = document.createElement('li');
+      li.className = 'border-b border-ink/[0.06] py-6 first:pt-0';
+      const topic = a.topic_key ? topicLabel(a.topic_key) : '';
+      li.innerHTML = `<a class="group block" href="/articles/${esc(a.slug)}">
+        <span class="font-display text-xl text-ink transition-colors group-hover:text-secondary">${esc(a.title)}</span>
+        ${topic ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${esc(topic)}</span>` : ''}
+        ${a.excerpt ? `<span class="mt-2 line-clamp-3 block text-sm text-ink-500">${esc(a.excerpt)}</span>` : ''}
+      </a>`;
+      ul.appendChild(li);
+    }
+    mount.appendChild(ul);
+  })();
+</script>

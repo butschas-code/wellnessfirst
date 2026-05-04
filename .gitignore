@@ -15,6 +15,8 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.local
+.env.*.local
 .env.production
 
 # macOS-specific files
@@ -28,3 +30,6 @@ pnpm-debug.log*
 
 # Vercel CLI local output (do not commit)
 .vercel/
+
+# Supabase CLI local link state (do not commit)
+supabase/.temp/

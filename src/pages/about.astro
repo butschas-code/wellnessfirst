@@ -19,10 +19,10 @@ const { title, description, hero } = entry.data;
 const offers = [
   {
     kicker: 'Reading',
-    title: 'The journal',
+    title: 'Articles',
     body: 'Long-form articles you can use in a real week. No clickbait, no feed — written by humans and fixed in public when we must.',
     href: '/articles',
-    cta: 'Open the journal',
+    cta: 'Browse articles',
   },
   {
     kicker: 'Gatherings',
@@ -68,7 +68,7 @@ const aboutSpotlight = nextWebinar
       meta: nextWebinarMeta ?? undefined,
       body: nextWebinar.data.excerpt,
       primary: { href: offerPath('webinars', nextWebinar), label: 'View this session' },
-      secondary: { href: '/articles', label: 'The journal' },
+      secondary: { href: '/articles', label: 'Articles' },
     }
   : null;
 ---
@@ -85,7 +85,7 @@ const aboutSpotlight = nextWebinar
     description={description}
   >
     <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-      <a class="btn-cta-invert" href="/articles">Read the journal</a>
+      <a class="btn-cta-invert" href="/articles">Read articles</a>
       <a class="btn-cta-invert-ghost" href="/webinars">Join a live hour</a>
     </div>
   </MarketingHero>
@@ -201,7 +201,7 @@ const aboutSpotlight = nextWebinar
         style="--stagger: 2"
       >
         <a class="btn-cta-invert" href="/webinars">Browse sessions</a>
-        <a class="btn-cta-invert-ghost" href="/articles">Open the journal</a>
+        <a class="btn-cta-invert-ghost" href="/articles">Browse articles</a>
       </div>
     </div>
   </section>

@@ -1,4 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
+import { LOGIN_PATH } from '@/lib/auth/constants';
 import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
 
 /**
@@ -17,7 +18,7 @@ export async function guardSessionOrRedirect(): Promise<Session | null> {
   } = await supabase.auth.getSession();
   if (!session) {
     const next = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
-    window.location.replace(`/app/sign-in?next=${next}`);
+    window.location.replace(`${LOGIN_PATH}?next=${next}`);
     return null;
   }
   return session;

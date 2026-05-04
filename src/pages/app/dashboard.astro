@@ -1,66 +1,8 @@
 ---
-/**
- * Client-guarded member home (static build). Reuse `guardSessionOrRedirect` for new
- * protected pages; list paths in `src/lib/app/protected-routes.ts`.
- */
 import AppLayout from '@/components/app/AppLayout.astro';
-import { COMMUNITY_TRACKS } from '@/lib/community-tracks';
 ---
 
-<AppLayout title="Account" description="Member dashboard (preview)." memberNav="account">
-  <div class="container-wfg py-10 sm:py-14">
-    <p id="app-dash-state" class="text-sm text-ink-500">Loading…</p>
-
-    <div id="app-dash-panel" class="hidden">
-      <h1 class="font-display text-3xl text-ink-800">Account</h1>
-      <p class="mt-2 text-ink-600">
-        Signed in as <span id="app-user-email" class="font-medium text-ink-800"></span>
-      </p>
-
-      <div class="mt-10 max-w-2xl border-0 border-t-2 border-ink bg-white pt-8 sm:pt-10">
-        <h2 class="font-display text-xl text-ink">Member library</h2>
-        <p class="mt-2 text-sm text-charcoal leading-relaxed">
-          Browse the scaffold for lessons, resources, and replays by track — placeholder content for now, same structure as launch.
-        </p>
-        <a class="btn-primary mt-6 inline-flex min-h-11 w-full items-center justify-center sm:w-auto" href="/community/dashboard"
-          >Open library</a
-        >
-        <p class="mt-5 text-sm text-ink-500">Tracks: {COMMUNITY_TRACKS.map((t) => t.label).join(' · ')}</p>
-      </div>
-
-      <div class="mt-8">
-        <button type="button" id="app-signout" class="btn-secondary min-h-11">Sign out</button>
-      </div>
-    </div>
-  </div>
-</AppLayout>
-<script>
-  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
-  import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
-
-  const state = document.getElementById('app-dash-state');
-  const panel = document.getElementById('app-dash-panel');
-  const emailEl = document.getElementById('app-user-email');
-
-  (async () => {
-    if (!isSupabaseConfigured()) {
-      if (state) {
-        state.textContent =
-          'Supabase is not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then rebuild.';
-      }
-      return;
-    }
-    const session = await guardSessionOrRedirect();
-    if (!session) return;
-    if (state) state.classList.add('hidden');
-    if (panel) panel.classList.remove('hidden');
-    if (emailEl) emailEl.textContent = session.user.email ?? 'Member';
-  })();
-
-  document.getElementById('app-signout')?.addEventListener('click', async () => {
-    if (!isSupabaseConfigured()) return;
-    const supabase = getSupabaseBrowser();
-    await supabase.auth.signOut();
-    window.location.replace('/app/sign-in');
-  });
+<AppLayout title="Redirecting…" description="Taking you to My Wellness Space." />
+<script is:inline>
+  window.location.replace('/my-wellness-space' + window.location.search + window.location.hash);
 </script>

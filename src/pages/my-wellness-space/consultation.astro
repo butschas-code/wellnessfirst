@@ -1,0 +1,133 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import {
+  CONSULTATION_TOPIC_OPTIONS,
+  CONSULTATION_URGENCY_OPTIONS,
+} from '@/lib/consultation/request-options';
+---
+
+<AppLayout
+  title="Consultation"
+  description="Share context for private guidance — without pressure."
+  memberShell={true}
+  memberNav="consultation"
+>
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-co-state" class="text-sm text-ink-500">Checking session…</p>
+
+    <div id="w-co-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Conversation</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">
+        Before we respond
+      </h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        Share what you would like us to understand before we respond. Depth is welcome; marketing language is not ours.
+      </p>
+
+      <div
+        id="w-co-confirm"
+        class="mt-12 hidden max-w-2xl rounded-2xl border border-secondary/25 bg-secondary/[0.06] px-6 py-10 sm:px-10"
+        role="status"
+      >
+        <p class="font-display text-2xl tracking-tight text-ink">Thank you — your words arrived gently.</p>
+        <p class="mt-4 text-base leading-relaxed text-ink-700">
+          There is nothing else you need to do. We read slowly and reply when we can meet what you have named with care.
+        </p>
+        <button type="button" id="w-co-new-note" class="btn-secondary mt-10">
+          Write another note
+        </button>
+      </div>
+
+      <div id="w-co-form-intro" class="mt-12 max-w-2xl">
+        <p class="text-sm leading-relaxed text-ink-600">
+          Fields marked as needed help us reply — the rest may stay sparse if that feels honest today.
+        </p>
+      </div>
+
+      <form id="w-co-form" class="mt-8 grid max-w-xl gap-7">
+        <input type="hidden" id="w-co-editing-id" value="" autocomplete="off" />
+
+        <div>
+          <label class="label-wfg" for="w-co-name">Name</label>
+          <input id="w-co-name" name="full_name" type="text" autocomplete="name" class="input-wfg" />
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-email">Email <span class="text-secondary">*</span></label>
+          <input id="w-co-email" name="email" type="email" autocomplete="email" required class="input-wfg" />
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-lang">Preferred language</label>
+          <input
+            id="w-co-lang"
+            name="preferred_language"
+            type="text"
+            class="input-wfg"
+            placeholder="e.g. English, Latvian, Russian"
+          />
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-topic">What holds most of your attention? <span class="text-secondary">*</span></label>
+          <select id="w-co-topic" name="topic" class="input-wfg" required aria-required="true">
+            <option value="" disabled selected>Select one</option>
+            {CONSULTATION_TOPIC_OPTIONS.map((t) => (
+              <option value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-situation">What feels present — in plain words?</label>
+          <textarea id="w-co-situation" name="situation" rows={6} class="input-wfg" placeholder="No need for polish." />
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-support">What kind of holding would feel useful?</label>
+          <textarea
+            id="w-co-support"
+            name="desired_support"
+            rows={4}
+            class="input-wfg"
+            placeholder="Listening, framing, practical experiments — whatever occurred to you."
+          />
+        </div>
+        <div>
+          <label class="label-wfg" for="w-co-urgency">Timing</label>
+          <select id="w-co-urgency" name="urgency" class="input-wfg">
+            {CONSULTATION_URGENCY_OPTIONS.map((u) => (
+              <option value={u}>{u}</option>
+            ))}
+          </select>
+        </div>
+
+        <label class="flex cursor-pointer items-start gap-3 text-sm text-ink-700 leading-snug">
+          <input
+            id="w-co-consent"
+            name="consent_to_contact"
+            type="checkbox"
+            required
+            class="mt-1 size-4 rounded border-ink/25 text-secondary focus:ring-secondary"
+          />
+          <span>I agree that Wellness First Global may contact me about this request — thoughtfully, not as a funnel.</span>
+        </label>
+
+        <p id="w-co-error" class="hidden text-sm text-red-800" role="alert"></p>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <button type="submit" id="w-co-submit" class="btn-primary min-h-11 w-fit px-10">Send note</button>
+          <button type="button" id="w-co-cancel-edit" class="btn-secondary hidden">Cancel edits</button>
+        </div>
+      </form>
+
+      <div class="mt-20 border-t border-ink/[0.06] pt-16">
+        <h2 class="font-display text-xl text-ink sm:text-2xl">Your previous notes</h2>
+        <p class="mt-2 max-w-xl text-sm leading-relaxed text-ink-600">
+          Nothing here is scored — only remembered so you can see what you already entrusted to us.
+        </p>
+        <div id="w-co-history" class="mt-6"></div>
+      </div>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { initConsultationRequestPage } from '@/scripts/consultation-request';
+  void initConsultationRequestPage();
+</script>

@@ -83,11 +83,28 @@ Copy from `.env.example` and mirror names in **Pages → Settings → Environmen
 
 In the Supabase dashboard: set **Site URL** to production origin; add **Redirect URLs** for localhost and production for `/app/**` and password recovery if used.
 
+### Supabase env vars (“My Wellness Space” base)
+
+Place **`PUBLIC_SUPABASE_URL`** and **`PUBLIC_SUPABASE_ANON_KEY`** where your build reads env:
+
+| Where | Files / UI |
+|-------|------------|
+| **Local** | `.env` or `.env.local` at repo root (copy from `.env.example` or `.env.local.example`). Astro/Vite loads these automatically for `npm run dev` / `npm run build`. |
+| **Cloudflare Pages** | Project → Settings → Environment variables → Production / Preview (same variable names). |
+| **Vercel** | Project → Settings → Environment variables (Production / Preview). |
+
+**Naming:** Astro uses **`PUBLIC_*`** for values exposed to the browser — same role as **`NEXT_PUBLIC_*`** in Next.js. Only use the **anon** key client-side; keep **`service_role`** out of this repo and off the frontend.
+
+Clients live under **`src/lib/supabase/`**: **`browser.ts`** (PKCE session in the browser) and **`server.ts`** (anon server client for future SSR/API routes).
+
+**Database (My Wellness Space):** migrations and seeds are in **`supabase/`** — see **[`supabase/README.md`](./supabase/README.md)**.
+
 ## Repository layout (short)
 
 - `src/pages/` — routes (`/`, `/articles`, `/app/*`, `/community/*`, …)
 - `src/components/` — layouts, cards, forms, member UI
 - `src/lib/` — site config, SEO, navigation, Supabase client, form config
+- `supabase/` — Postgres migrations + optional SQL seeds for the member system
 - `functions/` — Cloudflare Pages Functions for public forms
 - `public/` — `robots.txt`, favicon, static brand assets
 
