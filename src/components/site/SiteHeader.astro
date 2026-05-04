@@ -6,6 +6,7 @@ const pathname = Astro.url.pathname;
 
 function navItemActive(href: string): boolean {
   if (href === '/') return pathname === '/';
+  if (href === '/login') return pathname === '/login' || pathname === '/signup';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -52,17 +53,41 @@ const menuId = 'wfg-mobile-menu';
         </a>
       </div>
 
-      <nav class="hidden flex-1 items-center justify-center gap-0.5 lg:flex" aria-label="Primary">
+      <nav class="hidden min-w-0 flex-1 items-center justify-end gap-0.5 lg:flex" aria-label="Primary">
         {primaryNav.map((item) => {
           const active = navItemActive(item.href);
-          return (
+          const iconOnly = item.iconOnly === true;
+          const baseCls = iconOnly
+            ? 'inline-flex shrink-0 items-center justify-center rounded-full px-2.5 py-1.5 transition-colors duration-200 xl:px-3'
+            : 'shrink-0 rounded-full px-3 py-1.5 text-sm font-medium tracking-[-0.01em] transition-colors duration-200 xl:px-4';
+          const toneCls = active
+            ? 'bg-primary text-white'
+            : 'text-charcoal hover:bg-primary/[0.06] hover:text-primary';
+          return iconOnly ? (
             <a
-              class:list={[
-                'shrink-0 rounded-full px-3 py-1.5 text-sm font-medium tracking-[-0.01em] transition-colors duration-200 xl:px-4',
-                active
-                  ? 'bg-primary text-white'
-                  : 'text-charcoal hover:bg-primary/[0.06] hover:text-primary',
-              ]}
+              class:list={[baseCls, toneCls]}
+              href={item.href}
+              aria-current={active ? 'page' : undefined}
+              aria-label={item.label}
+            >
+              <svg
+                class="h-[1.125rem] w-[1.125rem] shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+          ) : (
+            <a
+              class:list={[baseCls, toneCls, 'text-sm font-medium tracking-[-0.01em]']}
               href={item.href}
               aria-current={active ? 'page' : undefined}
             >
@@ -137,15 +162,39 @@ const menuId = 'wfg-mobile-menu';
         </button>
       </div>
       <nav class="max-h-[min(70vh,28rem)] overflow-y-auto px-2 py-2" aria-label="Mobile">
-        {primaryNav.map((item) => (
-          <a
-            class="flex min-h-12 items-center rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
-            href={item.href}
-            data-wfg-menu-link
-          >
-            {item.label}
-          </a>
-        ))}
+        {primaryNav.map((item) =>
+          item.iconOnly ? (
+            <a
+              class="flex min-h-12 items-center gap-2 rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
+              href={item.href}
+              data-wfg-menu-link
+              aria-label={item.label}
+            >
+              <svg
+                class="h-6 w-6 shrink-0 text-current"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </a>
+          ) : (
+            <a
+              class="flex min-h-12 items-center rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
+              href={item.href}
+              data-wfg-menu-link
+            >
+              {item.label}
+            </a>
+          ),
+        )}
         {navPages.map((item) => (
           <a
             class="flex min-h-12 items-center rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"
