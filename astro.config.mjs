@@ -13,9 +13,13 @@ const useVercel = Boolean(process.env.VERCEL);
 
 const _dirname = dirname(fileURLToPath(import.meta.url));
 
+/** Canonical site origin for sitemap, `Astro.site`, OG URLs. Override per deploy with `PUBLIC_SITE_URL`. */
+const siteFromEnv = process.env.PUBLIC_SITE_URL?.trim().replace(/\/$/, '');
+const configuredSite = siteFromEnv || 'https://www.wellnessfirstglobal.com';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://wellnessfirstglobal.com',
+  site: configuredSite,
   output: 'static',
   compressHTML: true,
   build: {

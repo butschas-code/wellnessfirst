@@ -2,6 +2,8 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
+  /** Override Astro `site` / canonical URLs (no trailing slash). Defaults to `https://www.wellnessfirstglobal.com`. */
+  readonly PUBLIC_SITE_URL?: string;
   /** Supabase project URL (public, safe in client bundle) */
   readonly PUBLIC_SUPABASE_URL?: string;
   /** Supabase anonymous key (public, protected by RLS in Supabase) */

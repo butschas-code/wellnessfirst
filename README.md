@@ -83,10 +83,20 @@ Member-gated article **metadata** can align with Supabase `journal_article_catal
 
 **Optional:** set **`PUBLIC_FORM_MODE=mailto`** explicitly in Vercel env if you want to document intent; behavior matches the default for Vercel builds.
 
+### Custom domain (`www` vs apex)
+
+Production defaults assume **`https://www.wellnessfirstglobal.com`** as the canonical host (`astro.config.mjs`, `public/robots.txt`, Decap `public/admin/config.yml`).
+
+1. **Vercel → Domains:** Assign **`www.wellnessfirstglobal.com`** and **`wellnessfirstglobal.com`**; redirect one to the other so SEO stays consistent (pick **`www`** to match this repo, or set **`PUBLIC_SITE_URL`** to your preferred origin — no trailing slash — and rebuild).
+2. **Supabase → Authentication → URL configuration:** Set **Site URL** to that same canonical origin (e.g. `https://www.wellnessfirstglobal.com`). Under **Redirect URLs**, include **`https://www.wellnessfirstglobal.com/**`** (and **`https://wellnessfirstglobal.com/**`** if bare apex still resolves without redirect). Include **`http://localhost:4321/**`** for local auth flows.
+3. **GitHub OAuth App** (Decap `/admin`): **Authorization callback URL** must be **`https://www.wellnessfirstglobal.com/callback`** (must match `base_url` in `public/admin/config.yml`). Update the GitHub app if it still points at `*.vercel.app`.
+4. After DNS/CDN changes, trigger a **redeploy** so builds pick up env overrides (`PUBLIC_SITE_URL`).
+
 ### Environment variables
 
 | Variable | Where | Purpose |
 |----------|--------|---------|
+| `PUBLIC_SITE_URL` | Build only | Optional. Canonical site origin (no `/` at end). Overrides default `https://www.wellnessfirstglobal.com` for sitemap, `Astro.site`, OG URLs. |
 | `PUBLIC_SUPABASE_URL` | Build + browser | Supabase project URL |
 | `PUBLIC_SUPABASE_ANON_KEY` | Build + browser | Supabase anon key (RLS protects data) |
 | `PUBLIC_FORM_MODE` | Build + browser | `mailto` → mailto only. Any other non-empty value → POST `/api/*` (Cloudflare Functions). **Unset:** Vercel production → mailto; Cloudflare production → API; `astro dev` → mailto. |
@@ -96,7 +106,7 @@ Copy from `.env.example` and mirror names in **Pages → Settings → Environmen
 
 ### Supabase (auth)
 
-In the Supabase dashboard: set **Site URL** to production origin; add **Redirect URLs** for localhost and production for `/app/**` and password recovery if used.
+In the Supabase dashboard: set **Site URL** to your canonical production origin (e.g. `https://www.wellnessfirstglobal.com`); add **Redirect URLs** for localhost and both bare apex and `www` if both hostnames reach the app.
 
 ### Supabase env vars (“My Wellness Space” base)
 

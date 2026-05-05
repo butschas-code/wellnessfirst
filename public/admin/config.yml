@@ -2,7 +2,7 @@
 #
 # Production (this file): GitHub OAuth uses server routes `/auth` + `/callback` (`src/pages/auth.ts`, `src/pages/callback.ts`).
 # Set env vars on Vercel: OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET (Settings → Environment Variables).
-# GitHub OAuth App → Authorization callback URL: https://wellnessfirstglobal.vercel.app/callback
+# GitHub OAuth App → Authorization callback URL (production): https://www.wellnessfirstglobal.com/callback
 #
 # Local editing without GitHub login: temporarily set local_backend: true, run `npx decap-server`, then `npm run dev`.
 
@@ -12,7 +12,7 @@ backend:
   name: github
   repo: butschas-code/wellnessfirst
   branch: main
-  base_url: https://wellnessfirstglobal.vercel.app
+  base_url: https://www.wellnessfirstglobal.com
   auth_endpoint: auth
 
 media_folder: public

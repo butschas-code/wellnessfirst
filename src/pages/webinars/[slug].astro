@@ -7,7 +7,7 @@ import Container from '@/components/layout/Container.astro';
 import Section from '@/components/layout/Section.astro';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
 import WebinarInterestForm from '@/components/forms/WebinarInterestForm.astro';
-import { webinarEventJsonLd } from '@/lib/seo';
+import { webinarEventJsonLd, getSiteOrigin } from '@/lib/seo';
 import { fetchWebinarsForBuild } from '@/lib/supabase/webinar-build-fetch';
 import { topicLabel } from '@/lib/member/topic-labels';
 import { formatWebinarScheduleStart } from '@/lib/webinars/format-schedule';
@@ -46,7 +46,7 @@ const durMin = row.ends_at
   ? Math.max(15, Math.round((new Date(row.ends_at).getTime() - new Date(row.starts_at).getTime()) / 60_000))
   : 90;
 
-const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const siteBase = Astro.site ?? new URL(getSiteOrigin());
 const webinarPageUrl = new URL(canonicalPath, siteBase).toString();
 const webinarLd = webinarEventJsonLd({
   name: row.title,

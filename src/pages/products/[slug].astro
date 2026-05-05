@@ -13,7 +13,7 @@ import CommunitySpine from '@/components/community/CommunitySpine.astro';
 import { publishedOnly } from '@/lib/content-filters';
 import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
 import { resolveRelatedArticles } from '@/lib/related-journal';
-import { productJsonLd } from '@/lib/seo';
+import { productJsonLd, getSiteOrigin } from '@/lib/seo';
 export async function getStaticPaths() {
   const items = await getCollection('products', publishedOnly);
   const used = new Map<string, string>();
@@ -46,7 +46,7 @@ const blocks = [
 ];
 const craft = d.craftNote;
 
-const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const siteBase = Astro.site ?? new URL(getSiteOrigin());
 const productPageUrl = new URL(canonical, siteBase).toString();
 const productLd = productJsonLd({
   name: d.name,

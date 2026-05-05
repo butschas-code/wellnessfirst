@@ -1,4 +1,4 @@
-# https://wellnessfirstglobal.com/robots.txt
+# https://www.wellnessfirstglobal.com/robots.txt
 User-agent: *
 Allow: /
 
@@ -15,4 +15,4 @@ Disallow: /community/l-rods
 Disallow: /community/geopathic-stress
 Disallow: /community/telluric-energy
 
-Sitemap: https://wellnessfirstglobal.com/sitemap-index.xml
+Sitemap: https://www.wellnessfirstglobal.com/sitemap-index.xml

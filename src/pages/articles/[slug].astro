@@ -19,7 +19,7 @@ import AccessGate from '@/components/access/AccessGate.astro';
 import { getArticleByParamSlug, fillRelatedArticles, articlePath } from '@/lib/articles';
 import { journalCatalogSlug } from '@/lib/articles/journal-catalog-slug';
 import { normalizeAccessLevel } from '@/lib/content/access-level';
-import { articleJsonLd } from '@/lib/seo';
+import { articleJsonLd, getSiteOrigin } from '@/lib/seo';
 import type { ProductEntry, WebinarEntry, ConsultationEntry } from '@/types/content';
 export async function getStaticPaths() {
   const items = await getCollection('articles', publishedOnly);
@@ -87,7 +87,7 @@ if (relatedConsultationId) {
 
 const related = fillRelatedArticles(allArticles, post, 3);
 
-const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const siteBase = Astro.site ?? new URL(getSiteOrigin());
 const articlePageUrl = new URL(publicPath, siteBase).toString();
 const articleLd = articleJsonLd({
   headline: title,

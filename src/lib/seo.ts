@@ -4,7 +4,7 @@ import { site, socialPreview } from '@/lib/site';
 export function getSiteOrigin(): string {
   const s = import.meta.env.SITE;
   if (s) return s.replace(/\/$/, '');
-  return 'https://wellnessfirstglobal.com';
+  return 'https://www.wellnessfirstglobal.com';
 }
 
 export function absoluteUrl(path: string): string {

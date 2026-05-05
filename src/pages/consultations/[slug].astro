@@ -13,7 +13,7 @@ import CommunitySpine from '@/components/community/CommunitySpine.astro';
 import { publishedOnly } from '@/lib/content-filters';
 import { offerPath, resolveByPublicSlug } from '@/lib/offer-paths';
 import { resolveRelatedArticles } from '@/lib/related-journal';
-import { serviceJsonLd } from '@/lib/seo';
+import { serviceJsonLd, getSiteOrigin } from '@/lib/seo';
 type ConsultGroup = 'geopathic' | 'astrology' | 'home' | 'frequency' | 'coaching' | 'environment' | 'ritual';
 
 function groupEyebrow(g: ConsultGroup) {
@@ -56,7 +56,7 @@ const blocks = [
   { id: 'expect', title: 'What to expect', body: d.whatToExpect },
 ];
 
-const siteBase = Astro.site ?? new URL('https://wellnessfirstglobal.com');
+const siteBase = Astro.site ?? new URL(getSiteOrigin());
 const consultationPageUrl = new URL(canonical, siteBase).toString();
 const serviceLd = serviceJsonLd({
   name: d.title,
