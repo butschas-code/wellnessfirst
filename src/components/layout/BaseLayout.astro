@@ -1,4 +1,5 @@
 ---
+import Analytics from '@vercel/analytics/astro';
 import '@/styles/global.css';
 import { site, socialPreview } from '@/lib/site';
 import SiteHeader from '@/components/site/SiteHeader.astro';
@@ -113,6 +114,7 @@ const homeFirstPaintStyle = `background-color: ${WFG_HOME_SCROLL_FIRST_BG}; back
     )}
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <slot name="head" />
+    <Analytics />
   </head>
   <body
     class:list={['flex', 'min-h-screen', 'flex-col', 'wfg-home-body', bodyClass]}
