@@ -85,6 +85,7 @@ export const homeProductDisplay: Record<
 /** Primary footer links in the order specified for the home marketing footer. */
 export const homeFooterNav = [
   { href: '/about', label: 'About' },
+  { href: '/csr', label: 'CSR' },
   { href: '/articles', label: 'Articles' },
   { href: '/webinars', label: 'Webinars' },
   { href: '/shop', label: 'Shop' },
