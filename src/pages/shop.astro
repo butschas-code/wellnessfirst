@@ -10,6 +10,7 @@ import ConversionCallout from '@/components/conversion/ConversionCallout.astro';
 import EmptyState from '@/components/conversion/EmptyState.astro';
 import { getPublished } from '@/lib/content-filters';
 import CommunitySpine from '@/components/community/CommunitySpine.astro';
+import { shopStorefrontUrl } from '@/lib/site';
 
 const products = (await getPublished('products')).sort((a, b) => a.data.order - b.data.order);
 const categories = [
@@ -17,8 +18,10 @@ const categories = [
   ...[...new Set(products.map((p) => p.data.category))].sort((a, b) => a.localeCompare(b)),
 ];
 
-// TODO(sascha): replace with the real Infinity Uno PEMF shop URL when you have it.
-const INFINITY_UNO_EXTERNAL_URL = '#';
+/** Shopify catalog + cart (checkout runs on the Shopify store). Collections URL — adjust if you use a dedicated shelf collection. */
+const shopCatalogUrl = `${shopStorefrontUrl}/collections/all`;
+const shopCartUrl = `${shopStorefrontUrl}/cart`;
+const INFINITY_UNO_EXTERNAL_URL = shopCatalogUrl;
 ---
 
 <BaseLayout
@@ -36,16 +39,35 @@ const INFINITY_UNO_EXTERNAL_URL = '#';
     <div slot="actions" class="flex max-w-2xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <a class="btn-cta-invert" href="#shop-list">Browse the edit</a>
       <a class="btn-cta-invert-ghost" href="/articles">Why we stock</a>
+      <a class="btn-cta-invert-ghost" href={shopCatalogUrl} target="_blank" rel="noopener noreferrer">
+        Shopify catalog
+      </a>
     </div>
   </MarketingHero>
-  <Section tone="minimal" spacing="comfortable" class="!py-20 md:!py-28 lg:!py-36" aria-labelledby="shop-coming-soon">
-    <div class="container-wfg max-w-4xl">
-      <p
-        id="shop-coming-soon"
-        class="text-balance text-center font-display text-4xl font-medium tracking-tight text-ink sm:text-5xl md:text-6xl"
-      >
-        Coming Soon
-      </p>
+  <Section tone="minimal" spacing="comfortable" class="!py-16 md:!py-20 lg:!py-24" aria-labelledby="shop-story-checkout">
+    <div class="container-wfg max-w-3xl space-y-6">
+      <h2 id="shop-story-checkout" class="text-balance font-display text-2xl font-medium text-ink sm:text-3xl">
+        Story on this site — cart &amp; checkout on Shopify
+      </h2>
+      <div class="space-y-4 leading-relaxed text-charcoal sm:text-lg">
+        <p>
+          You get the slow shelf narrative here: why we carry something, how to think about fit, when to write before you
+          buy. When you add items and pay, that step happens on our connected{' '}
+          <a class="font-medium text-secondary underline decoration-line underline-offset-4 hover:text-ink" href={shopStorefrontUrl} target="_blank" rel="noopener noreferrer">Shopify store</a>{' '}
+          (operated as <strong class="text-ink">Infinity Consciousness</strong>) — taxes, receipts, and payment protection follow Shopify&apos;s checkout.
+        </p>
+        <p class="text-sm text-ink-600">
+          Prefer to browse SKUs first? Open the catalog; use your editorial picks below when you want context alongside.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn-primary" href={shopCatalogUrl} target="_blank" rel="noopener noreferrer">
+          Browse Shopify catalog
+        </a>
+        <a class="btn-secondary" href={shopCartUrl} target="_blank" rel="noopener noreferrer">
+          View cart
+        </a>
+      </div>
     </div>
   </Section>
 

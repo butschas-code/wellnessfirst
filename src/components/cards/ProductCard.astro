@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { name, oneLine, category, priceNote, availability, learnMoreUrl, image } = entry.data;
+const { name, oneLine, category, priceNote, availability, learnMoreUrl, shopifyUrl, image } = entry.data;
 const detailHref = offerPath('products', entry);
 
 const availabilityLabel =
@@ -48,6 +48,18 @@ const availabilityLabel =
     <div class="mt-3 border-t border-ink/10 pt-3">
       <a class="type-ui text-ink transition-colors hover:text-secondary" href={learnMoreUrl}>
         Inquire or reserve →
+      </a>
+    </div>
+  )}
+  {shopifyUrl && (
+    <div class:list={[learnMoreUrl ? 'mt-2' : 'mt-3 border-t border-ink/10 pt-3']}>
+      <a
+        class="type-ui font-medium text-secondary transition-colors hover:text-ink"
+        href={shopifyUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Buy on Shopify →
       </a>
     </div>
   )}

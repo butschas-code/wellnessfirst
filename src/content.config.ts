@@ -162,6 +162,8 @@ const products = defineCollection({
     craftNote: z.string().optional(),
     priceNote: z.string().optional(),
     learnMoreUrl: ctaTarget.optional(),
+    /** Shopify product URL — payment & fulfillment use the Infinity Consciousness Shopify store. */
+    shopifyUrl: z.string().url().optional(),
     image: publicPathOrUrl.optional(),
     availability: z.enum(['available', 'waitlist', 'retired']),
     order: z.number().int().default(0),

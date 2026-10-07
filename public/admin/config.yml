@@ -163,6 +163,7 @@ collections:
       - { label: Craft note, name: craftNote, required: false, widget: string }
       - { label: Price note, name: priceNote, required: false, widget: string }
       - { label: Learn more URL, name: learnMoreUrl, required: false, widget: string }
+      - { label: Shopify product URL, name: shopifyUrl, required: false, widget: string, hint: "Full URL on shop.wellnessfirstglobal.com — cart & checkout happen there." }
       - { label: Image, name: image, required: false, widget: string }
       - label: Availability
         name: availability

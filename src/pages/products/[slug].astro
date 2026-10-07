@@ -88,13 +88,18 @@ const productLd = productJsonLd({
             </p>
           )}
           <div class="mt-8 flex flex-wrap gap-3">
+            {d.shopifyUrl && (
+              <a class="btn-primary" href={d.shopifyUrl} target="_blank" rel="noopener noreferrer">
+                Buy on Shopify
+              </a>
+            )}
             {d.learnMoreUrl && (
-              <a class="btn-primary" href={d.learnMoreUrl}>
+              <a class={d.shopifyUrl ? 'btn-secondary' : 'btn-primary'} href={d.learnMoreUrl}>
                 {d.availability === 'available' ? 'Inquire' : 'Request or join waitlist'}
               </a>
             )}
             <a class="btn-secondary" href="/shop">
-              Back to shop
+              Back to shelf
             </a>
             <a class="link-wfg-ghost" href="/contact">Ask before you buy</a>
           </div>

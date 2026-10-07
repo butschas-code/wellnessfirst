@@ -16,6 +16,9 @@ export const site = {
   contactEmail: 'hello@wellnessfirstglobal.com' as const,
 } as const;
 
+/** Public Shopify storefront (`shop.` subdomain). Cart & checkout; legal merchant follows Shopify store settings (Infinity Consciousness). */
+export const shopStorefrontUrl = 'https://shop.wellnessfirstglobal.com' as const;
+
 export const socialPreview = {
   defaultOgImage: '/brand/og-default.svg',
 } as const;
