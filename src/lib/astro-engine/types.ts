@@ -98,8 +98,17 @@ export interface PlanetPosition {
   speed: number;
   isRetrograde: boolean;
   dignity: DignityType;
+  /** Five-fold compound relationship with the sign lord (natural + temporal). */
+  compoundRelation?: CompoundRelation;
+  /** Ecliptic latitude, degrees. */
+  latitude?: number;
+  /** Declination (true equator of date), degrees. */
+  declination?: number;
   kp?: KPPosition;
 }
+
+export type CompoundRelation = 'GreatFriend' | 'Friend' | 'Neutral' | 'Enemy' | 'GreatEnemy' | 'Self';
+export type NodeType = 'true' | 'mean';
 
 export interface AscendantInfo {
   tropicalLongitude: number;
@@ -109,6 +118,8 @@ export interface AscendantInfo {
   formattedDegree: string;
   nakshatra: NakshatraInfo;
   nakshatraPada: number;
+  /** Sidereal longitude of the Midheaven (MC), degrees. */
+  midheavenSidereal?: number;
   kp?: KPPosition;
 }
 
@@ -186,6 +197,10 @@ export interface PanchangResult {
     gulikaKalam: { start: string; end: string };
     abhijitMuhurat: { start: string; end: string };
   };
+  /** Sunrise-to-sunrise day at the observer's location. */
+  solarDay?: import('./panchang/solar-day.ts').SolarDay;
+  /** Exact muhurat instants (Date objects). */
+  muhuratTimes?: import('./panchang/solar-day.ts').DayMuhurats;
 }
 
 export interface DoshaAnalysis {

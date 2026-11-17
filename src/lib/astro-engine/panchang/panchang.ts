@@ -1,5 +1,7 @@
 import * as Astronomy from 'astronomy-engine';
 import { calculateLahiriAyanamsha } from '../core/ayanamsha.ts';
+import { apparentBody, earthTilt, norm360 } from '../core/precision.ts';
+import { calculateSolarDay, calculateDayMuhurats } from './solar-day.ts';
 import { getNakshatraPlacement } from '../core/nakshatra.ts';
 import type { PanchangResult, PlanetName } from '../types.ts';
 
@@ -61,18 +63,23 @@ const KARANA_NAMES = [
 
 export function calculatePanchang(
   date: Date,
-  _latitude: number = 28.6139,
-  _longitude: number = 77.209
+  latitude: number = 28.6139,
+  longitude: number = 77.209,
+  timeZone: string = 'UTC'
 ): PanchangResult {
   const ayanamsha = calculateLahiriAyanamsha(date);
+  const dpsi = earthTilt(date).dpsi;
 
-  // Tropical coordinates
-  const sunPos = Astronomy.SunPosition(date);
-  const sunTropLong = ((sunPos.elon % 360) + 360) % 360;
+  // Apparent tropical coordinates (mean equinox of date), consistent with the natal ephemeris
+  const sunTropLong = norm360(apparentBody(Astronomy.Body.Sun, date).longitude - dpsi);
+  const moonTropLong = norm360(apparentBody(Astronomy.Body.Moon, date).longitude - dpsi);
 
-  const moonVec = Astronomy.GeoVector(Astronomy.Body.Moon, date, false);
-  const moonEcl = Astronomy.Ecliptic(moonVec);
-  const moonTropLong = ((moonEcl.elon % 360) + 360) % 360;
+  // The Vedic day runs sunrise to sunrise at the observer's location
+  const solarDay = calculateSolarDay(date, latitude, longitude, timeZone);
+  const dayMuhurats = calculateDayMuhurats(solarDay);
+  const hhmm = (d: Date) =>
+    new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone }).format(d);
+  const span = (x: { start: Date; end: Date }) => ({ start: hhmm(x.start), end: hhmm(x.end) });
 
   // Sidereal coordinates
   const sunSidLong = ((sunTropLong - ayanamsha) % 360 + 360) % 360;
@@ -87,7 +94,7 @@ export function calculatePanchang(
   const tithiPercentageElapsed = ((tithiDiff % 12) / 12) * 100;
 
   // 2. Vara (Weekday)
-  const dayOfWeek = date.getDay(); // 0 = Sunday
+  const dayOfWeek = solarDay.weekday; // 0 = Sunday, sunrise-based
   const vara = VARA_INFO[dayOfWeek];
 
   // 3. Nakshatra
@@ -108,28 +115,6 @@ export function calculatePanchang(
     karanaName = fixedKaranas[karanaIndex - 57];
   } else {
     karanaName = KARANA_NAMES[(karanaIndex - 1) % 7];
-  }
-
-  // 6. Muhurats (Rahu Kalam, Yamagandam, Abhijit)
-  // Standard daytime intervals (06:00 to 18:00 base approximation)
-  // Day partitioned into 8 segments of 1.5h (90 mins):
-  // Segments: 1: 06:00-07:30, 2: 07:30-09:00, 3: 09:00-10:30, 4: 10:30-12:00,
-  //           5: 12:00-13:30, 6: 13:30-15:00, 7: 15:00-16:30, 8: 16:30-18:00
-  const rahuOctants = [8, 2, 7, 5, 6, 4, 3]; // Sun=8, Mon=2, Tue=7, Wed=5, Thu=6, Fri=4, Sat=3
-  const yamaOctants = [5, 4, 3, 2, 1, 7, 6]; // Sun=5, Mon=4, Tue=3, Wed=2, Thu=1, Fri=7, Sat=6
-  const gulikaOctants = [7, 6, 5, 4, 3, 2, 1];
-
-  function getOctantTime(octant: number): { start: string; end: string } {
-    const startHour = 6 + (octant - 1) * 1.5;
-    const endHour = startHour + 1.5;
-
-    const formatHour = (h: number) => {
-      const hours = Math.floor(h);
-      const minutes = Math.round((h - hours) * 60);
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    };
-
-    return { start: formatHour(startHour), end: formatHour(endHour) };
   }
 
   return {
@@ -156,10 +141,12 @@ export function calculatePanchang(
       number: karanaIndex + 1,
     },
     muhurats: {
-      rahuKalam: getOctantTime(rahuOctants[dayOfWeek]),
-      yamagandam: getOctantTime(yamaOctants[dayOfWeek]),
-      gulikaKalam: getOctantTime(gulikaOctants[dayOfWeek]),
-      abhijitMuhurat: { start: '11:44', end: '12:32' },
+      rahuKalam: span(dayMuhurats.rahuKalam),
+      yamagandam: span(dayMuhurats.yamagandam),
+      gulikaKalam: span(dayMuhurats.gulikaKalam),
+      abhijitMuhurat: span(dayMuhurats.abhijitMuhurat),
     },
+    solarDay,
+    muhuratTimes: dayMuhurats,
   };
 }

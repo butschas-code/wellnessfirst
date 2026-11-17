@@ -23,18 +23,24 @@ export function calculateAyanamsha(
   const jd = calculateJulianDay(date);
   const t = (jd - 2451545.0) / 36525.0; // Julian centuries from J2000.0
 
-  // Base Lahiri Ayanamsha at J2000.0 (23° 51' 25.53")
-  const lahiri = 23.85709167 + 1.39604167 * t + 0.000308 * t * t;
+  // General precession in longitude since J2000 (IAU 2006, Capitaine et al.), degrees.
+  const precessionSince2000 = (tc: number) =>
+    (5028.796195 * tc + 1.1054348 * tc * tc + 0.00007964 * tc ** 3 - 0.000023857 * tc ** 4) / 3600;
+  const precession = precessionSince2000(t);
+
+  // Lahiri (Chitrapaksha), defined as in Swiss Ephemeris: 23.245524743° at JD 2435553.5 (1956-03-21).
+  const T0_LAHIRI = (2435553.5 - 2451545.0) / 36525.0;
+  const lahiri = 23.245524743 + precession - precessionSince2000(T0_LAHIRI);
 
   switch (system) {
     case 'Lahiri':
       return lahiri;
     case 'KP':
-      // KP Ayanamsha is approximately 5 minutes 56 seconds (~0.0989°) less than Lahiri
-      return lahiri - 0.09888889;
+      // KP (new) ayanamsha: 5' 56" less than Lahiri.
+      return lahiri - 0.098869;
     case 'Raman':
-      // Raman Ayanamsha uses 397 AD as zero year (~1.447° less than Lahiri at J2000)
-      return 22.40972222 + 1.39604167 * t + 0.000308 * t * t;
+      // B.V. Raman: 22° 24' 35" at J2000.
+      return lahiri - (23.857164 - 22.409722); // Raman: 22° 24' 35" at J2000
     default:
       return lahiri;
   }

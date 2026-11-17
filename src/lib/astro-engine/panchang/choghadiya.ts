@@ -20,7 +20,7 @@ export interface DailyChoghadiyaResult {
   nightSlots: ChoghadiyaSlot[];
 }
 
-const CHOGHADIYA_QUALITY: Record<ChoghadiyaType, { quality: 'Auspicious' | 'Neutral' | 'Inauspicious'; activity: string }> = {
+export const CHOGHADIYA_QUALITY: Record<ChoghadiyaType, { quality: 'Auspicious' | 'Neutral' | 'Inauspicious'; activity: string }> = {
   Amrit: { quality: 'Auspicious', activity: 'Best for all restorative actions, medical treatments, meditation, and important starts.' },
   Shubh: { quality: 'Auspicious', activity: 'Excellent for ceremonies, meetings, sacred work, and creative focus.' },
   Labh: { quality: 'Auspicious', activity: 'Ideal for commercial starts, learning, contracts, and financial initiatives.' },
@@ -31,7 +31,7 @@ const CHOGHADIYA_QUALITY: Record<ChoghadiyaType, { quality: 'Auspicious' | 'Neut
 };
 
 // Day sequences (8 segments of 1.5h from 06:00 to 18:00)
-const DAY_SEQUENCES: Record<number, ChoghadiyaType[]> = {
+export const CHOGHADIYA_DAY_SEQUENCES: Record<number, ChoghadiyaType[]> = {
   0: ['Udveg', 'Char', 'Labh', 'Amrit', 'Kaal', 'Shubh', 'Rog', 'Udveg'], // Sun
   1: ['Amrit', 'Kaal', 'Shubh', 'Rog', 'Udveg', 'Char', 'Labh', 'Amrit'], // Mon
   2: ['Rog', 'Udveg', 'Char', 'Labh', 'Amrit', 'Kaal', 'Shubh', 'Rog'], // Tue
@@ -42,7 +42,7 @@ const DAY_SEQUENCES: Record<number, ChoghadiyaType[]> = {
 };
 
 // Night sequences (8 segments of 1.5h from 18:00 to 06:00)
-const NIGHT_SEQUENCES: Record<number, ChoghadiyaType[]> = {
+export const CHOGHADIYA_NIGHT_SEQUENCES: Record<number, ChoghadiyaType[]> = {
   0: ['Shubh', 'Amrit', 'Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh'], // Sun
   1: ['Char', 'Rog', 'Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char'], // Mon
   2: ['Kaal', 'Labh', 'Udveg', 'Shubh', 'Amrit', 'Char', 'Rog', 'Kaal'], // Tue
@@ -54,8 +54,8 @@ const NIGHT_SEQUENCES: Record<number, ChoghadiyaType[]> = {
 
 export function calculateChoghadiya(date: Date): DailyChoghadiyaResult {
   const dayOfWeek = date.getDay();
-  const daySequence = DAY_SEQUENCES[dayOfWeek];
-  const nightSequence = NIGHT_SEQUENCES[dayOfWeek];
+  const daySequence = CHOGHADIYA_DAY_SEQUENCES[dayOfWeek];
+  const nightSequence = CHOGHADIYA_NIGHT_SEQUENCES[dayOfWeek];
 
   function formatTime(hourFloat: number): string {
     const norm = (hourFloat + 24) % 24;

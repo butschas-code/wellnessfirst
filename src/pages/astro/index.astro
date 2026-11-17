@@ -95,13 +95,14 @@ const steps = [
 
             <div>
               <div class="flex items-center justify-between gap-3">
-                <label for="lr-time" class="lr-label">Time of birth</label>
+                <label for="lr-time-h" class="lr-label">Time of birth</label>
                 <label class="lr-check">
                   <input id="lr-time-unknown" type="checkbox" />
                   <span>I don’t know it</span>
                 </label>
               </div>
-              <input id="lr-time" name="birthTime" type="time" class="input-wfg" value="12:00" required />
+              <div data-lr-timepicker="lr-time"></div>
+              <input id="lr-time" name="birthTime" type="hidden" value="12:00" />
               <p id="lr-time-hint" class="lr-hint">A birth certificate often has it. If you’re unsure, a rough time is better than none.</p>
             </div>
 
@@ -163,9 +164,10 @@ const steps = [
         <div class="container-wfg">
           <div class="lr-tabs" role="tablist" aria-label="Sections">
             <button type="button" role="tab" id="lr-tab-today" aria-controls="lr-panel-today" aria-selected="true" data-lr-tab="today">Today</button>
-            <button type="button" role="tab" id="lr-tab-nature" aria-controls="lr-panel-nature" aria-selected="false" tabindex="-1" data-lr-tab="nature">Your nature</button>
+            <button type="button" role="tab" id="lr-tab-you" aria-controls="lr-panel-you" aria-selected="false" tabindex="-1" data-lr-tab="you">You</button>
             <button type="button" role="tab" id="lr-tab-seasons" aria-controls="lr-panel-seasons" aria-selected="false" tabindex="-1" data-lr-tab="seasons">Your seasons</button>
-            <button type="button" role="tab" id="lr-tab-together" aria-controls="lr-panel-together" aria-selected="false" tabindex="-1" data-lr-tab="together">Together</button>
+            <button type="button" role="tab" id="lr-tab-people" aria-controls="lr-panel-people" aria-selected="false" tabindex="-1" data-lr-tab="people">People</button>
+            <button type="button" role="tab" id="lr-tab-decide" aria-controls="lr-panel-decide" aria-selected="false" tabindex="-1" data-lr-tab="decide">Decisions</button>
             <button type="button" role="tab" id="lr-tab-chart" aria-controls="lr-panel-chart" aria-selected="false" tabindex="-1" data-lr-tab="chart" class="lr-pro-tab">Chart data</button>
           </div>
         </div>
@@ -173,9 +175,10 @@ const steps = [
 
       <div class="container-wfg pb-20 pt-10 sm:pt-14">
         <div role="tabpanel" id="lr-panel-today" aria-labelledby="lr-tab-today" class="lr-panel" tabindex="0"></div>
-        <div role="tabpanel" id="lr-panel-nature" aria-labelledby="lr-tab-nature" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-you" aria-labelledby="lr-tab-you" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-seasons" aria-labelledby="lr-tab-seasons" class="lr-panel" tabindex="0" hidden></div>
-        <div role="tabpanel" id="lr-panel-together" aria-labelledby="lr-tab-together" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-people" aria-labelledby="lr-tab-people" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-decide" aria-labelledby="lr-tab-decide" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-chart" aria-labelledby="lr-tab-chart" class="lr-panel" tabindex="0" hidden></div>
       </div>
     </div>
@@ -247,6 +250,15 @@ const steps = [
   }
   .lr-textbtn:hover { color: var(--color-primary); text-decoration-color: var(--color-secondary); }
   input.input-wfg:disabled { opacity: 0.45; }
+
+  .lr-time { display: flex; align-items: center; gap: 0.5rem; }
+  .lr-time select.input-wfg { flex: 1; min-width: 0; appearance: none; cursor: pointer; text-align: center; font-variant-numeric: tabular-nums; padding-left: 0.5rem; padding-right: 0.5rem; }
+  .lr-time .lr-time-colon { color: var(--color-ink-500); font-weight: 500; }
+  .lr-ampm { display: inline-flex; flex-shrink: 0; padding: 0.2rem; border-radius: 0.6rem; border: 1px solid var(--color-line-strong); background: var(--color-muted-bg); }
+  .lr-ampm button { min-height: 2.35rem; min-width: 3rem; padding: 0 0.75rem; border-radius: 0.45rem; font-size: 0.875rem; font-weight: 500; color: var(--color-ink-500); cursor: pointer; transition: background-color .2s, color .2s; }
+  .lr-ampm button[aria-checked='true'] { background: var(--color-primary); color: #fff; }
+  .lr-ampm button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .lr-time[data-disabled] { opacity: 0.45; pointer-events: none; }
 
   .lr-places {
     position: absolute; left: 0; right: 0; top: calc(100% - 1.75rem); z-index: 30;
@@ -451,4 +463,37 @@ const steps = [
   .lr-table .muted { color: var(--color-ink-500); }
 
   .lr-chart-svg text { font-family: var(--font-sans); }
+
+  /* ─── Sub-navigation inside a section ─── */
+  .lr-subnav { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; margin: 0 0 2.5rem; padding-bottom: 2px; }
+  .lr-subnav::-webkit-scrollbar { display: none; }
+  .lr-subnav button {
+    flex-shrink: 0; min-height: 2.5rem; padding: 0 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
+    border: 1px solid var(--color-line-strong); background: #fff; color: var(--color-charcoal); cursor: pointer;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .lr-subnav button:hover { border-color: var(--color-secondary); color: var(--color-ink); }
+  .lr-subnav button[aria-pressed='true'] { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+  .lr-subnav button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  .lr-sub[hidden] { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lr-sub:not([hidden]) { animation: lr-in .4s var(--ease-wfg) both; }
+  }
+
+  /* ─── Evidence line (Pro) ─── */
+  .lr-ev { margin-top: 0.75rem; font-size: 0.75rem; line-height: 1.5; color: #3c6b74; font-variant-numeric: tabular-nums; }
+  .lr-ev::before { content: 'Basis · '; font-weight: 600; letter-spacing: 0.04em; }
+
+  .lr-meter { display: flex; gap: 3px; }
+  .lr-meter i { width: 1.25rem; height: 0.4rem; border-radius: 9999px; background: var(--color-line); }
+  .lr-meter[data-level='strong'] i, .lr-meter[data-level='good'] i:nth-child(-n+3), .lr-meter[data-level='average'] i:nth-child(-n+2), .lr-meter[data-level='low'] i:nth-child(1) { background: var(--color-secondary); }
+  .lr-meter[data-level='low'] i:nth-child(1) { background: #d4bf9a; }
+
+  .lr-score { position: relative; width: 6.5rem; height: 6.5rem; border-radius: 9999px; display: grid; place-items: center; flex-shrink: 0;
+    background: conic-gradient(var(--lr-score-color, var(--color-secondary)) calc(var(--p) * 1%), var(--color-muted-bg) 0); }
+  .lr-score > div { width: 5.3rem; height: 5.3rem; border-radius: 9999px; background: #fff; display: grid; place-items: center; text-align: center; }
+
+  .lr-loc { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px; padding: 0.4rem 0.4rem 0.4rem 0.9rem; font-size: 0.8125rem; background: var(--color-muted-bg); color: var(--color-ink); }
+  .lr-loc button { border-radius: 9999px; padding: 0.3rem 0.75rem; background: #fff; font-weight: 500; cursor: pointer; border: 1px solid var(--color-line-strong); }
+  .lr-loc button:hover { border-color: var(--color-secondary); }
 </style>

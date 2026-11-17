@@ -16,6 +16,7 @@ import { detectYogas } from './predictive/yogas.ts';
 import { calculateGocharaTransits } from './predictive/transits.ts';
 import { calculatePanchang } from './panchang/panchang.ts';
 import { calculateChoghadiya } from './panchang/choghadiya.ts';
+import { calculateSolarDay, calculateTimedChoghadiya, calculateDayMuhurats } from './panchang/solar-day.ts';
 import { calculateAshtakoota } from './matching/ashtakoota.ts';
 import { calculateElementBalance, generateTempoGuidance } from './wellness/tempo.ts';
 import { calculatePrashnaKundli } from './prashna/prashna.ts';
@@ -27,6 +28,7 @@ import type {
   ComprehensiveKundliResult,
   AyanamshaSystem,
   PlanetName,
+  NodeType,
 } from './types.ts';
 
 export interface ChartCalculationParams {
@@ -36,6 +38,7 @@ export interface ChartCalculationParams {
   timezone?: number; // offset in hours e.g. 5.5 for IST
   targetDate?: Date; // date for which active dasha / transits are evaluated (defaults to now)
   ayanamshaSystem?: AyanamshaSystem; // defaults to 'Lahiri'
+  nodeType?: NodeType; // 'true' (default) or 'mean' lunar node for Rahu/Ketu
 }
 
 /**
@@ -71,6 +74,7 @@ export function calculateJanamKundli(
     timezone = 0,
     targetDate = new Date(),
     ayanamshaSystem = 'Lahiri',
+    nodeType = 'true',
   } = params;
 
   // 1. Calculate Ayanamsha
@@ -81,7 +85,7 @@ export function calculateJanamKundli(
   ascendant.kp = calculateKP(ascendant.siderealLongitude);
 
   // 3. Calculate Planetary Placements (Navagrahas) & KP Lords
-  const planets = calculatePlanetaryPositions(date, ascendant.sign.index);
+  const planets = calculatePlanetaryPositions(date, ascendant.sign.index, nodeType);
   for (const pName of Object.keys(planets) as PlanetName[]) {
     planets[pName].kp = calculateKP(planets[pName].siderealLongitude);
   }
@@ -107,7 +111,7 @@ export function calculateJanamKundli(
   const ashtakavarga = calculateAshtakavarga(ascendant.sign.index, planetSignIndices);
 
   // 7. Complete Shadbala (Six-Fold Strengths)
-  const shadbala = calculateShadbala(ascendant, planets, date);
+  const shadbala = calculateShadbala(ascendant, planets, date, { latitude, longitude, timezone });
 
   // 8. Bhava Chalit Chart & House Shift Detection
   const bhavaChalit = calculateBhavaChalit(ascendant, planets);
@@ -170,6 +174,9 @@ export function calculateJanamKundli(
 export {
   calculatePanchang,
   calculateChoghadiya,
+  calculateSolarDay,
+  calculateTimedChoghadiya,
+  calculateDayMuhurats,
   calculateAshtakoota,
   detectYogas,
   calculateShadbala,
@@ -199,3 +206,4 @@ export {
 
 export * from './types.ts';
 export * from './core/constants.ts';
+export type { SolarDay, TimedSlot, DayMuhurats } from './panchang/solar-day.ts';

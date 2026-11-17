@@ -9,7 +9,10 @@ import {
   calculateDerivedChart,
   calculateProgenyAnalysis,
   calculateRelationalSynastry,
+  calculatePanchang,
+  calculateTimedChoghadiya,
 } from '../src/lib/astro-engine/index.ts';
+import { trueNode, meanNode } from '../src/lib/astro-engine/core/precision.ts';
 
 console.log('=== Running Full Vedic Astronomical Engine Verification ===\n');
 
@@ -150,4 +153,36 @@ console.log(`   - Nervous System Rhythm: ${tempo.seasonFocus.nervousSystemTempo}
 assert(tempo.seasonFocus.theme);
 console.log('   ✓ Wellness Tempo guidance verified.\n');
 
-console.log('=== All 12 State-of-the-Art Astro Engine Systems Passed with 100% Reliability! ===');
+// 13. Precision core
+console.log('13. Testing precision core (Lahiri epoch, true node):');
+const lahiriEpoch = calculateAyanamsha(new Date(Date.UTC(1956, 2, 21)), 'Lahiri');
+assert(Math.abs(lahiriEpoch - 23.245524743) < 0.0005, `Lahiri at 1956-03-21 = ${lahiriEpoch}`);
+assert(Math.abs(lahiri - 23.857092) < 0.0003, `Lahiri at J2000 = ${lahiri}`); // 23° 51' 25.5"
+const nodeGap = Math.abs(((trueNode(j2000Date) - meanNode(j2000Date) + 540) % 360) - 180);
+assert(nodeGap < 2, `true vs mean node differ by ${nodeGap}°`);
+console.log(`   - Lahiri 1956-03-21: ${lahiriEpoch.toFixed(6)}° · true–mean node: ${nodeGap.toFixed(3)}°`);
+console.log('   ✓ Precision core verified.\n');
+
+// 14. Full BPHS Shadbala components
+console.log('14. Testing full Shadbala components:');
+const sb = calculateJanamKundli({ date: new Date(Date.UTC(1992, 5, 21, 7, 45)), latitude: 51.5074, longitude: -0.1278, timezone: 1 }).shadbala as any;
+assert.strictEqual(sb.Sun.components.vara, 45, 'Sunday birth → Sun gets Vara bala');
+assert.strictEqual(sb.Saturn.components.hora, 60, '5th hora from sunrise on Sunday → Saturn');
+assert.strictEqual(sb.Jupiter.components.tribhaga, 60, 'Jupiter always gets Tribhaga bala');
+assert(sb.Sun.components.ayana > 110, 'Sun at solstice → doubled Ayana bala');
+console.log('   ✓ Shadbala (Sthana, Dig, Kala incl. Abda/Masa/Vara/Hora, Chesta, Drik) verified.\n');
+
+// 15. Sunrise-based day (Riga, 17 Nov 2026)
+console.log('15. Testing sunrise-based Panchang & Choghadiya (Riga):');
+const riga = calculatePanchang(new Date('2026-11-17T21:00:00Z'), 56.9496, 24.1052, 'Europe/Riga');
+const rigaTime = (d: Date) => d.toLocaleTimeString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', minute: '2-digit' });
+assert.strictEqual(rigaTime(riga.solarDay!.sunrise), '08:08');
+assert.strictEqual(rigaTime(riga.solarDay!.sunset), '16:07');
+assert.strictEqual(riga.muhurats.rahuKalam.start, '14:07'); // Tuesday → 7th octant of daylight
+const rigaSlots = calculateTimedChoghadiya(riga.solarDay!);
+assert.strictEqual(rigaSlots.length, 16);
+assert.strictEqual(rigaSlots[0].name, 'Rog'); // Tuesday day sequence starts with Rog
+console.log(`   - Sunrise ${rigaTime(riga.solarDay!.sunrise)}, sunset ${rigaTime(riga.solarDay!.sunset)}, Rahu Kalam ${riga.muhurats.rahuKalam.start}–${riga.muhurats.rahuKalam.end}`);
+console.log('   ✓ Sunrise-based timings verified.\n');
+
+console.log('=== All 15 Astro Engine Systems Passed ===');

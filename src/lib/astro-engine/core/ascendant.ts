@@ -1,7 +1,7 @@
-import * as Astronomy from 'astronomy-engine';
 import { calculateLahiriAyanamsha, formatDegreesToDMS } from './ayanamsha.ts';
 import { ZODIAC_SIGNS } from './constants.ts';
 import { getNakshatraPlacement } from './nakshatra.ts';
+import { earthTilt, localSiderealDegrees, norm360 } from './precision.ts';
 import type { AscendantInfo } from '../types.ts';
 
 export function calculateAscendant(
@@ -9,37 +9,27 @@ export function calculateAscendant(
   latitude: number,
   longitude: number
 ): AscendantInfo {
-  // Greenwich Mean Sidereal Time in hours
-  const gmstHours = Astronomy.SiderealTime(date);
-
-  // Local Sidereal Time in hours
-  let lstHours = (gmstHours + longitude / 15) % 24;
-  if (lstHours < 0) lstHours += 24;
-
-  // RAMC (Right Ascension of Medium Coeli) in radians
-  const ramcRad = (lstHours * 15 * Math.PI) / 180;
+  // Local apparent sidereal time → RAMC (true equinox of date).
+  const ramcDeg = localSiderealDegrees(date, longitude);
+  const ramcRad = (ramcDeg * Math.PI) / 180;
   const latRad = (latitude * Math.PI) / 180;
 
-  // Approximate true obliquity of the ecliptic around date
-  // Standard J2000 obliquity with precession rate
-  const jd = date.getTime() / 86400000 + 2440587.5;
-  const t = (jd - 2451545.0) / 36525.0;
-  // Laskar formula approximation (arcsec)
-  const epsilonDeg = 23.43929111 - 0.013004167 * t;
-  const epsRad = (epsilonDeg * Math.PI) / 180;
+  // True obliquity of the ecliptic (IAU 2006 mean obliquity + nutation in obliquity).
+  const tilt = earthTilt(date);
+  const epsRad = (tilt.trueObliquity * Math.PI) / 180;
 
-  // Standard Astrological Ascendant calculation:
-  // tan(lambda) = cos(RAMC) / (-sin(RAMC)*cos(eps) - tan(lat)*sin(eps))
+  // Ascendant: tan(λ) = cos(RAMC) / −(sin(RAMC)·cos ε + tan φ·sin ε)
   const y = Math.cos(ramcRad);
   const x = -Math.sin(ramcRad) * Math.cos(epsRad) - Math.tan(latRad) * Math.sin(epsRad);
+  const tropicalAscDeg = norm360((Math.atan2(y, x) * 180) / Math.PI);
 
-  let tropicalAscDeg = (Math.atan2(y, x) * 180) / Math.PI;
-  if (tropicalAscDeg < 0) tropicalAscDeg += 360;
+  // Midheaven: tan(MC) = tan(RAMC) / cos ε
+  const tropicalMcDeg = norm360((Math.atan2(Math.sin(ramcRad), Math.cos(ramcRad) * Math.cos(epsRad)) * 180) / Math.PI);
 
-  // Apply Lahiri Ayanamsha for Sidereal Ascendant (Lagna)
+  // Remove nutation (true → mean equinox), then apply Lahiri for the sidereal Lagna.
   const ayanamsha = calculateLahiriAyanamsha(date);
-  let siderealAscDeg = (tropicalAscDeg - ayanamsha) % 360;
-  if (siderealAscDeg < 0) siderealAscDeg += 360;
+  const siderealAscDeg = norm360(tropicalAscDeg - tilt.dpsi - ayanamsha);
+  const siderealMcDeg = norm360(tropicalMcDeg - tilt.dpsi - ayanamsha);
 
   const signIndex = Math.floor(siderealAscDeg / 30);
   const sign = ZODIAC_SIGNS[Math.min(Math.max(signIndex, 0), 11)];
@@ -55,5 +45,6 @@ export function calculateAscendant(
     formattedDegree: formatDegreesToDMS(degreeInSign),
     nakshatra: nakPlacement.nakshatra,
     nakshatraPada: nakPlacement.pada,
+    midheavenSidereal: siderealMcDeg,
   };
 }
