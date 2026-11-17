@@ -1,0 +1,454 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import MarketingHero from '@/components/layout/MarketingHero.astro';
+import HomePageFooter from '@/components/home/HomePageFooter.astro';
+import { marketingPageLayout } from '@/lib/marketing-page';
+import { DISCLAIMER } from '@/lib/astro-copy';
+
+const pageTitle = 'Life Rhythm — Wellness First Global';
+const pageDescription =
+  'A calm, plain-English guide to your natural rhythm: what this season of life is asking of you, which hours of today suit what, and how your pace fits with someone else’s.';
+
+const offers = [
+  { n: '01', title: 'Today', body: 'Your day at a glance, and the hours that suit focus, people or rest.' },
+  { n: '02', title: 'Your nature', body: 'What tends to come easily to you, and what takes a little more effort.' },
+  { n: '03', title: 'Your seasons', body: 'The chapter of life you are in, how long it runs, and what comes next.' },
+  { n: '04', title: 'Together', body: 'How your rhythm fits with a partner, friend or co-founder.' },
+] as const;
+
+const steps = [
+  {
+    title: 'Calculated, not generated',
+    body: 'Positions of the sun, moon and planets are worked out with established astronomical formulas. The same details always give the same result — no AI writing.',
+  },
+  {
+    title: 'Translated into plain words',
+    body: 'A traditional Indian timing system (Jyotish) is turned into simple themes about pace, focus and rest. Switch to Pro detail any time to see the full workings.',
+  },
+  {
+    title: 'Kept on your device',
+    body: 'Everything is worked out in your browser and saved only there. The one thing sent out is the place name you type, to look up its location.',
+  },
+] as const;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} canonicalPath="/astro" {...marketingPageLayout}>
+  <MarketingHero
+    compact
+    eyebrow="Life Rhythm"
+    title="Know when to push, and when to rest"
+    description="A calm, plain-English guide to your natural rhythm — what this season of life is asking of you, and which hours of today suit what."
+    imageUrl="/images/life-rhythm-hero.jpg"
+    imageAlt="A woman walks down a tree-lined avenue towards the rising sun, which sits exactly at the end of the path."
+  >
+    <div slot="actions" class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+      <a class="btn-cta-invert" href="#lr-intake" id="lr-hero-start">Find your rhythm</a>
+      <button type="button" class="btn-cta-invert-ghost cursor-pointer" data-lr-demo>See an example</button>
+    </div>
+  </MarketingHero>
+
+  <!-- ═══ Intake ═══ -->
+  <section id="lr-intake" class="wfg-home-band lr-scroll-anchor" aria-labelledby="lr-intake-title" data-bg="#f8faf8">
+    <div class="container-wfg py-16 md:py-24">
+      <div class="grid gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-20">
+        <div class="lg:pt-4">
+          <p class="wfg-home-kicker text-primary">Start here</p>
+          <h2 id="lr-intake-title" class="mt-2 font-display text-3xl font-medium leading-tight text-ink sm:text-4xl md:text-[2.75rem]">
+            Three details.<br />About a minute.
+          </h2>
+          <p class="mt-5 max-w-md text-base leading-relaxed text-charcoal">
+            Your birth date, time and place set the starting point. From there we map the rhythm you were born into —
+            and where it stands today.
+          </p>
+
+          <ol class="mt-10 grid list-none gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2" role="list">
+            {
+              offers.map((o) => (
+                <li class="flex gap-4">
+                  <span class="lr-num" aria-hidden="true">{o.n}</span>
+                  <div>
+                    <p class="font-display text-lg font-medium text-ink">{o.title}</p>
+                    <p class="mt-1 text-sm leading-relaxed text-ink-500">{o.body}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <div class="lr-intake-card">
+          <div class="flex items-baseline justify-between gap-4 border-b border-primary/10 pb-5">
+            <p class="font-display text-xl font-medium text-ink">Your details</p>
+            <button type="button" class="lr-textbtn" data-lr-demo>Use an example</button>
+          </div>
+
+          <form id="lr-form" class="mt-6 space-y-6" novalidate>
+            <div>
+              <label for="lr-name" class="lr-label">What should we call you? <span class="lr-optional">Optional</span></label>
+              <input id="lr-name" name="name" type="text" autocomplete="given-name" class="input-wfg" placeholder="Your first name" />
+            </div>
+
+            <div>
+              <label for="lr-date" class="lr-label">Date of birth</label>
+              <input id="lr-date" name="birthDate" type="date" class="input-wfg" required min="1900-01-01" />
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <label for="lr-time" class="lr-label">Time of birth</label>
+                <label class="lr-check">
+                  <input id="lr-time-unknown" type="checkbox" />
+                  <span>I don’t know it</span>
+                </label>
+              </div>
+              <input id="lr-time" name="birthTime" type="time" class="input-wfg" value="12:00" required />
+              <p id="lr-time-hint" class="lr-hint">A birth certificate often has it. If you’re unsure, a rough time is better than none.</p>
+            </div>
+
+            <div class="relative">
+              <label for="lr-place" class="lr-label">Place of birth</label>
+              <input
+                id="lr-place"
+                type="text"
+                class="input-wfg"
+                autocomplete="off"
+                placeholder="Start typing a town or city"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-controls="lr-place-list"
+                required
+              />
+              <div id="lr-place-list" class="lr-places" role="listbox" hidden></div>
+              <p id="lr-place-hint" class="lr-hint">Choose from the list so we get the exact location and time zone.</p>
+            </div>
+
+            <p id="lr-form-error" class="lr-error" role="alert" hidden></p>
+
+            <button type="submit" class="btn-primary w-full !min-h-12 !text-base">Show my rhythm</button>
+            <p class="flex items-center justify-center gap-2 text-center text-xs text-ink-500">
+              <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
+              Worked out on your device. Nothing is stored on our servers.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Results ═══ -->
+  <section id="lr-results" class="wfg-home-band lr-scroll-anchor" aria-label="Your Life Rhythm" data-bg="#ffffff" hidden>
+    <div id="lr-app" data-mode="simple">
+      <header class="lr-head">
+        <div class="container-wfg py-10 sm:py-14">
+          <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="wfg-home-kicker text-white/70">Life Rhythm</p>
+              <h2 id="lr-head-name" class="mt-2 font-display text-3xl font-medium text-white sm:text-[2.6rem] sm:leading-tight">Your rhythm</h2>
+              <p id="lr-head-meta" class="mt-2 text-sm text-white/75"></p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="lr-mode" role="radiogroup" aria-label="Level of detail">
+                <button type="button" role="radio" aria-checked="true" data-lr-mode="simple">Simple</button>
+                <button type="button" role="radio" aria-checked="false" data-lr-mode="pro">Pro detail</button>
+              </div>
+              <a href="#lr-intake" id="lr-edit" class="lr-head-link">Edit details</a>
+            </div>
+          </div>
+          <p id="lr-head-note" class="lr-head-note" hidden></p>
+        </div>
+      </header>
+
+      <div class="lr-tabs-wrap">
+        <div class="container-wfg">
+          <div class="lr-tabs" role="tablist" aria-label="Sections">
+            <button type="button" role="tab" id="lr-tab-today" aria-controls="lr-panel-today" aria-selected="true" data-lr-tab="today">Today</button>
+            <button type="button" role="tab" id="lr-tab-nature" aria-controls="lr-panel-nature" aria-selected="false" tabindex="-1" data-lr-tab="nature">Your nature</button>
+            <button type="button" role="tab" id="lr-tab-seasons" aria-controls="lr-panel-seasons" aria-selected="false" tabindex="-1" data-lr-tab="seasons">Your seasons</button>
+            <button type="button" role="tab" id="lr-tab-together" aria-controls="lr-panel-together" aria-selected="false" tabindex="-1" data-lr-tab="together">Together</button>
+            <button type="button" role="tab" id="lr-tab-chart" aria-controls="lr-panel-chart" aria-selected="false" tabindex="-1" data-lr-tab="chart" class="lr-pro-tab">Chart data</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-wfg pb-20 pt-10 sm:pt-14">
+        <div role="tabpanel" id="lr-panel-today" aria-labelledby="lr-tab-today" class="lr-panel" tabindex="0"></div>
+        <div role="tabpanel" id="lr-panel-nature" aria-labelledby="lr-tab-nature" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-seasons" aria-labelledby="lr-tab-seasons" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-together" aria-labelledby="lr-tab-together" class="lr-panel" tabindex="0" hidden></div>
+        <div role="tabpanel" id="lr-panel-chart" aria-labelledby="lr-tab-chart" class="lr-panel" tabindex="0" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ How it works ═══ -->
+  <section class="wfg-home-band" aria-labelledby="lr-how-title" data-bg="#f0f4f2">
+    <div class="container-wfg py-16 md:py-20">
+      <div class="max-w-2xl">
+        <p class="wfg-home-kicker text-primary">How it works</p>
+        <h2 id="lr-how-title" class="mt-2 font-display text-2xl font-medium text-ink sm:text-3xl md:text-4xl">
+          Precise maths, plain words
+        </h2>
+      </div>
+      <ul class="mt-10 grid list-none gap-5 md:grid-cols-3 lg:gap-6" role="list">
+        {
+          steps.map((s, i) => (
+            <li class="wfg-card-home flex flex-col p-6 sm:p-7">
+              <span class="lr-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="mt-4 font-display text-xl font-medium text-ink">{s.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-charcoal sm:text-[0.9375rem]">{s.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-10 max-w-3xl text-xs leading-relaxed text-ink-500">{DISCLAIMER}</p>
+    </div>
+  </section>
+
+  <HomePageFooter slot="footer" />
+
+  <script src="../../scripts/astro-controller.ts"></script>
+</BaseLayout>
+
+<style is:global>
+  /* ═══ Life Rhythm (scoped by lr- prefix) ═══ */
+  .lr-scroll-anchor { scroll-margin-top: 5.5rem; }
+
+  .lr-num {
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 2rem; height: 2rem; border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-secondary) 55%, transparent);
+    font-family: var(--font-display); font-size: 0.75rem; font-variant-numeric: tabular-nums;
+    color: var(--color-primary);
+  }
+
+  .lr-intake-card {
+    border-radius: 1.75rem; background: #fff; padding: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 9%, transparent);
+    box-shadow: 0 30px 60px -30px rgba(10, 35, 52, 0.22), 0 2px 14px rgba(32, 28, 22, 0.06);
+  }
+  @media (min-width: 640px) { .lr-intake-card { padding: 2.5rem; } }
+
+  .lr-label {
+    display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;
+    font-size: 0.875rem; font-weight: 500; color: var(--color-ink);
+  }
+  .lr-optional { font-size: 0.75rem; font-weight: 400; color: var(--color-cool-gray); }
+  .lr-hint { margin-top: 0.5rem; font-size: 0.8125rem; line-height: 1.5; color: var(--color-ink-500); }
+  .lr-error {
+    border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem;
+    background: #fbf1ee; color: #8a3b2a; border: 1px solid #f0d6cf;
+  }
+  .lr-check { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.8125rem; color: var(--color-charcoal); cursor: pointer; }
+  .lr-check input { width: 1rem; height: 1rem; accent-color: var(--color-primary); }
+  .lr-textbtn {
+    font-size: 0.8125rem; font-weight: 500; color: var(--color-ink-500); cursor: pointer;
+    text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 4px;
+  }
+  .lr-textbtn:hover { color: var(--color-primary); text-decoration-color: var(--color-secondary); }
+  input.input-wfg:disabled { opacity: 0.45; }
+
+  .lr-places {
+    position: absolute; left: 0; right: 0; top: calc(100% - 1.75rem); z-index: 30;
+    max-height: 18rem; overflow-y: auto; border-radius: 1rem; background: #fff; padding: 0.375rem;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+    box-shadow: 0 20px 40px -20px rgba(10, 35, 52, 0.3);
+  }
+  .lr-places button {
+    display: flex; width: 100%; flex-direction: column; align-items: flex-start; gap: 0.1rem;
+    border-radius: 0.625rem; padding: 0.625rem 0.75rem; text-align: left; cursor: pointer;
+  }
+  .lr-places button:hover, .lr-places button[aria-selected='true'] { background: var(--color-muted-bg); }
+  .lr-places .lr-place-name { font-size: 0.9375rem; color: var(--color-ink); }
+  .lr-places .lr-place-sub { font-size: 0.75rem; color: var(--color-ink-500); }
+  .lr-places .lr-place-empty { padding: 0.75rem; font-size: 0.875rem; color: var(--color-ink-500); }
+
+  /* ─── Results header ─── */
+  .lr-head {
+    background:
+      radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--color-accent) 28%, transparent) 0%, transparent 55%),
+      radial-gradient(90% 120% at 0% 100%, color-mix(in srgb, var(--color-secondary) 22%, transparent) 0%, transparent 60%),
+      var(--color-primary);
+  }
+  .lr-head-link { font-size: 0.875rem; color: rgba(255,255,255,0.8); text-decoration: underline; text-decoration-color: rgba(255,255,255,0.35); text-underline-offset: 4px; }
+  .lr-head-link:hover { color: #fff; }
+  .lr-head-note {
+    margin-top: 1.5rem; max-width: 42rem; border-radius: 0.875rem; padding: 0.75rem 1rem;
+    font-size: 0.8125rem; line-height: 1.5; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+
+  .lr-mode { display: inline-flex; padding: 0.25rem; border-radius: 9999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); }
+  .lr-mode button {
+    min-height: 2.5rem; padding: 0 1.1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
+    color: rgba(255,255,255,0.8); cursor: pointer; transition: background-color .2s, color .2s;
+  }
+  .lr-mode button[aria-checked='true'] { background: #fff; color: var(--color-primary); }
+  .lr-mode button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .lr-tabs-wrap { border-bottom: 1px solid var(--color-line); background: #fff; }
+  .lr-tabs { display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none; margin: 0 -0.25rem; }
+  .lr-tabs::-webkit-scrollbar { display: none; }
+  .lr-tabs button {
+    position: relative; flex-shrink: 0; padding: 1.1rem 0.9rem; font-size: 0.9375rem; font-weight: 500;
+    color: var(--color-ink-500); cursor: pointer; transition: color .2s;
+  }
+  .lr-tabs button::after {
+    content: ''; position: absolute; left: 0.9rem; right: 0.9rem; bottom: -1px; height: 2px; border-radius: 2px;
+    background: var(--color-primary); transform: scaleX(0); transition: transform .3s var(--ease-wfg);
+  }
+  .lr-tabs button:hover { color: var(--color-ink); }
+  .lr-tabs button[aria-selected='true'] { color: var(--color-ink); }
+  .lr-tabs button[aria-selected='true']::after { transform: scaleX(1); }
+  .lr-tabs button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -4px; border-radius: 0.5rem; }
+  .lr-tabs .lr-pro-tab { color: var(--color-ink-500); }
+
+  #lr-app[data-mode='simple'] .lr-pro,
+  #lr-app[data-mode='simple'] .lr-pro-tab { display: none !important; }
+  #lr-app[data-mode='pro'] .lr-simple-only { display: none !important; }
+
+  .lr-panel:focus-visible { outline: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .lr-panel:not([hidden]) { animation: lr-in .45s var(--ease-wfg) both; }
+    @keyframes lr-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+
+  /* ─── Panel typography ─── */
+  .lr-intro { max-width: 46rem; }
+  .lr-date { font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-ink-500); }
+  .lr-h1 { margin-top: 0.75rem; font-family: var(--font-display); font-weight: 500; font-size: clamp(2rem, 1.2rem + 2.6vw, 3.25rem); line-height: 1.08; letter-spacing: -0.02em; color: var(--color-ink); text-wrap: balance; }
+  .lr-lede { margin-top: 1rem; font-size: 1.0625rem; line-height: 1.7; color: var(--color-charcoal); max-width: 40rem; }
+  @media (min-width: 640px) { .lr-lede { font-size: 1.1875rem; } }
+  .lr-h2 { font-family: var(--font-display); font-weight: 500; font-size: 1.5rem; line-height: 1.2; color: var(--color-ink); }
+  @media (min-width: 640px) { .lr-h2 { font-size: 1.75rem; } }
+  .lr-h3 { font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; line-height: 1.3; color: var(--color-ink); }
+  .lr-sub { margin-top: 0.4rem; font-size: 0.9375rem; line-height: 1.6; color: var(--color-ink-500); }
+  .lr-section { margin-top: 4rem; }
+  @media (min-width: 768px) { .lr-section { margin-top: 5rem; } }
+  .lr-section-head { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1.75rem; }
+  @media (min-width: 768px) { .lr-section-head { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: 2rem; } }
+
+  .lr-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px; padding: 0.35rem 0.85rem 0.35rem 0.6rem;
+    font-size: 0.8125rem; font-weight: 500;
+  }
+  .lr-pill::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: currentColor; }
+  .lr-tone-good { background: color-mix(in srgb, var(--color-secondary) 16%, #fff); color: #4f6a3f; }
+  .lr-tone-steady, .lr-tone-neutral { background: color-mix(in srgb, var(--color-accent) 24%, #fff); color: #2f5b63; }
+  .lr-tone-light, .lr-tone-quiet { background: var(--color-warm-cream); color: #7a6648; }
+
+  .lr-card {
+    border-radius: 1.25rem; background: #fff; padding: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 9%, transparent);
+    box-shadow: var(--shadow-elevated);
+  }
+  @media (min-width: 640px) { .lr-card { padding: 1.75rem 2rem; } }
+  .lr-card-quiet { border-radius: 1.25rem; padding: 1.5rem; background: var(--color-muted-bg); }
+  @media (min-width: 640px) { .lr-card-quiet { padding: 1.75rem 2rem; } }
+
+  .lr-list { list-style: none; display: grid; gap: 0.9rem; margin-top: 1rem; }
+  .lr-list li { display: grid; grid-template-columns: 1.25rem 1fr; gap: 0.75rem; font-size: 0.9875rem; line-height: 1.55; color: var(--color-ink); }
+  .lr-list li::before {
+    content: ''; margin-top: 0.42rem; width: 0.7rem; height: 0.7rem; border-radius: 9999px;
+    border: 1.5px solid var(--color-secondary); background: color-mix(in srgb, var(--color-secondary) 25%, transparent);
+  }
+  .lr-list.lr-list-ease li::before { border-color: #c4ae8c; background: var(--color-warm-cream); }
+
+  .lr-label-sm { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-ink-500); }
+
+  /* ─── Day ribbon ─── */
+  .lr-ribbon { position: relative; display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; height: 3.25rem; }
+  .lr-ribbon > span { border-radius: 0.5rem; }
+  .lr-ribbon .t-good { background: color-mix(in srgb, var(--color-secondary) 70%, #fff); }
+  .lr-ribbon .t-neutral { background: color-mix(in srgb, var(--color-accent) 70%, #fff); }
+  .lr-ribbon .t-quiet { background: #ebe5da; }
+  .lr-ribbon .is-past { opacity: 0.35; }
+  .lr-now { position: absolute; top: -0.5rem; bottom: -0.5rem; width: 2px; background: var(--color-primary); border-radius: 2px; }
+  .lr-now::before { content: ''; position: absolute; top: -0.25rem; left: 50%; width: 0.6rem; height: 0.6rem; transform: translateX(-50%); border-radius: 9999px; background: var(--color-primary); }
+  .lr-ribbon-axis { display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.75rem; color: var(--color-ink-500); font-variant-numeric: tabular-nums; }
+  .lr-legend { display: flex; flex-wrap: wrap; gap: 1.25rem; font-size: 0.8125rem; color: var(--color-charcoal); }
+  .lr-legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .lr-legend i { width: 0.75rem; height: 0.75rem; border-radius: 0.25rem; }
+
+  .lr-window { display: grid; grid-template-columns: 1fr; gap: 0.5rem; align-items: baseline; padding: 1rem 0; border-top: 1px solid var(--color-line); }
+  .lr-window:first-child { border-top: 0; }
+  @media (min-width: 640px) { .lr-window { grid-template-columns: 10rem 1fr; gap: 1rem; } }
+  .lr-window-time { white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 0.9375rem; font-weight: 500; color: var(--color-ink); }
+
+  /* ─── Bars ─── */
+  .lr-bar { height: 0.5rem; border-radius: 9999px; background: var(--color-muted-bg); overflow: hidden; }
+  .lr-bar > i { display: block; height: 100%; border-radius: 9999px; background: var(--color-secondary); }
+
+  /* ─── Life chapters ─── */
+  .lr-life { position: relative; display: flex; gap: 3px; height: 4.5rem; }
+  .lr-life > div { position: relative; border-radius: 0.6rem; background: var(--color-muted-bg); overflow: hidden; min-width: 4px; }
+  .lr-life > div.is-past { background: #eef1ef; }
+  .lr-life > div.is-now { background: var(--color-primary); }
+  .lr-life > div span { position: absolute; left: 0.6rem; bottom: 0.5rem; right: 0.4rem; font-size: 0.7rem; line-height: 1.2; color: var(--color-ink-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lr-life > div.is-now span { color: #fff; }
+  .lr-life-axis { position: relative; height: 1.25rem; margin-top: 0.5rem; font-size: 0.7rem; color: var(--color-ink-500); font-variant-numeric: tabular-nums; }
+  .lr-life-axis span { position: absolute; transform: translateX(-50%); }
+  .lr-progress { height: 0.375rem; border-radius: 9999px; background: rgba(255,255,255,0.18); overflow: hidden; }
+  .lr-progress > i { display: block; height: 100%; background: var(--color-secondary); border-radius: 9999px; }
+
+  .lr-feature {
+    border-radius: 1.5rem; padding: 1.75rem; color: #fff;
+    background:
+      radial-gradient(100% 120% at 100% 0%, color-mix(in srgb, var(--color-accent) 25%, transparent) 0%, transparent 60%),
+      var(--color-primary);
+  }
+  @media (min-width: 640px) { .lr-feature { padding: 2.5rem; } }
+
+  .lr-timeline { list-style: none; position: relative; display: grid; gap: 0; }
+  .lr-timeline li { position: relative; display: grid; grid-template-columns: 1.5rem 1fr; gap: 1rem; padding-bottom: 1.75rem; }
+  .lr-timeline li::before { content: ''; position: absolute; left: 0.71rem; top: 1.1rem; bottom: 0; width: 1px; background: var(--color-line-strong); }
+  .lr-timeline li:last-child::before { display: none; }
+  .lr-timeline .dot { margin-top: 0.3rem; width: 0.75rem; height: 0.75rem; margin-left: 0.36rem; border-radius: 9999px; border: 1.5px solid var(--color-secondary); background: #fff; }
+  .lr-timeline li.is-now .dot { background: var(--color-primary); border-color: var(--color-primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 12%, transparent); }
+
+  /* ─── Ask ─── */
+  .lr-ask { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 640px) { .lr-ask { flex-direction: row; } }
+  .lr-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+  .lr-chips button {
+    border-radius: 9999px; border: 1px solid var(--color-line-strong); background: #fff; padding: 0.45rem 0.9rem;
+    font-size: 0.8125rem; color: var(--color-charcoal); cursor: pointer; transition: border-color .2s, color .2s;
+  }
+  .lr-chips button:hover { border-color: var(--color-secondary); color: var(--color-ink); }
+  .lr-answer { margin-top: 1.5rem; border-top: 1px solid var(--color-line); padding-top: 1.5rem; }
+  .lr-signal { display: inline-flex; gap: 0.3rem; }
+  .lr-signal i { width: 0.6rem; height: 0.6rem; border-radius: 9999px; background: var(--color-line); }
+  .lr-signal[data-level='green'] i:nth-child(-n+3) { background: var(--color-secondary); }
+  .lr-signal[data-level='amber'] i:nth-child(-n+2) { background: #c8a96b; }
+  .lr-signal[data-level='red'] i:nth-child(1) { background: #c98a72; }
+
+  /* ─── Ring (compatibility) ─── */
+  .lr-ring { --p: 0; width: 8.5rem; height: 8.5rem; border-radius: 9999px; display: grid; place-items: center;
+    background: conic-gradient(var(--color-secondary) calc(var(--p) * 1%), var(--color-muted-bg) 0); }
+  .lr-ring > div { width: 7rem; height: 7rem; border-radius: 9999px; background: #fff; display: grid; place-items: center; text-align: center; }
+
+  /* ─── Pro blocks ─── */
+  .lr-pro-block {
+    margin-top: 1.5rem; border-radius: 1rem; padding: 1.1rem 1.25rem;
+    background: color-mix(in srgb, var(--color-accent) 9%, #fff);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+    font-size: 0.8125rem; line-height: 1.55; color: var(--color-ink-600);
+  }
+  .lr-pro-tag {
+    display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;
+    font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #3c6b74;
+  }
+  .lr-pro-tag::before { content: ''; width: 0.4rem; height: 0.4rem; border-radius: 9999px; background: currentColor; }
+  .lr-kv { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.75rem 1.5rem; }
+  .lr-kv dt { font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-500); }
+  .lr-kv dd { margin-top: 0.15rem; font-size: 0.875rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+
+  .lr-table-wrap { overflow-x: auto; border-radius: 1rem; border: 1px solid var(--color-line); background: #fff; }
+  .lr-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .lr-table th { text-align: left; font-weight: 500; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-500); background: var(--color-muted-bg); padding: 0.7rem 1rem; white-space: nowrap; }
+  .lr-table td { padding: 0.7rem 1rem; border-top: 1px solid var(--color-line); color: var(--color-ink); white-space: nowrap; }
+  .lr-table tr.is-now td { background: color-mix(in srgb, var(--color-secondary) 10%, #fff); }
+  .lr-table .muted { color: var(--color-ink-500); }
+
+  .lr-chart-svg text { font-family: var(--font-sans); }
+</style>
