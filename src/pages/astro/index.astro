@@ -181,6 +181,18 @@ const steps = [
       </div>
 
       <div class="container-wfg pb-20 pt-10 sm:pt-14">
+        <details class="lr-pro lr-guide">
+          <summary>How to read the technical notes</summary>
+          <div class="lr-guide-body">
+            <p><strong>Houses (“areas”).</strong> Your chart is divided into 12 houses, counted from your rising sign (Lagna) as the 1st. Each covers one part of life: 1st self and health · 2nd money and speech · 3rd effort, siblings, short trips · 4th home and mother · 5th children and creativity · 6th work routines, health, rivals · 7th partner and contracts · 8th change, joint money, research · 9th beliefs, teachers, long journeys · 10th career and reputation · 11th gains and networks · 12th rest, expenses, abroad. Houses here are whole-sign: one sign = one house.</p>
+            <p><strong>Ruling a house.</strong> Each house is a sign, and each sign has a ruling planet (its “lord”). A planet gives the results of the house it sits in first, then of the houses it rules. That is why one planet can bring several areas into focus at once.</p>
+            <p><strong>Sarvashtakavarga points (bindus).</strong> A classical tally of how much support each house gets from all planets. The 12 houses always share 337 points, so 28 is average; 28+ supported, 32+ strong, under 25 weak. Transits through high-point houses work out better.</p>
+            <p><strong>Shadbala and rupas.</strong> A planet’s six-fold strength from BPHS (position, direction, time, motion, nature, aspects), measured in rupas. Each planet has a classical minimum; we show strength as a percentage of it. 100%+ means it can fully deliver its results; below 100%, partly or late. The rank compares the 7 planets in your chart (Rahu and Ketu have no Shadbala).</p>
+            <p><strong>Dignity.</strong> How comfortable a planet is in its sign: exalted (best) → moolatrikona → own sign → friend → neutral → enemy → debilitated (weakest), using five-fold friendship.</p>
+            <p><strong>Bhava Bala and Vimshopaka.</strong> Bhava Bala is a separate strength measure for each house (rupas, ranked 1–12). Vimshopaka scores how consistently dignified a planet is across the 16 divisional charts, out of 20.</p>
+            <p><strong>Periods (dashas).</strong> Vimshottari splits life into planetary periods: mahadasha (years), antardasha (months), pratyantardasha (weeks). Yogini, Ashtottari and Jaimini Chara are independent cross-checks.</p>
+          </div>
+        </details>
         <div role="tabpanel" id="lr-panel-today" aria-labelledby="lr-tab-today" class="lr-panel" tabindex="0"></div>
         <div role="tabpanel" id="lr-panel-you" aria-labelledby="lr-tab-you" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-seasons" aria-labelledby="lr-tab-seasons" class="lr-panel" tabindex="0" hidden></div>
@@ -489,7 +501,10 @@ const steps = [
 
   /* ─── Evidence line (Pro) ─── */
   .lr-ev { margin-top: 0.75rem; font-size: 0.75rem; line-height: 1.5; color: #3c6b74; font-variant-numeric: tabular-nums; }
-  .lr-ev::before { content: 'Basis · '; font-weight: 600; letter-spacing: 0.04em; }
+  .lr-ev::before { content: 'How this was worked out · '; font-weight: 600; letter-spacing: 0.04em; }
+  .lr-guide { margin-bottom: 2rem; border: 1px solid var(--color-line); border-radius: 1rem; background: color-mix(in srgb, var(--color-accent) 6%, #fff); }
+  .lr-guide summary { cursor: pointer; padding: 0.9rem 1.25rem; font-size: 0.875rem; font-weight: 600; color: #3c6b74; }
+  .lr-guide-body { display: grid; gap: 0.75rem; padding: 0 1.25rem 1.25rem; font-size: 0.875rem; line-height: 1.6; color: var(--color-charcoal); max-width: 60rem; }
 
   .lr-meter { display: flex; gap: 3px; }
   .lr-meter i { width: 1.25rem; height: 0.4rem; border-radius: 9999px; background: var(--color-line); }

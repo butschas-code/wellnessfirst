@@ -14,6 +14,7 @@ import { ZODIAC_SIGNS, NAKSHATRAS } from './astro-engine/core/constants.ts';
 import { LIFE_AREA, AREA_PLAYBOOK } from './astro-content.ts';
 import { VIMSHOTTARI_DASHA_CYCLE } from './astro-engine/core/constants.ts';
 
+export type PlanetKey = PlanetName;
 export type Level = 'strong' | 'good' | 'average' | 'low';
 
 const SEVEN: PlanetName[] = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
@@ -73,6 +74,69 @@ export function housesRuledBy(chart: ComprehensiveKundliResult, p: PlanetName): 
   return chart.houses.filter((h) => h.sign.lord === p).map((h) => h.houseNumber);
 }
 
+export const ORD = (n: number) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? 'th' : n % 10 === 1 ? 'st' : n % 10 === 2 ? 'nd' : n % 10 === 3 ? 'rd' : 'th'}`;
+const cap1 = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+export const pname = (p: string) => (p === 'Sun' || p === 'Moon' ? `the ${p}` : p);
+const joinAnd = (xs: string[]) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+const fix = (n: number, d = 2) => Number(n).toFixed(d);
+const nodeWord = (p: PlanetName) => (p === 'Rahu' ? 'Rahu (the north lunar node)' : p === 'Ketu' ? 'Ketu (the south lunar node)' : p);
+
+const DIGNITY_PRO: Record<string, string> = {
+  Exalted: 'exalted (uchcha) — the sign where it is strongest',
+  Moolatrikona: 'in its moolatrikona sign — its "office", very dependable',
+  OwnSign: 'in its own sign (swakshetra) — fully in control',
+  Friendly: 'in the sign of a friend (by five-fold friendship) — works with modest effort',
+  Neutral: 'in a neutral sign — gives results in proportion to effort',
+  Enemy: 'in the sign of an enemy (by five-fold friendship) — works with friction',
+  Debilitated: 'debilitated (neecha) — the sign where it is weakest',
+};
+
+/**
+ * Pro view: one planet, fully explained — position, house, dignity, what it rules, Shadbala.
+ * Written so a reader who knows some astrology can check every number.
+ */
+export function explainPlanet(chart: ComprehensiveKundliResult, p: PlanetName): string {
+  const pos = chart.planets[p];
+  const rules = housesRuledBy(chart, p);
+  const sb = (chart.shadbala as Record<string, any>)[p];
+  const out = [
+    `${nodeWord(p)} is at ${pos.formattedDegree} ${pos.sign.name} (${pos.nakshatra.name} nakshatra) in your ${ORD(pos.house)} house, counted from the rising sign (Lagna). It is ${DIGNITY_PRO[pos.dignity] ?? DIGNITY_PRO.Neutral}${pos.isRetrograde ? ', and retrograde' : ''}.`,
+  ];
+  if (rules.length) out.push(`It rules (is lord of) your ${joinAnd(rules.map((h) => `${ORD(h)} house — ${LIFE_AREA[h].name.toLowerCase()}`))}, so it also delivers the results of ${rules.length > 1 ? 'those houses' : 'that house'}.`);
+  if (sb) {
+    out.push(
+      `Shadbala (the six-fold strength from BPHS) is ${fix(sb.totalRupas)} rupas against a classical minimum of ${fix(sb.requiredRupas, 1)} for ${p}: ${Math.round(sb.strengthRatio * 100)}%. At 100% or more a planet can fully give its results; below 100% it gives them partially or late. It ranks ${sb.rank} of the 7 planets in your chart.`
+    );
+  } else {
+    out.push(`The nodes have no Shadbala. They give the results of the house they occupy and of the planet that owns their sign (here ${pos.sign.lord}, in your ${ORD(chart.planets[pos.sign.lord].house)} house).`);
+  }
+  return out.join(' ');
+}
+
+/** Pro view: a house's Sarvashtakavarga score, explained with its rank. */
+export function explainArea(chart: ComprehensiveKundliResult, h: number): string {
+  const a = areaSupport(chart, h);
+  const rank = allAreas(chart).sort((x, y) => y.points - x.points).findIndex((x) => x.house === h) + 1;
+  const sign = chart.houses[h - 1].sign;
+  return `Your ${ORD(h)} house (${a.name.toLowerCase()}; ${sign.name}, ruled by ${sign.lord}) has ${a.points} Sarvashtakavarga points (bindus). The 12 houses always share 337 points, so 28 is average: 28+ counts as supported, 32+ as strong, under 25 as weak. This house ranks ${rank} of 12 in your chart.`;
+}
+
+/** Plain view: a planet's overall capacity, no numbers. */
+export function strengthPlain(chart: ComprehensiveKundliResult, p: PlanetName, withPlace = true): { text: string; level: Level } {
+  const sb = (chart.shadbala as Record<string, any>)[p];
+  const pos = chart.planets[p];
+  const place = DIGNITY_PLAIN[pos.dignity] ?? 'in neutral territory';
+  if (!sb) {
+    const a = areaSupport(chart, pos.house);
+    return { level: a.level, text: `${p === 'Rahu' ? 'The north node' : 'The south node'} has no strength of its own — it amplifies whatever part of life it sits in, and in your chart that part of life is ${a.phrase}.` };
+  }
+  const r = sb.strengthRatio as number;
+  const power = r >= 1.2 ? 'has more than enough power to deliver' : r >= 1 ? 'has just enough power to deliver' : 'is short of the power it needs, so it delivers slowly or partly';
+  const rel = sb.rank <= 2 ? 'one of the two most powerful planets in your chart' : sb.rank >= 6 ? 'one of the less powerful planets in your chart' : 'mid-range compared with your other planets';
+  const level: Level = r >= 1.2 && sb.rank <= 3 ? 'strong' : r >= 1.1 ? 'good' : r >= 0.95 ? 'average' : 'low';
+  return { level, text: withPlace ? `${cap1(pname(p))} is ${rel}, ${power}, and it sits ${place}.` : `${cap1(pname(p))} is ${rel} and ${power}.` };
+}
+
 export function planetCondition(chart: ComprehensiveKundliResult, p: PlanetName): PlanetCondition {
   const pos = chart.planets[p];
   const rules = housesRuledBy(chart, p);
@@ -106,9 +170,7 @@ export function planetCondition(chart: ComprehensiveKundliResult, p: PlanetName)
     level,
     phrase,
     dignityPlain: DIGNITY_PLAIN[pos.dignity] ?? 'in neutral territory',
-    evidence: `${p} in ${pos.sign.name} ${pos.formattedDegree} · H${pos.house} · ${pos.dignity}${pos.isRetrograde ? ' · R' : ''}${
-      rules.length ? ` · lord of H${rules.join(', H')}` : ''
-    }${strengthEv}`,
+    evidence: explainPlanet(chart, p),
   };
 }
 
@@ -161,13 +223,13 @@ export function chapterInsight(chart: ComprehensiveKundliResult, period: DashaPe
     support,
     supportText,
     advice,
-    evidence: `${cond.evidence} · SAV H${stage.house} = ${stage.points}`,
+    evidence: `${cond.evidence} ${explainArea(chart, stage.house)}`,
   };
 }
 
 /** How the main chapter and the current phase blend (house distance between their lords). */
 export function blendInsight(chart: ComprehensiveKundliResult, md: PlanetName, ad: PlanetName) {
-  if (md === ad) return { tone: 'good' as Level, text: 'The current phase repeats the theme of the whole chapter, so its themes come through especially clearly.', evidence: `${md}/${ad}` };
+  if (md === ad) return { tone: 'good' as Level, text: 'The current phase repeats the theme of the whole chapter, so its themes come through especially clearly.', evidence: `Both the main period (mahadasha) and the current sub-period (antardasha) are run by ${md}, so its results are doubled.` };
   const a = chart.planets[md].house;
   const b = chart.planets[ad].house;
   const dist = ((b - a + 12) % 12) + 1;
@@ -178,7 +240,7 @@ export function blendInsight(chart: ComprehensiveKundliResult, md: PlanetName, a
       : [6, 8, 12].includes(dist)
         ? ['low', 'The current phase pulls in a slightly different direction from the bigger chapter. Expect some friction — keep your priorities simple.']
         : ['average', 'The current phase adds a new focus alongside the bigger chapter.'];
-  return { tone, text, evidence: `${ad} is ${dist}${['st', 'nd', 'rd'][dist - 1] ?? 'th'} from ${md} (H${b} from H${a})` };
+  return { tone, text, evidence: `${md} (main period) sits in your ${ORD(a)} house and ${ad} (current sub-period) in your ${ORD(b)}. Counted from ${md}, ${ad} is ${ORD(dist)}. Placements 1st/5th/9th from each other (trines) blend best; 3rd/4th/7th/10th/11th support each other; 6th/8th/12th (dusthana) pull against each other.` };
 }
 
 /* ═══════════ Today: personal day quality ═══════════ */
@@ -238,7 +300,7 @@ export function dayInsight(chart: ComprehensiveKundliResult, now: Date, transitT
     moonArea,
     moonSignName: moon.sign.name,
     moonNakshatra: moon.nakshatra.name,
-    evidence: `Tarabala: ${tara.name} (${count} from ${chart.planets.Moon.nakshatra.name}) · Chandrabala: transit Moon ${chandraHouse}H from natal Moon (${chandraGood ? 'favourable' : 'unfavourable'}) · Moon in ${moon.sign.name}/${moon.nakshatra.name}, H${moon.house} (SAV ${moonArea.points}) · Gochara: ${transitTone}`,
+    evidence: `Tarabala: today's Moon nakshatra (${moon.nakshatra.name}) is number ${count} counted from your birth nakshatra (${chart.planets.Moon.nakshatra.name}), which gives the tara "${tara.name}" — ${tara.good ? 'one of the favourable taras' : 'one of the difficult taras (Janma, Vipat, Pratyak and Naidhana are the difficult ones)'}. Chandrabala: the Moon is ${ORD(chandraHouse)} from your birth Moon sign, which is ${chandraGood ? 'favourable (1st, 3rd, 6th, 7th, 10th and 11th are good)' : 'unfavourable (only 1st, 3rd, 6th, 7th, 10th and 11th are good)'}. The Moon is in ${moon.sign.name}, your ${ORD(moon.house)} house (${moonArea.points} Sarvashtakavarga points). Overall transit picture (gochara from the Moon): ${transitTone}.`,
   };
 }
 
@@ -315,8 +377,8 @@ export function slowTransits(chart: ComprehensiveKundliResult, now: Date): SlowT
       area,
       until,
       favourable,
-      plain: `${p === 'Rahu' ? 'The lunar node' : p} currently ${verb} your area of ${area.name.toLowerCase()}. ${quality}`,
-      evidence: `${p} transiting ${ZODIAC_SIGNS[signIdx].name} · H${h} from Lagna · H${hm} from Moon · SAV ${area.points}${until ? ` · ingress ${until.toISOString().slice(0, 10)}` : ''}`,
+      plain: `${p === 'Rahu' ? 'The north node' : p} currently ${verb} the part of your life about ${AREA_PLAYBOOK[h].shows}. ${quality} ${favourable ? `Use it: ${AREA_PLAYBOOK[h].act[0].charAt(0).toLowerCase() + AREA_PLAYBOOK[h].act[0].slice(1)}.` : `Protect it: watch out for ${AREA_PLAYBOOK[h].risk}.`}`,
+      evidence: `${p} is moving through ${ZODIAC_SIGNS[signIdx].name}: your ${ORD(h)} house counted from the Lagna (which life area it affects) and ${ORD(hm)} counted from your Moon (classical transit results, gochara, are judged from the Moon; for ${p} the good positions from the Moon are ${FAV_FROM_MOON[p].map(ORD).join(', ')}). That house has ${area.points} Sarvashtakavarga points — more points, more help from the transit.${until ? ` It changes sign around ${until.toISOString().slice(0, 10)}.` : ''}`,
     };
   });
 }
@@ -351,8 +413,8 @@ export function naturalStrengths(chart: ComprehensiveKundliResult, copy: Record<
       title: copy[p]?.title ?? p,
       text:
         kind === 'natural'
-          ? `${copy[p]?.natural ?? ''} This shows up most in your area of ${area.name.toLowerCase()}. ${why(p)}`
-          : `${copy[p]?.effort ?? ''} It plays out mostly in your area of ${area.name.toLowerCase()}.`,
+          ? `${copy[p]?.natural ?? ''} This shows up most in the part of your life about ${AREA_PLAYBOOK[cond.house].shows}. ${why(p)}`
+          : `${copy[p]?.effort ?? ''} It plays out mostly in the part of your life about ${AREA_PLAYBOOK[cond.house].shows}.`,
       evidence: cond.evidence,
     };
   };
@@ -394,23 +456,23 @@ export function careerFindings(chart: ComprehensiveKundliResult) {
   return {
     direction: {
       title: 'Work that tends to suit you',
-      text: `Your career area is guided by ${lord === 'Rahu' || lord === 'Ketu' ? 'the lunar node' : lord}, which sits in your area of ${LIFE_AREA[cond.house].name.toLowerCase()}. That points to ${WORK_VIA_HOUSE[cond.house]}. ${lord} is ${cond.phrase} and sits ${cond.dignityPlain}.`,
-      evidence: `10H ${h10.sign.name}, lord ${cond.evidence}${inH10.length ? ` · in 10H: ${inH10.join(', ')}` : ''}`,
+      text: `Your career area is guided by ${lord === 'Rahu' || lord === 'Ketu' ? 'the lunar node' : lord}, which sits in the part of your life about ${AREA_PLAYBOOK[cond.house].shows}. That points to work in ${WORK_VIA_HOUSE[cond.house]}. ${strengthPlain(chart, lord).text}`,
+      evidence: `Your 10th house (career) is ${h10.sign.name}, so its ruler is ${lord}. ${cond.evidence}${inH10.length ? ` Planets in the 10th house: ${inH10.join(', ')}.` : ''}`,
     },
     career: {
       title: 'Career support',
-      text: `Your career area is ${a10.phrase} (${a10.points} support points; 28 is average). ${a10.level === 'strong' || a10.level === 'good' ? 'Visible effort at work tends to be noticed and rewarded.' : 'Recognition tends to come through steady, consistent work rather than quick wins.'}`,
-      evidence: `SAV 10H = ${a10.points}`,
+      text: `Compared with the rest of your chart, your career area is ${a10.phrase}. ${a10.level === 'strong' || a10.level === 'good' ? 'Visible effort at work tends to be noticed and rewarded.' : 'Recognition tends to come through steady, consistent work rather than quick wins.'}`,
+      evidence: explainArea(chart, 10),
     },
     savings: {
       title: 'Saving and keeping money',
-      text: `Your money-and-savings area is ${a2.phrase} (${a2.points} points). ${a2.points >= 28 ? 'You tend to hold on to resources well — let savings build automatically.' : 'Money can slip away more easily — automatic transfers to savings on payday help a lot.'}`,
-      evidence: `SAV 2H = ${a2.points} · 2L ${chart.houses[1].sign.lord} in H${chart.planets[chart.houses[1].sign.lord].house}`,
+      text: `Your money-and-savings area is ${a2.phrase}. ${a2.points >= 28 ? 'You tend to hold on to resources well — let savings build automatically.' : 'Money can slip away more easily — automatic transfers to savings on payday help a lot.'}`,
+      evidence: `${explainArea(chart, 2)} Its ruler ${chart.houses[1].sign.lord} sits in your ${ORD(chart.planets[chart.houses[1].sign.lord].house)} house.`,
     },
     gains: {
       title: 'Gains through people',
-      text: `Your area of friends and gains is ${a11.phrase} (${a11.points} points). ${a11.points >= 28 ? 'Opportunities tend to come through your network — stay connected.' : 'A few deep, trusted relationships will serve you better than a large network.'}`,
-      evidence: `SAV 11H = ${a11.points} · 11L ${chart.houses[10].sign.lord} in H${chart.planets[chart.houses[10].sign.lord].house}`,
+      text: `Your area of friends and gains is ${a11.phrase}. ${a11.points >= 28 ? 'Opportunities tend to come through your network — stay connected.' : 'A few deep, trusted relationships will serve you better than a large network.'}`,
+      evidence: `${explainArea(chart, 11)} Its ruler ${chart.houses[10].sign.lord} sits in your ${ORD(chart.planets[chart.houses[10].sign.lord].house)} house.`,
     },
   };
 }
@@ -424,10 +486,10 @@ export function healthFindings(chart: ComprehensiveKundliResult) {
   return [
     {
       title: 'Your core vitality',
-      text: `The planet that represents you, ${lagnaLord}, is ${lc.phrase} and sits ${lc.dignityPlain}. Your energy area is ${a1.phrase} (${a1.points} points). ${
+      text: `The planet that represents you, ${lagnaLord}, is ${lc.phrase} and sits ${lc.dignityPlain}. Your energy area is ${a1.phrase}. ${
         lc.level === 'strong' || lc.level === 'good' ? 'You tend to have good reserves — just don’t mistake that for unlimited.' : 'Your energy is precious — guard sleep and recovery like appointments.'
       }`,
-      evidence: `Lagna lord ${lc.evidence} · SAV 1H = ${a1.points}`,
+      evidence: `The ruler of your rising sign (Lagna lord) is ${lagnaLord}. ${lc.evidence} ${explainArea(chart, 1)}`,
     },
     {
       title: 'Emotional resilience',
@@ -438,10 +500,10 @@ export function healthFindings(chart: ComprehensiveKundliResult) {
     },
     {
       title: 'Daily habits',
-      text: `Your area of routines and health is ${a6.phrase} (${a6.points} points). ${
+      text: `Your area of routines and health is ${a6.phrase}. ${
         a6.points >= 28 ? 'Good habits tend to stick once you start them.' : 'Habits take more effort to establish — start very small and keep it daily.'
       }`,
-      evidence: `SAV 6H = ${a6.points} · 6L ${chart.houses[5].sign.lord} in H${chart.planets[chart.houses[5].sign.lord].house}`,
+      evidence: `${explainArea(chart, 6)} Its ruler ${chart.houses[5].sign.lord} sits in your ${ORD(chart.planets[chart.houses[5].sign.lord].house)} house.`,
     },
   ];
 }
@@ -454,8 +516,8 @@ export function relationshipFindings(chart: ComprehensiveKundliResult) {
   return [
     {
       title: 'Partnership in your chart',
-      text: `Your partnership area is ${a7.phrase} (${a7.points} points). It is guided by ${lord7}, which sits in your area of ${LIFE_AREA[c7.house].name.toLowerCase()} — so ${LIFE_AREA[c7.house].about.toLowerCase()} often play a part in how close relationships develop.`,
-      evidence: `SAV 7H = ${a7.points} · 7L ${c7.evidence}`,
+      text: `Your partnership area is ${a7.phrase}. It is guided by ${lord7}, which sits in the part of your life about ${AREA_PLAYBOOK[c7.house].shows} — so ${LIFE_AREA[c7.house].about.toLowerCase()} often play a part in how close relationships develop.`,
+      evidence: `${explainArea(chart, 7)} ${c7.evidence}`,
     },
     {
       title: 'Warmth and affection',
@@ -475,8 +537,8 @@ export function childrenFindings(chart: ComprehensiveKundliResult) {
   return [
     {
       title: 'Children and creativity in your chart',
-      text: `Your area of children and creativity is ${a5.phrase} (${a5.points} points). It is guided by ${lord5}, which sits in your area of ${LIFE_AREA[c5.house].name.toLowerCase()}.`,
-      evidence: `SAV 5H = ${a5.points} · 5L ${c5.evidence}`,
+      text: `Your area of children and creativity is ${a5.phrase}. It is guided by ${lord5}, which sits in the part of your life about ${AREA_PLAYBOOK[c5.house].shows} — so that is where creative ideas and your bond with children tend to grow.`,
+      evidence: `${explainArea(chart, 5)} ${c5.evidence}`,
     },
     {
       title: 'Guidance and patience',
@@ -492,7 +554,6 @@ export { NAKSHATRAS, SEVEN };
 
 /* ═══════════ Phase brief: specific, dated and actionable ═══════════ */
 
-const ORD = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`;
 const YEAR = 365.2425 * 86_400_000;
 
 export interface PhaseBrief {
@@ -515,25 +576,31 @@ export function phaseBrief(chart: ComprehensiveKundliResult, period: DashaPeriod
   const sits = { ...areaSupport(chart, cond.house), role: 'sits in' as const };
   const rules = cond.rules.filter((h) => h !== cond.house).map((h) => ({ ...areaSupport(chart, h), role: 'rules' as const }));
   const areas = [sits, ...rules];
-  const word = period.lord === 'Rahu' ? 'the north node (Rahu)' : period.lord === 'Ketu' ? 'the south node (Ketu)' : `${period.lord}`;
+  const word = period.lord === 'Rahu' ? 'the north node (Rahu)' : period.lord === 'Ketu' ? 'the south node (Ketu)' : pname(period.lord);
+  const P = (h: number) => AREA_PLAYBOOK[h].shows;
   const why =
-    `This phase is run by ${word}. In your chart it sits in your ${ORD(sits.house)} area — ${AREA_PLAYBOOK[sits.house].shows}` +
-    (rules.length ? `, and it is in charge of your ${rules.map((r) => `${ORD(r.house)} area (${AREA_PLAYBOOK[r.house].shows})`).join(' and your ')}` : '') +
-    '. Those are the parts of life that move to the front.';
+    `For this stretch of time, ${word} sets the agenda. In your chart it lives in the part of life about ${P(sits.house)} — so that is where things move first and where you will feel this phase most.` +
+    (rules.length
+      ? ` It is also in charge of ${joinAnd(rules.map((r) => P(r.house)))}. These are linked now: what happens with ${LIFE_AREA[sits.house].name.toLowerCase()} feeds straight into ${joinAnd(rules.map((r) => LIFE_AREA[r.house].name.toLowerCase()))} — progress in one lifts the other, and a problem in one shows up in the other.`
+      : '') +
+    ` Practically: plan your next months around these areas, because what you start or repair here tends to hold for the rest of this phase (until ${period.endDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}).`;
 
-  const sb = (chart.shadbala as Record<string, any>)[period.lord];
+  const sp = strengthPlain(chart, period.lord);
   const pos = chart.planets[period.lord];
-  const strength = sb
-    ? `${period.lord} is ${sb.rank === 1 ? 'the strongest planet' : sb.rank === 7 ? 'the weakest planet' : `the ${ORD(sb.rank)}-strongest of the 7 planets`} in your chart (${Math.round(sb.strengthRatio * 100)}% of the strength it needs) and sits ${DIGNITY_PLAIN[pos.dignity] ?? 'in neutral territory'}. ${
-        sb.strengthRatio >= 1.2 ? 'Expect this phase to deliver when you put effort in.' : sb.strengthRatio >= 1 ? 'It has enough strength to deliver with steady effort.' : 'It is under-powered, so results come slower — plan for that and don’t over-commit.'
-      }`
-    : `The nodes take on the results of the area they sit in. Your ${ORD(sits.house)} area has ${sits.points} support points (average 28), so ${sits.points >= 28 ? 'this phase has solid ground to work with' : 'expect to work harder for results here'}.`;
+  const hardSign = ['Debilitated', 'Enemy'].includes(pos.dignity);
+  const advice =
+    sp.level === 'strong' || sp.level === 'good'
+      ? 'What that means for you: this phase rewards initiative. Aim higher than usual, ask clearly for what you want, and start the bigger projects now rather than later — the backing is there.'
+      : sp.level === 'average'
+        ? 'What that means for you: results come from steady, consistent effort rather than big pushes. Choose two or three priorities and work on them every week instead of chasing everything.'
+        : 'What that means for you: results come more slowly in this phase. Set smaller milestones, keep a buffer of time and money, and get good advice before big commitments.';
+  const strength = `How well equipped is ${period.lord === 'Rahu' || period.lord === 'Ketu' ? 'this node' : pname(period.lord)} to deliver? ${sp.text} ${advice}${hardSign ? ' Because its position is uncomfortable, early efforts may be underrated — keep a record of what you achieve and build allies.' : ''}`;
 
   const actions = areas.slice(0, 2).flatMap((a) => AREA_PLAYBOOK[a.house].act.slice(0, a.role === 'sits in' ? 2 : 1));
   if (actions.length < 3 && areas[0]) actions.push(AREA_PLAYBOOK[areas[0].house].act[2]);
   const close = areas.map((a) => AREA_PLAYBOOK[a.house].close);
   const weakest = [...areas].sort((a, b) => a.points - b.points)[0];
-  const risk = weakest && weakest.points < 28 ? `Your ${ORD(weakest.house)} area has only ${weakest.points} support points, so watch out for ${AREA_PLAYBOOK[weakest.house].risk}.` : null;
+  const risk = weakest && weakest.points < 28 ? `The weak spot in this phase is ${weakest.name.toLowerCase()} — it gets less built-in support in your chart than most areas. Guard against ${AREA_PLAYBOOK[weakest.house].risk}.` : null;
 
   // Sub-phases (pratyantardashas) inside this period, each with its main area.
   const startIdx = VIMSHOTTARI_DASHA_CYCLE.findIndex((c) => c.lord === period.lord);
@@ -557,7 +624,7 @@ export function phaseBrief(chart: ComprehensiveKundliResult, period: DashaPeriod
     close,
     risk,
     roadmap,
-    evidence: `${cond.evidence} · ${areas.map((a) => `SAV H${a.house}=${a.points}`).join(', ')}`,
+    evidence: `This is the ${period.lord} mahadasha (Vimshottari), ${period.startDate.toISOString().slice(0, 10)} to ${period.endDate.toISOString().slice(0, 10)}. A dasha lord gives the results of the house it occupies first, then of the houses it rules. ${cond.evidence} ${areas.map((a) => explainArea(chart, a.house)).join(' ')}`,
   };
 }
 
@@ -601,6 +668,7 @@ export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], 
     const rules = housesRuledBy(chart, p).some((h) => houses.includes(h)) ? 1 : 0;
     return sits + rules;
   };
+  const role = (p: PlanetName) => (houses.includes(chart.planets[p].house) ? 'sits in this area' : housesRuledBy(chart, p).some((h) => houses.includes(h)) ? 'runs this area' : 'connects to it');
   const out: TimingWindow[] = [];
   for (const md of chart.dasha.mahadashas) {
     if (md.endDate < from || md.startDate > to) continue;
@@ -612,7 +680,7 @@ export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], 
           start: ad.startDate < from ? from : ad.startDate,
           end: ad.endDate,
           strength: adScore >= 2 && involve(md.lord) >= 1 ? 'strong' : 'good',
-          why: `The ${ad.lord} phase — ${ad.lord} ${chart.planets[ad.lord].house && houses.includes(chart.planets[ad.lord].house) ? 'sits in' : 'runs'} this area`,
+          why: `${cap1(pname(ad.lord))}, which ${role(ad.lord)}, is in charge for these months — a sustained push for this area. Use it for the bigger moves.`,
         });
         continue;
       }
@@ -631,7 +699,7 @@ export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], 
             start: s < from ? from : s,
             end: e,
             strength: score >= 4 ? 'strong' : 'good',
-            why: `${it.lord} sub-phase${adScore ? ` inside the ${ad.lord} phase` : ''} — both connected to this area`,
+            why: `${cap1(pname(it.lord))}, which ${role(it.lord)}, is in charge for these weeks${adScore ? `, inside a ${pname(ad.lord)} phase that also ${role(ad.lord)}` : ''}. A short, focused window — schedule the important step here.`,
           });
         }
       }
@@ -647,7 +715,7 @@ export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], 
     const inside = houses.includes(h);
     if (inside && !segStart) segStart = day;
     if ((!inside || d + 5 > months * 30.44) && segStart) {
-      out.push({ start: segStart, end: day, strength: 'good', why: 'Jupiter, the planet of growth, moves through this area' });
+      out.push({ start: segStart, end: day, strength: 'good', why: 'Jupiter, the planet of growth, moves through this area — doors open more easily. Say yes to opportunities and ask for support.' });
       segStart = null;
     }
   }
@@ -739,20 +807,28 @@ export function topicReport(chart: ComprehensiveKundliResult, topicId: keyof typ
   const weakLord = ['Debilitated', 'Enemy'].includes(lp.dignity) && !cancelled;
 
   const savRank = allAreas(chart).sort((x, y) => y.points - x.points).findIndex((x) => x.house === main) + 1;
-  const standing = `Your ${T.title.toLowerCase()} area has ${a.points} support points (the average is 28), which puts it ${savRank <= 3 ? `among your three best-supported areas (${ORD(savRank)} of 12)` : savRank >= 10 ? `among your least-supported areas (${ORD(savRank)} of 12)` : `in the middle of your chart (${ORD(savRank)} of 12)`}.${
-    bb ? ` On the separate measure of house strength it ranks ${ORD(bb.rank)} of 12${(bb.rank <= 4) !== (savRank <= 4) ? ' — so the opportunity is there, but how much you get out of it depends on your effort' : ''}.` : ''
-  }`;
+  const standing =
+    (savRank <= 3
+      ? `Compared with the other parts of your life, ${T.title.toLowerCase()} is one of your three best-supported areas — effort here goes further than elsewhere, so it deserves a real share of your time.`
+      : savRank >= 10
+        ? `Compared with the other parts of your life, ${T.title.toLowerCase()} gets less built-in support. It is not closed to you — it simply needs more structure, patience and good advice than your stronger areas.`
+        : `Compared with the other parts of your life, ${T.title.toLowerCase()} sits in the middle — it gives back roughly what you put in.`) +
+    (bb && bb.rank <= 4 && savRank > 4
+      ? ' Its foundation is stronger than it first looks, so consistent effort can lift it well above average.'
+      : bb && bb.rank > 6 && savRank <= 4
+        ? ' The opportunities are plentiful, but they do not land by themselves — you have to act on them.'
+        : '');
 
   const how: string[] = [];
   how.push(
     lp.house === main
       ? `It is run by ${lord}, which sits in this very area — so you are directly in charge here. It responds to your own effort more than to luck or other people.`
-      : `It is run by ${lord === 'Rahu' || lord === 'Ketu' ? `the lunar node ${lord}` : lord}, which sits in your ${ORD(lp.house)} area — ${AREA_PLAYBOOK[lp.house].shows}. So what happens in those parts of your life feeds directly into your ${T.title.toLowerCase()} — look after them and this area follows.`
+      : `It is run by ${lord === 'Rahu' || lord === 'Ketu' ? `the lunar node ${lord}` : lord}, which lives in the part of your life about ${AREA_PLAYBOOK[lp.house].shows}. So that is your lever: look after those things and your ${T.title.toLowerCase()} follows. ${cap1(AREA_PLAYBOOK[lp.house].act[0])}.`
   );
   how.push(
     `${lord} ${DIGNITY_EFFECT[lp.dignity] ?? DIGNITY_EFFECT.Neutral}${cancelled ? ' — but a classical cancellation applies, so this weakness tends to turn into a strength with time' : ''}.${
-      sb ? ` It is number ${sb.rank} of 7 by overall strength.` : ''
-    }${vim ? ` Across your sixteen divisional charts it scores ${vim.shodashavarga.toFixed(1)} of 20 (${vim.grade}).` : ''}`
+      ' ' + strengthPlain(chart, lord, false).text
+    }${vim ? ` Looked at from every angle of your chart, it is ${{ excellent: 'consistently strong', good: 'mostly well placed', average: 'mixed', weak: 'often under pressure' }[vim.grade as string] ?? 'mixed'}.` : ''}`
   );
   if (occupants.length) {
     how.push(
@@ -785,6 +861,6 @@ export function topicReport(chart: ComprehensiveKundliResult, topicId: keyof typ
     actions,
     avoid: T.avoid,
     windows,
-    evidence: `${main}H ${chart.houses[main - 1].sign.name} · SAV ${a.points}${bb ? ` · Bhava Bala ${bb.totalRupas} Rp (rank ${bb.rank})` : ''} · lord ${lc.evidence}${vim ? ` · Vimshopaka ${vim.shodashavarga}` : ''}${occupants.length ? ` · occupants ${occupants.join(', ')}` : ''}`,
+    evidence: `${explainArea(chart, main)}${bb ? ` Bhava Bala (a separate classical measure of house strength, BPHS) is ${fix(bb.totalRupas)} rupas, rank ${bb.rank} of 12.` : ''} ${cap1(lc.evidence)}${vim ? ` Vimshopaka (how dignified ${lord} is across the 16 divisional charts, out of 20): ${vim.shodashavarga.toFixed(1)} — ${vim.grade}.` : ''}${occupants.length ? ` Planets inside the house: ${occupants.join(', ')}.` : ''}`,
   };
 }

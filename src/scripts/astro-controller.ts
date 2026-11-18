@@ -109,6 +109,7 @@ const deviceTimeZone = () => {
 
 /* ═══════════ Small render helpers ═══════════ */
 
+const lcFirst = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
 const ev = (text: string) => `<p class="lr-pro lr-ev">${esc(text)}</p>`;
 const meter = (level: I.Level) => `<span class="lr-meter" data-level="${level}" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`;
 const LEVEL_WORD: Record<I.Level, string> = { strong: 'Strong', good: 'Good', average: 'Moderate', low: 'Needs care' };
@@ -714,7 +715,7 @@ class LifeRhythm {
     const roadmap = (b: I.PhaseBrief) => `<ol class="lr-timeline mt-4" role="list">${b.roadmap
       .map((r) => {
         const isNow = r.start <= now && r.end > now;
-        return `<li class="${isNow ? 'is-now' : ''}"><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(shortDate(r.start))} – ${esc(shortDate(r.end))}${isNow ? ' · now' : ''}</p><p class="mt-1 text-[0.9375rem] text-ink"><strong class="font-medium">${esc(cap(r.area.name))}</strong> <span class="text-ink-500">— ${esc(C.AREA_PLAYBOOK[r.area.house].shows)}</span></p><p class="lr-pro lr-ev">${esc(`${b.lord}–${r.lord} pratyantardasha · ${r.lord} in H${r.area.house} (SAV ${r.area.points})`)}</p></div></li>`;
+        return `<li class="${isNow ? 'is-now' : ''}"><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(shortDate(r.start))} – ${esc(shortDate(r.end))}${isNow ? ' · now' : ''}</p><p class="mt-1 text-[0.9375rem] text-ink"><strong class="font-medium">${esc(cap(r.area.name))}</strong> <span class="text-ink-500">— ${esc(C.AREA_PLAYBOOK[r.area.house].shows)}</span></p><p class="lr-pro lr-ev">${esc(`${b.lord}–${r.lord} pratyantardasha (the third level of Vimshottari). ${r.lord} sits in your ${I.ORD(r.area.house)} house, which has ${r.area.points} Sarvashtakavarga points (28 is average).`)}</p></div></li>`;
       })
       .join('')}</ol>`;
 
@@ -808,16 +809,16 @@ class LifeRhythm {
         ${sectionHead('Three sides of you', 'Each comes from a different part of your chart.')}
         <div class="grid gap-5 md:grid-cols-3">
           ${card('Your natural energy', C.RISING[asc.sign.name], `Lagna ${asc.sign.name} ${asc.formattedDegree} · ${asc.nakshatra.name} ${asc.nakshatraPada}`, { kicker: 'How you come across' })}
-          ${card('How you handle stress', `${C.MOON_RESET[moon.sign.name].style} What helps: ${C.MOON_RESET[moon.sign.name].reset}`, `Moon ${moon.sign.name} ${moon.formattedDegree} · ${moon.nakshatra.name} ${moon.nakshatraPada} · ${moon.dignity}`, { kicker: 'Your inner world' })}
-          ${card('Where you shine', C.SUN_HOUSE[sun.house], `Sun ${sun.sign.name} ${sun.formattedDegree} · H${sun.house} · ${sun.dignity}`, { kicker: 'Your purpose' })}
+          ${card('How you handle stress', `${C.MOON_RESET[moon.sign.name].style} What helps: ${C.MOON_RESET[moon.sign.name].reset}`, I.explainPlanet(chart, 'Moon'), { kicker: 'Your inner world' })}
+          ${card('Where you shine', C.SUN_HOUSE[sun.house], I.explainPlanet(chart, 'Sun'), { kicker: 'Your purpose' })}
         </div>
       </section>`;
 
     const pillars: Array<[C.Pillar, string]> = [
-      [C.pillarAction(mars.sign.name, mars.isRetrograde), `Mars ${mars.sign.name} · H${mars.house}${mars.isRetrograde ? ' · R' : ''} · ${mars.dignity}`],
-      [C.pillarThinking(merc.sign.name, merc.isRetrograde), `Mercury ${merc.sign.name} · H${merc.house}${merc.isRetrograde ? ' · R' : ''} · ${merc.dignity}`],
-      [C.pillarLeadership(sun.house), `Sun ${sun.sign.name} · H${sun.house} · ${sun.dignity}`],
-      [C.pillarLongTerm(sat.house, sat.isRetrograde), `Saturn ${sat.sign.name} · H${sat.house}${sat.isRetrograde ? ' · R' : ''} · ${sat.dignity}`],
+      [C.pillarAction(mars.sign.name, mars.isRetrograde), I.explainPlanet(chart, 'Mars')],
+      [C.pillarThinking(merc.sign.name, merc.isRetrograde), I.explainPlanet(chart, 'Mercury')],
+      [C.pillarLeadership(sun.house), I.explainPlanet(chart, 'Sun')],
+      [C.pillarLongTerm(sat.house, sat.isRetrograde), I.explainPlanet(chart, 'Saturn')],
     ];
     const work = `
       ${intro('How you work', 'Four sides of how you get things done', 'How you act, think, lead and build for the long term — each based on a different planet in your chart.')}
@@ -851,7 +852,7 @@ class LifeRhythm {
       <section class="lr-section">
         ${sectionHead('Where life tends to flow most easily', 'The three areas of your life with the most built-in support.')}
         <div class="grid gap-5 md:grid-cols-3">
-          ${ext.best.map((x) => `<article class="lr-card"><div class="flex items-center justify-between gap-3"><p class="lr-label-sm">${LEVEL_WORD[x.level]}</p>${meter(x.level)}</div><h4 class="lr-h3 mt-2">${esc(x.name)}</h4><p class="mt-2 text-[0.9375rem] text-charcoal">${esc(x.about)}. ${x.points} support points — the average is 28.</p>${ev(`SAV H${x.house} = ${x.points}`)}</article>`).join('')}
+          ${ext.best.map((x) => `<article class="lr-card"><div class="flex items-center justify-between gap-3"><p class="lr-label-sm">${LEVEL_WORD[x.level]}</p>${meter(x.level)}</div><h4 class="lr-h3 mt-2">${esc(x.name)}</h4><p class="mt-2 text-[0.9375rem] text-charcoal">${esc(x.about)}. This is one of the parts of your life where effort goes furthest — ${esc(lcFirst(C.AREA_PLAYBOOK[x.house].act[0]))}.</p>${ev(I.explainArea(chart, x.house))}</article>`).join('')}
         </div>
       </section>
       ${supportive.length ? `<section class="lr-section">${sectionHead(`${supportive.length} special combinations in your chart`, 'Classical planetary combinations (yogas) found in your chart, graded by how strong the planets forming them are.')}<div class="grid gap-5 md:grid-cols-2">${supportive.map((y) => card(y.title!, y.use!, y.ev, { kicker: y.strength ? `${cap(y.strength)} · ${y.name}` : y.name })).join('')}</div></section>` : ''}
@@ -862,7 +863,7 @@ class LifeRhythm {
         <div class="mt-5 grid gap-5 md:grid-cols-2">
           ${ext.hardest.map((x) => {
             const l = C.LEAK[x.house];
-            return `<article class="lr-card-quiet"><p class="lr-label-sm">${esc(x.name)} · ${x.points} points</p><h4 class="lr-h3 mt-2">${esc(l.title)}</h4><p class="mt-2 text-[0.9375rem] text-charcoal">${esc(l.risk)}</p><div class="mt-4 rounded-xl bg-white p-4 text-[0.9375rem]"><span class="font-medium text-ink">What helps:</span> ${esc(l.fix)}</div>${ev(`SAV H${x.house} = ${x.points} (among lowest)`)}</article>`;
+            return `<article class="lr-card-quiet"><p class="lr-label-sm">${esc(x.name)}</p><h4 class="lr-h3 mt-2">${esc(l.title)}</h4><p class="mt-2 text-[0.9375rem] text-charcoal">${esc(l.risk)}</p><div class="mt-4 rounded-xl bg-white p-4 text-[0.9375rem]"><span class="font-medium text-ink">What helps:</span> ${esc(l.fix)}</div>${ev(I.explainArea(chart, x.house))}</article>`;
           }).join('')}
         </div>
         ${proBlock(table(['Graha', 'Sthana', 'Dig', 'Kala', 'Chesta', 'Naisarg.', 'Drik', 'Rupas', 'Req.', 'Ratio', 'Ishta', 'Kashta'], Object.values(chart.shadbala as Record<string, any>).map((s) => [esc(s.planet), s.sthanaBala.toFixed(1), s.digBala.toFixed(1), s.kaalaBala.toFixed(1), s.chestaBala.toFixed(1), s.naisargikaBala.toFixed(1), s.drikBala.toFixed(1), s.totalRupas.toFixed(2), s.requiredRupas.toFixed(1), s.strengthRatio.toFixed(2), String(s.ishtaPhala ?? '—'), String(s.kashtaPhala ?? '—')])), 'Pro detail · Shadbala (virupas, BPHS)')}
@@ -1083,9 +1084,9 @@ class LifeRhythm {
       <div class="mt-10 grid gap-5 md:grid-cols-2">
         <article class="lr-card"><p class="lr-label-sm">The theme of this year</p><h4 class="lr-h2 mt-2">${esc(cap(munthaArea.name))}</h4><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">The year’s focal point (Muntha) falls in your ${esc(munthaArea.name.toLowerCase())} area this year — ${esc(C.AREA_PLAYBOOK[v.muntha.house].shows)}. ${[6, 8, 12].includes(v.muntha.house) ? 'That is one of the more demanding positions, so pace yourself and keep a buffer.' : [1, 9, 10, 11].includes(v.muntha.house) ? 'That is one of the most supportive positions — a year to move things forward.' : 'A year to work steadily on this area.'}</p>
           <p class="lr-label-sm mt-6">Do this year</p>${list(C.AREA_PLAYBOOK[v.muntha.house].act)}
-          ${ev(`Muntha ${v.muntha.sign} · H${v.muntha.house} of the annual chart · lord ${v.muntha.lord}`)}</article>
+          ${ev(`Muntha is the year's progressed point: it starts in your Lagna sign at birth and moves one sign per year. This year it is in ${v.muntha.sign}, the ${I.ORD(v.muntha.house)} house of the year chart, ruled by ${v.muntha.lord}. Muntha in the 1st, 9th, 10th or 11th is read as supportive; in the 6th, 8th or 12th as demanding.`)}</article>
         <article class="lr-card"><p class="lr-label-sm">The planet in charge of this year</p><h4 class="lr-h2 mt-2">${esc(yl)}</h4><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">${esc(yl)} brings ${esc(I.PLANET_NATURE[yl].brings)} to this year, and works best through ${esc(I.PLANET_NATURE[yl].works)}. In the year chart it sits in your ${esc(C.LIFE_AREA[ylHouse].name.toLowerCase())} area. In your birth chart it is ${esc(ylNatal.phrase)}.</p>
-          ${ev(`Varsheshvara by Pancha-adhikari: ${v.candidates.map((c) => `${c.role} ${c.planet}${c.aspectsLagna ? ' (aspects)' : ''}`).join(' · ')}`)}</article>
+          ${ev(`The year lord (Varsheshvara) is chosen from five office-holders (Pancha-adhikari): the strongest of them that aspects the year chart's Lagna. Candidates: ${v.candidates.map((c) => `${c.role} ${c.planet}${c.aspectsLagna ? ' (aspects)' : ''}`).join(' · ')}`)}</article>
       </div>
       <section class="lr-section">
         ${sectionHead('Month by month', 'The year is split into nine periods — each lights up a different part of life.')}
@@ -1105,26 +1106,64 @@ class LifeRhythm {
     const chart = this.chart!;
     const now = new Date();
     const systems = [calculateYoginiDasha(chart, now), calculateCharaDasha(chart, now), calculateAshtottariDasha(chart, now)];
-    const meaning = (r: ReturnType<typeof calculateYoginiDasha>) => {
+    const SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+    const houseOfSign = (sign: string) => ((SIGNS.indexOf(sign) - chart.ascendant.sign.index + 12) % 12) + 1;
+    const houseOf = (r: ReturnType<typeof calculateYoginiDasha>, x: { label: string; lord?: I.PlanetKey }) =>
+      r.system === 'Chara' ? houseOfSign(x.label) : chart.planets[x.lord!].house;
+
+    // What the main (Vimshottari) timing currently highlights: where its two lords sit and what they rule.
+    const { mahadasha: md, antardasha: ad } = chart.dasha.currentDasha;
+    const vimAreas = new Set<number>([md.lord, ad.lord].flatMap((l) => [chart.planets[l].house, ...I.housesRuledBy(chart, l)]));
+    const names = { Yogini: 'Yogini cycle · 36 years', Chara: 'Jaimini sign cycle', Ashtottari: 'Ashtottari cycle · 108 years' };
+    const how = {
+      Yogini: 'Eight periods of 1 to 8 years (36 in all), each run by a planet. Your starting point comes from the star the Moon was in when you were born: (nakshatra number + 3) divided by 8, the remainder picks the first yogini; the part of that star the Moon had already crossed is treated as already used up.',
+      Chara: 'Jaimini’s Chara dasha (K.N. Rao method). Periods belong to signs, not planets, starting from your rising sign. A sign’s period in years is the count from that sign to the sign holding its ruler, minus one (12 if the ruler sits in the sign itself), counted forwards or backwards depending on the sign. Each period is split into 12 equal sub-periods, one per sign.',
+      Ashtottari: 'Eight planets (Ketu is left out) over 108 years, starting from the group of nakshatras your Moon was in. Classically it is used only when Rahu is in a kendra or trikona from the Lagna lord, and not in the Lagna itself.',
+    } as const;
+
+    const cardFor = (r: ReturnType<typeof calculateYoginiDasha>) => {
       const m = r.current.main;
-      if (r.system === 'Chara') {
-        const signIdx = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'].indexOf(m.label);
-        const house = ((signIdx - chart.ascendant.sign.index + 12) % 12) + 1;
-        return { area: C.LIFE_AREA[house], house };
-      }
-      const house = chart.planets[m.lord!].house;
-      return { area: C.LIFE_AREA[house], house };
+      const sb = r.current.sub;
+      const mh = houseOf(r, m);
+      const sh = sb ? houseOf(r, sb) : null;
+      const P = C.AREA_PLAYBOOK;
+      const agrees = vimAreas.has(mh) || (sh != null && vimAreas.has(sh));
+      const agreeArea = vimAreas.has(mh) ? mh : sh!;
+      const intro =
+        r.system === 'Chara'
+          ? `This period belongs to your ${C.LIFE_AREA[mh].name.toLowerCase()} sector, the part of your life about ${P[mh].shows}.`
+          : `${m.lord} runs this period. It brings ${I.PLANET_NATURE[m.lord!].brings} into the part of your life about ${P[mh].shows}.`;
+      const subLine = sb && sh
+        ? sh === mh
+          ? `Right now (until ${shortDate(sb.end)}) the focus sharpens on the same area — this is the most concentrated stretch of the period.`
+          : `Right now (until ${shortDate(sb.end)}) the focus narrows to ${C.LIFE_AREA[sh].name.toLowerCase()}: ${P[sh].shows}.`
+        : '';
+      const todo = [P[mh].act[0], sh && sh !== mh ? P[sh].act[0] : P[mh].act[1]];
+      const agreeHtml = r.applicable === false
+        ? `<p class="mt-4 rounded-xl bg-white px-4 py-3 text-sm text-ink-500"><span class="font-medium text-ink">Reference only.</span> The classical condition for using this system isn’t met in your chart, so ${agrees ? 'even though it points to the same area as your main timing, it doesn’t count as confirmation' : 'give it the least weight'}.</p>`
+        : agrees
+        ? `<p class="mt-4 rounded-xl bg-white px-4 py-3 text-sm text-ink"><span class="font-medium">Agrees with your main timing.</span> Your main timing system also points to ${esc(C.LIFE_AREA[agreeArea].name.toLowerCase())} right now — treat this as a confirmed theme and give it priority.</p>`
+        : `<p class="mt-4 rounded-xl bg-white px-4 py-3 text-sm text-ink-500"><span class="font-medium text-ink">A different emphasis.</span> Your main timing points elsewhere right now — treat this as a background theme, not your first priority.</p>`;
+      const subPro = sb && sh ? ` Current sub-period: ${sb.label}${sb.lord && sb.lord !== sb.label ? ` (${sb.lord})` : ''}, your ${I.ORD(sh)} house, ${fmtISO(sb.start)} to ${fmtISO(sb.end)}.` : '';
+      const mainPro = r.system === 'Chara'
+        ? `Current period: ${m.label}, your ${I.ORD(mh)} house, ${fmtISO(m.start)} to ${fmtISO(m.end)} (${m.years} years).`
+        : `Current period: ${m.label}${m.lord && m.lord !== m.label ? ` (ruled by ${m.lord})` : ''}, ${fmtISO(m.start)} to ${fmtISO(m.end)} (${m.years.toFixed(m.years % 1 ? 2 : 0)} years). ${m.lord} sits in your ${I.ORD(mh)} house.`;
+      const vimPro = ` Agreement check: the current Vimshottari ${md.lord}–${ad.lord} period activates houses ${[...vimAreas].sort((x, y) => x - y).join(', ')} (where the two lords sit and what they rule); this system's period${sh ? 's are' : ' is'} in house ${mh}${sh && sh !== mh ? ` and ${sh}` : ''}.`;
+      return `<article class="${r.applicable === false ? 'lr-card-quiet' : 'lr-card'}">
+        <p class="lr-label-sm">${esc(names[r.system])}</p>
+        <h4 class="lr-h3 mt-2">${esc(cap(C.LIFE_AREA[mh].name))} <span class="font-normal text-ink-500">· until ${esc(fmtMonthYear(m.end))}</span></h4>
+        <p class="mt-3 text-[0.9375rem] leading-relaxed text-charcoal">${esc(intro)} ${esc(subLine)}</p>
+        <p class="mt-4 text-sm font-medium text-ink">What to do with it</p>
+        <ul class="mt-2 list-disc space-y-1 pl-5 text-[0.9375rem] text-charcoal">${todo.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+        ${agreeHtml}
+        ${ev(`${how[r.system]} ${mainPro}${subPro}${r.note ? ` ${r.note}` : ''}${vimPro}`)}
+      </article>`;
     };
-    const names = { Yogini: 'Yogini (36-year cycle)', Chara: 'Jaimini Chara (sign-based)', Ashtottari: 'Ashtottari (108-year cycle)' };
+    const agreeing = systems.filter((r) => r.applicable !== false && (vimAreas.has(houseOf(r, r.current.main)) || (r.current.sub ? vimAreas.has(houseOf(r, r.current.sub)) : false))).length;
     return `
-      ${intro('Other systems', 'A second and third opinion on timing', 'Classical astrology uses several independent timing systems. When they point to the same area of life at the same time, that theme is especially reliable.')}
-      <div class="mt-10 grid gap-5 md:grid-cols-3">
-        ${systems.map((r) => {
-          const mm = meaning(r);
-          return `<article class="${r.applicable === false ? 'lr-card-quiet' : 'lr-card'}"><p class="lr-label-sm">${esc(names[r.system])}</p><h4 class="lr-h3 mt-2">${esc(cap(mm.area.name))}</h4><p class="mt-2 text-[0.9375rem] leading-relaxed text-charcoal">Until ${esc(longDate(r.current.main.end))} this system highlights ${esc(C.AREA_PLAYBOOK[mm.house].shows)}.${r.current.sub ? ` Within it, the current sub-period runs until ${esc(shortDate(r.current.sub.end))}.` : ''}</p>${r.applicable === false ? `<p class="mt-3 text-sm text-ink-500">Shown for reference — the classical condition for using this system isn’t met in your chart.</p>` : ''}${ev(`${r.system}: ${r.current.main.label}${r.current.main.lord ? ` (${r.current.main.lord})` : ''} ${fmtISO(r.current.main.start)} → ${fmtISO(r.current.main.end)}${r.current.sub ? ` · sub ${r.current.sub.label}` : ''}${r.note ? ` · ${r.note}` : ''}`)}</article>`;
-        }).join('')}
-      </div>
-      ${proBlock(systems.map((r) => `<p class="lr-pro-tag mt-4">${esc(r.system)}</p>${table(['Period', 'Start', 'End', 'Years'], r.periods.slice(0, 16).map((x) => [`${esc(x.label)}${x.lord && x.lord !== x.label ? ` <span class="muted">${esc(x.lord)}</span>` : ''}`, fmtISO(x.start), fmtISO(x.end), x.years.toFixed(2)]), (i) => (r.periods[i] === r.current.main ? 'is-now' : ''))}`).join(''), 'Pro detail · Yogini, Chara, Ashtottari')}`;
+      ${intro('Other systems', 'A second and third opinion on timing', `Astrology has several independent ways of timing life. Your main timing (shown under “This chapter”) uses one of them. Here three others check it. ${agreeing >= 2 ? `Right now ${agreeing} of them agree with your main timing — so its themes are especially reliable.` : agreeing === 1 ? 'Right now one of them agrees with your main timing; the others add background themes.' : 'Right now they point to other areas than your main timing — treat those as background themes, and keep your main timing as your guide.'}`)}
+      <div class="mt-10 grid gap-5 lg:grid-cols-3">${systems.map(cardFor).join('')}</div>
+      ${proBlock(systems.map((r) => `<p class="lr-pro-tag mt-4">${esc(r.system)}</p>${table(['Period', 'House', 'Start', 'End', 'Years'], r.periods.slice(0, 16).map((x) => [`${esc(x.label)}${x.lord && x.lord !== x.label ? ` <span class="muted">${esc(x.lord)}</span>` : ''}`, String(houseOf(r, x)), fmtISO(x.start), fmtISO(x.end), x.years.toFixed(2)]), (i) => (r.periods[i] === r.current.main ? 'is-now' : ''))}`).join(''), 'Pro detail · Yogini, Chara, Ashtottari (house = counted from your Lagna)')}`;
   }
 
   /* ═══════════ PEOPLE ═══════════ */
