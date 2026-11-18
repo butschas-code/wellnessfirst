@@ -272,6 +272,9 @@ export interface ComprehensiveKundliResult {
   upagrahas: any; // Gulika, Mandi, Dhuma, etc.
   aspects: any; // Vedic Drishtis (special aspects)
   yogas: any[]; // Detected classical Yogas
+  extendedYogas?: import('./predictive/yogas-extended.ts').ExtendedYoga[];
+  vimshopaka?: Record<string, import('./core/vimshopaka-bhava.ts').VimshopakaResult>;
+  bhavaBala?: import('./core/vimshopaka-bhava.ts').BhavaBalaResult[];
   dasha: VimshottariDashaResult;
   doshas: DoshaAnalysis;
   elementBalance: {

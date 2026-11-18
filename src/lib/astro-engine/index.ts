@@ -17,6 +17,12 @@ import { calculateGocharaTransits } from './predictive/transits.ts';
 import { calculatePanchang } from './panchang/panchang.ts';
 import { calculateChoghadiya } from './panchang/choghadiya.ts';
 import { calculateSolarDay, calculateTimedChoghadiya, calculateDayMuhurats } from './panchang/solar-day.ts';
+import { detectExtendedYogas } from './predictive/yogas-extended.ts';
+import { calculateVimshopaka, calculateBhavaBala } from './core/vimshopaka-bhava.ts';
+import { calculateYoginiDasha, calculateAshtottariDasha, calculateCharaDasha } from './predictive/dasha-systems.ts';
+import { calculateVarshaphal, solarReturn } from './annual/varshaphal.ts';
+import { calculateKPAnalysis, calculateRulingPlanets, placidusCusps } from './core/kp-system.ts';
+import { findMuhurtas, MUHURTA_RULES } from './predictive/muhurta.ts';
 import { calculateAshtakoota } from './matching/ashtakoota.ts';
 import { calculateElementBalance, generateTempoGuidance } from './wellness/tempo.ts';
 import { calculatePrashnaKundli } from './prashna/prashna.ts';
@@ -125,8 +131,11 @@ export function calculateJanamKundli(
   // 11. Vedic Aspects (Special Drishtis)
   const aspects = calculateVedicAspects(planets);
 
-  // 12. Classical Yogas
+  // 12. Classical Yogas (core set + extended library graded by Shadbala)
+  const extendedYogas = detectExtendedYogas(ascendant, planets, shadbala as any);
   const yogas = detectYogas(ascendant, planets);
+  const vimshopaka = calculateVimshopaka(planets);
+  const bhavaBala = calculateBhavaBala(ascendant, planets, shadbala as any);
 
   // 13. Deep 5-Level Vimshottari Dasha
   const dasha = calculateVimshottariDasha(planets.Moon.siderealLongitude, date, targetDate);
@@ -165,6 +174,9 @@ export function calculateJanamKundli(
     upagrahas,
     aspects,
     yogas,
+    extendedYogas,
+    vimshopaka,
+    bhavaBala,
     dasha,
     doshas,
     elementBalance,
@@ -195,6 +207,20 @@ export {
   calculateDerivedChart,
   calculateProgenyAnalysis,
   calculateRelationalSynastry,
+  detectExtendedYogas,
+  calculateVimshopaka,
+  calculateBhavaBala,
+  calculateYoginiDasha,
+  calculateAshtottariDasha,
+  calculateCharaDasha,
+  calculateVarshaphal,
+  solarReturn,
+  calculateKPAnalysis,
+  calculateRulingPlanets,
+  placidusCusps,
+  findMuhurtas,
+  MUHURTA_RULES,
+  calculatePlanetaryPositions,
 };
 
 export {
@@ -207,3 +233,9 @@ export {
 export * from './types.ts';
 export * from './core/constants.ts';
 export type { SolarDay, TimedSlot, DayMuhurats } from './panchang/solar-day.ts';
+export type { ExtendedYoga } from './predictive/yogas-extended.ts';
+export type { VimshopakaResult, BhavaBalaResult } from './core/vimshopaka-bhava.ts';
+export type { DashaSystemResult, GenericPeriod } from './predictive/dasha-systems.ts';
+export type { VarshaphalResult, MuddaPeriod } from './annual/varshaphal.ts';
+export type { KPAnalysis, KPCusp, KPSignificators, RulingPlanets } from './core/kp-system.ts';
+export type { MuhurtaActivity, MuhurtaWindow } from './predictive/muhurta.ts';

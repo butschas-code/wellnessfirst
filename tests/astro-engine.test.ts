@@ -13,6 +13,17 @@ import {
   calculateTimedChoghadiya,
 } from '../src/lib/astro-engine/index.ts';
 import { trueNode, meanNode } from '../src/lib/astro-engine/core/precision.ts';
+import {
+  calculateYoginiDasha,
+  calculateAshtottariDasha,
+  calculateCharaDasha,
+  calculateVarshaphal,
+  calculateKPAnalysis,
+  calculateRulingPlanets,
+  placidusCusps,
+  findMuhurtas,
+  calculatePlanetaryPositions,
+} from '../src/lib/astro-engine/index.ts';
 
 console.log('=== Running Full Vedic Astronomical Engine Verification ===\n');
 
@@ -185,4 +196,57 @@ assert.strictEqual(rigaSlots[0].name, 'Rog'); // Tuesday day sequence starts wit
 console.log(`   - Sunrise ${rigaTime(riga.solarDay!.sunrise)}, sunset ${rigaTime(riga.solarDay!.sunset)}, Rahu Kalam ${riga.muhurats.rahuKalam.start}–${riga.muhurats.rahuKalam.end}`);
 console.log('   ✓ Sunrise-based timings verified.\n');
 
-console.log('=== All 15 Astro Engine Systems Passed ===');
+// 16. Dasha correctness + additional systems
+console.log('16. Testing dasha systems (Vimshottari first-period fix, Yogini, Ashtottari, Chara):');
+const ref = calculateJanamKundli({ date: new Date(Date.UTC(1992, 5, 21, 7, 45)), latitude: 51.5074, longitude: -0.1278, timezone: 1, targetDate: new Date('2026-11-18') });
+const md0 = ref.dasha.mahadashas[0];
+const yrs = (md0.endDate.getTime() - md0.startDate.getTime()) / (365.2425 * 86400000);
+assert(Math.abs(yrs - 18) < 1e-6, 'first Mahadasha keeps its full length (starts before birth)');
+const adSum = md0.antardashas!.reduce((t, a) => t + a.durationYears, 0);
+assert(Math.abs(adSum - 18) < 1e-6, 'antardashas keep classical lengths');
+const yog = calculateYoginiDasha(ref, new Date('2026-11-18'));
+assert.strictEqual(yog.periods[0].label, 'Dhanya'); // Shatabhisha (24): (24+3) mod 8 = 3 → Dhanya
+const asht = calculateAshtottariDasha(ref, new Date('2026-11-18'));
+assert.strictEqual(asht.periods[0].label, 'Jupiter'); // Shatabhisha belongs to Jupiter's group
+const chara = calculateCharaDasha(ref, new Date('2026-11-18'));
+assert.strictEqual(chara.periods[0].label, ref.ascendant.sign.name);
+console.log('   ✓ Vimshottari, Yogini, Ashtottari and Chara verified.\n');
+
+// 17. Varshaphal
+console.log('17. Testing Varshaphal:');
+const vp = calculateVarshaphal(ref, new Date('2026-11-18'));
+const sunAtReturn = calculatePlanetaryPositions(vp.pravesha, 0).Sun.siderealLongitude;
+assert(Math.abs(sunAtReturn - ref.planets.Sun.siderealLongitude) * 3600 < 1, 'solar return within 1 arc-second');
+assert.strictEqual(vp.age, 34);
+assert.strictEqual(vp.muntha.sign, 'Taurus'); // Cancer lagna + 34 years
+assert.strictEqual(vp.mudda.length, 9);
+console.log(`   - Varsha Pravesha ${vp.pravesha.toISOString()} · year lord ${vp.yearLord}`);
+console.log('   ✓ Varshaphal verified.\n');
+
+// 18. KP
+console.log('18. Testing KP (Placidus, significators, ruling planets):');
+const cusps = placidusCusps(ref.birthDetails.date, 51.5074, -0.1278);
+assert(Math.abs(cusps[0] - ref.ascendant.siderealLongitude) < 1e-6, 'cusp 1 = ascendant');
+assert(Math.abs(cusps[9] - ref.ascendant.midheavenSidereal!) < 1e-6, 'cusp 10 = MC');
+const kpa = calculateKPAnalysis(ref.birthDetails.date, 51.5074, -0.1278, ref.planets);
+assert.strictEqual(kpa.significators.length, 12);
+const rp = calculateRulingPlanets(new Date('2026-11-17T22:20:00Z'), 56.95, 24.1, 'Europe/Riga');
+assert.strictEqual(rp.dayLord, 'Mars'); // 00:20 Wed in Riga is still Tuesday's Vedic day
+console.log('   ✓ KP verified.\n');
+
+// 19. Strength measures and yogas
+console.log('19. Testing Vimshopaka, Bhava Bala and extended yogas:');
+for (const v of Object.values(ref.vimshopaka!)) assert(v.shodashavarga >= 1 && v.shodashavarga <= 20);
+assert.strictEqual(ref.bhavaBala!.length, 12);
+assert(ref.extendedYogas!.some((y) => y.name === 'Yogakaraka' && y.planets[0] === 'Mars'), 'Mars is yogakaraka for Cancer lagna');
+console.log('   ✓ Vimshopaka, Bhava Bala and yoga library verified.\n');
+
+// 20. Muhurta
+console.log('20. Testing muhurta finder:');
+const mu = findMuhurtas(ref, 'venture', { from: new Date('2026-11-18'), days: 60, latitude: 56.95, longitude: 24.1, timeZone: 'Europe/Riga' });
+assert(mu.length > 0 && mu.every((w) => w.score >= 60));
+assert(mu.every((w) => ![4, 9, 14].includes(((w.tithiNumber - 1) % 15) + 1) || w.score < 70));
+console.log(`   - Best: ${mu[0].start.toISOString()} score ${mu[0].score} (${mu[0].nakshatra}, ${mu[0].tithi})`);
+console.log('   ✓ Muhurta finder verified.\n');
+
+console.log('=== All 20 Astro Engine Systems Passed ===');

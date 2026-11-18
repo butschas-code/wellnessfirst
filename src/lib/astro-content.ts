@@ -677,3 +677,91 @@ export const RESET_STEPS = [
   { title: 'Clear your space', text: 'Tidy your desk, clear notifications and simplify your surroundings. Outer order helps inner calm.' },
   { title: 'Do one kind thing', text: 'Help someone quietly, without needing credit. It shifts your attention and lifts your mood.' },
 ];
+
+/* ═══════════ Concrete actions per life area (used for phase briefs) ═══════════ */
+
+export interface AreaPlaybook {
+  /** What typically comes up in this area, concretely. */
+  shows: string;
+  /** Things to do when this area is activated. */
+  act: [string, string, string];
+  /** Things to finish/close when a phase that activated this area ends. */
+  close: string;
+  /** Typical risk when this area is under-supported. */
+  risk: string;
+}
+
+export const AREA_PLAYBOOK: Record<number, AreaPlaybook> = {
+  1: {
+    shows: 'your health, appearance, confidence and how you present yourself',
+    act: ['Set one clear personal goal for the phase and tell someone about it', 'Book the health check-ups you have been postponing', 'Refresh how you present yourself — CV, profile photo, wardrobe'],
+    close: 'Finish personal projects you started for yourself before switching focus',
+    risk: 'running on willpower and neglecting sleep and recovery',
+  },
+  2: {
+    shows: 'income, savings, pricing, family finances and the way you speak',
+    act: ['Review your income streams and raise prices or ask for a raise if overdue', 'Set up an automatic monthly transfer into savings', 'Clean up family money arrangements and shared household costs'],
+    close: 'Close or consolidate unused accounts and settle small debts',
+    risk: 'money slipping away through unplanned spending',
+  },
+  3: {
+    shows: 'writing, marketing, short trips, siblings, neighbours and taking initiative',
+    act: ['Start publishing or pitching — a newsletter, posts, proposals', 'Take a short course to sharpen a practical skill', 'Reconnect with siblings or close peers'],
+    close: 'Send the drafts and follow-ups that are still sitting unsent',
+    risk: 'scattering energy across too many small initiatives',
+  },
+  4: {
+    shows: 'home, property, family, your mother, inner peace and vehicles',
+    act: ['Fix or improve your home — repairs, a calmer bedroom, a proper workspace', 'Look at property, rent or moving options if they are on your mind', 'Spend regular, unhurried time with family'],
+    close: 'Finish home repairs and paperwork for property or rental agreements',
+    risk: 'work stress spilling into home life',
+  },
+  5: {
+    shows: 'children, creativity, romance, study, ideas and calculated risks',
+    act: ['Give a creative project a regular weekly slot', 'Invest time in children or in mentoring younger people', 'Test one new idea small before committing to it'],
+    close: 'Complete or shelve open creative projects so they don’t drain you',
+    risk: 'over-investing in untested ideas',
+  },
+  6: {
+    shows: 'daily work, routines, health habits, colleagues, debts and disputes',
+    act: ['Fix one daily habit — sleep time, a walk, meal times', 'Tidy your work systems: to-do lists, admin, inbox', 'Resolve open disputes or debts directly rather than letting them drag'],
+    close: 'Clear outstanding admin, small debts and unresolved conflicts',
+    risk: 'admin and small problems piling up',
+  },
+  7: {
+    shows: 'your partner, business partners, clients, contracts and agreements',
+    act: ['Have the open conversation about expectations with your partner or co-workers', 'Put important agreements in writing', 'Choose collaborators deliberately — fewer, better'],
+    close: 'Formalise or properly end partnerships that are in limbo',
+    risk: 'giving too much in relationships or agreeing to vague terms',
+  },
+  8: {
+    shows: 'big changes, joint finances, insurance, taxes, inheritance, research and anything hidden',
+    act: ['Review joint money, insurance, tax and debts — read the small print', 'Make one overdue change you have been avoiding', 'Go deep on a subject: research, therapy, serious study'],
+    close: 'Settle shared financial matters, insurance and tax paperwork',
+    risk: 'being caught off guard by changes or shared obligations',
+  },
+  9: {
+    shows: 'higher learning, beliefs, teachers, long-distance travel, law and publishing',
+    act: ['Enrol in a serious course or find a mentor', 'Plan a meaningful long-distance trip', 'Write down the principles you want to live and work by'],
+    close: 'Complete studies or certifications already in progress',
+    risk: 'arguing principles with people who only think short-term',
+  },
+  10: {
+    shows: 'career, reputation, responsibility, your boss and public standing',
+    act: ['Take on a visible project or ask for more responsibility', 'Update your CV and professional profiles', 'Have a career conversation with whoever decides your next step'],
+    close: 'Hand over or wrap up work projects cleanly so your reputation carries forward',
+    risk: 'carrying a lot of responsibility without enough support',
+  },
+  11: {
+    shows: 'friends, networks, communities, income from work and long-term goals',
+    act: ['Reconnect with your network — three meaningful conversations a month', 'Join or build a community around a goal', 'Write down your 3-year goals and review them monthly'],
+    close: 'Collect what you are owed and thank the people who helped you',
+    risk: 'spreading yourself thin socially',
+  },
+  12: {
+    shows: 'rest, sleep, retreat, spending, foreign places and letting go',
+    act: ['Protect sleep and schedule real downtime', 'Review spending and cut what no longer adds value', 'Consider time abroad, a retreat or a period of quiet focus'],
+    close: 'Let go of commitments, possessions and habits that have run their course',
+    risk: 'restless nights and money leaking away',
+  },
+};

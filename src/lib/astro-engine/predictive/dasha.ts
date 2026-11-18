@@ -36,14 +36,17 @@ export function calculateVimshottariDasha(
   const birthBalanceYears = birthLordCycleItem.years * fractionRemaining;
 
   const mahadashas: DashaPeriod[] = [];
-  let currentPointer = new Date(birthDate.getTime());
+  // The first Mahadasha began before birth: its elapsed part is (1 − fraction remaining) of its full length.
+  // Starting from that true start keeps every Antardasha at its classical full length.
+  const elapsedYears = birthLordCycleItem.years - birthBalanceYears;
+  let currentPointer = new Date(birthDate.getTime() - elapsedYears * MS_PER_YEAR);
 
   // Generate 120 years of Mahadashas starting from birth lord
   for (let i = 0; i < VIMSHOTTARI_DASHA_CYCLE.length; i++) {
     const cycleIndex = (cycleStartIndex + i) % VIMSHOTTARI_DASHA_CYCLE.length;
     const item = VIMSHOTTARI_DASHA_CYCLE[cycleIndex];
 
-    const durationYears = i === 0 ? birthBalanceYears : item.years;
+    const durationYears = item.years;
     const durationMs = durationYears * MS_PER_YEAR;
     const endDate = new Date(currentPointer.getTime() + durationMs);
 
@@ -64,7 +67,7 @@ export function calculateVimshottariDasha(
       const adItem = VIMSHOTTARI_DASHA_CYCLE[adIndex];
 
       const nominalAdYears = (item.years * adItem.years) / 120;
-      const effectiveAdYears = (durationYears / item.years) * nominalAdYears;
+      const effectiveAdYears = nominalAdYears;
       const adMs = effectiveAdYears * MS_PER_YEAR;
       const adEnd = new Date(adPointer.getTime() + adMs);
 

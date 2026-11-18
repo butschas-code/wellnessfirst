@@ -11,7 +11,8 @@ import { calculatePlanetaryPositions } from './astro-engine/core/ephemeris.ts';
 import { apparentBody, earthTilt, trueNode, norm360 } from './astro-engine/core/precision.ts';
 import { calculateLahiriAyanamsha } from './astro-engine/core/ayanamsha.ts';
 import { ZODIAC_SIGNS, NAKSHATRAS } from './astro-engine/core/constants.ts';
-import { LIFE_AREA } from './astro-content.ts';
+import { LIFE_AREA, AREA_PLAYBOOK } from './astro-content.ts';
+import { VIMSHOTTARI_DASHA_CYCLE } from './astro-engine/core/constants.ts';
 
 export type Level = 'strong' | 'good' | 'average' | 'low';
 
@@ -488,3 +489,302 @@ export function childrenFindings(chart: ComprehensiveKundliResult) {
 }
 
 export { NAKSHATRAS, SEVEN };
+
+/* ═══════════ Phase brief: specific, dated and actionable ═══════════ */
+
+const ORD = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`;
+const YEAR = 365.2425 * 86_400_000;
+
+export interface PhaseBrief {
+  lord: PlanetName;
+  start: Date;
+  end: Date;
+  /** Life areas this phase activates: where the lord sits first, then what it rules. */
+  areas: Array<AreaSupport & { role: 'sits in' | 'rules' }>;
+  why: string;
+  strength: string;
+  actions: string[];
+  close: string[];
+  risk: string | null;
+  roadmap: Array<{ lord: PlanetName; start: Date; end: Date; area: AreaSupport }>;
+  evidence: string;
+}
+
+export function phaseBrief(chart: ComprehensiveKundliResult, period: DashaPeriod): PhaseBrief {
+  const cond = planetCondition(chart, period.lord);
+  const sits = { ...areaSupport(chart, cond.house), role: 'sits in' as const };
+  const rules = cond.rules.filter((h) => h !== cond.house).map((h) => ({ ...areaSupport(chart, h), role: 'rules' as const }));
+  const areas = [sits, ...rules];
+  const word = period.lord === 'Rahu' ? 'the north node (Rahu)' : period.lord === 'Ketu' ? 'the south node (Ketu)' : `${period.lord}`;
+  const why =
+    `This phase is run by ${word}. In your chart it sits in your ${ORD(sits.house)} area — ${AREA_PLAYBOOK[sits.house].shows}` +
+    (rules.length ? `, and it is in charge of your ${rules.map((r) => `${ORD(r.house)} area (${AREA_PLAYBOOK[r.house].shows})`).join(' and your ')}` : '') +
+    '. Those are the parts of life that move to the front.';
+
+  const sb = (chart.shadbala as Record<string, any>)[period.lord];
+  const pos = chart.planets[period.lord];
+  const strength = sb
+    ? `${period.lord} is ${sb.rank === 1 ? 'the strongest planet' : sb.rank === 7 ? 'the weakest planet' : `the ${ORD(sb.rank)}-strongest of the 7 planets`} in your chart (${Math.round(sb.strengthRatio * 100)}% of the strength it needs) and sits ${DIGNITY_PLAIN[pos.dignity] ?? 'in neutral territory'}. ${
+        sb.strengthRatio >= 1.2 ? 'Expect this phase to deliver when you put effort in.' : sb.strengthRatio >= 1 ? 'It has enough strength to deliver with steady effort.' : 'It is under-powered, so results come slower — plan for that and don’t over-commit.'
+      }`
+    : `The nodes take on the results of the area they sit in. Your ${ORD(sits.house)} area has ${sits.points} support points (average 28), so ${sits.points >= 28 ? 'this phase has solid ground to work with' : 'expect to work harder for results here'}.`;
+
+  const actions = areas.slice(0, 2).flatMap((a) => AREA_PLAYBOOK[a.house].act.slice(0, a.role === 'sits in' ? 2 : 1));
+  if (actions.length < 3 && areas[0]) actions.push(AREA_PLAYBOOK[areas[0].house].act[2]);
+  const close = areas.map((a) => AREA_PLAYBOOK[a.house].close);
+  const weakest = [...areas].sort((a, b) => a.points - b.points)[0];
+  const risk = weakest && weakest.points < 28 ? `Your ${ORD(weakest.house)} area has only ${weakest.points} support points, so watch out for ${AREA_PLAYBOOK[weakest.house].risk}.` : null;
+
+  // Sub-phases (pratyantardashas) inside this period, each with its main area.
+  const startIdx = VIMSHOTTARI_DASHA_CYCLE.findIndex((c) => c.lord === period.lord);
+  const roadmap: PhaseBrief['roadmap'] = [];
+  let t = period.startDate.getTime();
+  for (let i = 0; i < 9; i++) {
+    const it = VIMSHOTTARI_DASHA_CYCLE[(startIdx + i) % 9];
+    const ms = ((period.durationYears * it.years) / 120) * YEAR;
+    roadmap.push({ lord: it.lord, start: new Date(t), end: new Date(t + ms), area: areaSupport(chart, chart.planets[it.lord].house) });
+    t += ms;
+  }
+
+  return {
+    lord: period.lord,
+    start: period.startDate,
+    end: period.endDate,
+    areas,
+    why,
+    strength,
+    actions,
+    close,
+    risk,
+    roadmap,
+    evidence: `${cond.evidence} · ${areas.map((a) => `SAV H${a.house}=${a.points}`).join(', ')}`,
+  };
+}
+
+/* ═══════════ Life-area reports: specific, dated, actionable ═══════════ */
+
+/** What each planet brings to any area it occupies or runs — concrete behavioural effects. */
+export const PLANET_NATURE: Record<PlanetName, { brings: string; works: string }> = {
+  Sun: { brings: 'visibility, authority and pride', works: 'leading openly and owning decisions; it struggles under micromanagement' },
+  Moon: { brings: 'feelings, care, the public and fluctuation', works: 'rhythm and emotional safety; results rise and fall in cycles' },
+  Mars: { brings: 'drive, competition, conflict and speed', works: 'direct action and clear targets; it overheats without an outlet' },
+  Mercury: { brings: 'communication, analysis, trade and skills', works: 'writing things down, negotiating and learning; it scatters when overloaded' },
+  Jupiter: { brings: 'growth, wisdom, teachers and generosity', works: 'learning, mentoring and long-term plans; it overpromises when unchecked' },
+  Venus: { brings: 'relationships, comfort, beauty and value', works: 'quality, charm and fair exchange; it avoids conflict too long' },
+  Saturn: { brings: 'discipline, delay, duty and endurance', works: 'patience and systems; results come slowly but last' },
+  Rahu: { brings: 'ambition, the unconventional, technology and foreign links', works: 'bold, new approaches; it creates restlessness and overreach' },
+  Ketu: { brings: 'detachment, depth, research and sudden endings', works: 'specialist depth and letting go; it can make you disengage' },
+};
+
+const DIGNITY_EFFECT: Record<string, string> = {
+  Exalted: 'is at its very strongest here — this is a genuine asset to build on deliberately',
+  Moolatrikona: 'is in one of its most comfortable positions — reliable, consistent results',
+  OwnSign: 'is in its own sign — you have natural command over this area',
+  Friendly: 'is in a friendly sign — things work with modest effort',
+  Neutral: 'is in a neutral sign — results match the effort you put in',
+  Enemy: 'is in an uncomfortable sign — expect friction; structure and good advisers compensate',
+  Debilitated: 'is in its weakest sign — early efforts are often undervalued, so build proof, allies and patience',
+};
+
+export interface TimingWindow {
+  start: Date;
+  end: Date;
+  strength: 'strong' | 'good';
+  why: string;
+}
+
+/** Dated windows in the next `months` when these houses are activated by dasha sub-periods or Jupiter's transit. */
+export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], from: Date, months = 24): TimingWindow[] {
+  const to = new Date(from.getTime() + months * 30.44 * 86_400_000);
+  const involve = (p: PlanetName) => {
+    const sits = houses.includes(chart.planets[p].house) ? 2 : 0;
+    const rules = housesRuledBy(chart, p).some((h) => houses.includes(h)) ? 1 : 0;
+    return sits + rules;
+  };
+  const out: TimingWindow[] = [];
+  for (const md of chart.dasha.mahadashas) {
+    if (md.endDate < from || md.startDate > to) continue;
+    for (const ad of md.antardashas ?? []) {
+      if (ad.endDate < from || ad.startDate > to) continue;
+      const adScore = involve(ad.lord);
+      if (adScore >= 2 || (adScore >= 1 && involve(md.lord) >= 1)) {
+        out.push({
+          start: ad.startDate < from ? from : ad.startDate,
+          end: ad.endDate,
+          strength: adScore >= 2 && involve(md.lord) >= 1 ? 'strong' : 'good',
+          why: `The ${ad.lord} phase — ${ad.lord} ${chart.planets[ad.lord].house && houses.includes(chart.planets[ad.lord].house) ? 'sits in' : 'runs'} this area`,
+        });
+        continue;
+      }
+      // Pratyantardashas inside this antardasha
+      const i0 = VIMSHOTTARI_DASHA_CYCLE.findIndex((c) => c.lord === ad.lord);
+      let t = ad.startDate.getTime();
+      for (let i = 0; i < 9; i++) {
+        const it = VIMSHOTTARI_DASHA_CYCLE[(i0 + i) % 9];
+        const ms = ((ad.durationYears * it.years) / 120) * YEAR;
+        const s = new Date(t), e = new Date(t + ms);
+        t += ms;
+        if (e < from || s > to) continue;
+        const score = adScore + involve(it.lord) + (involve(md.lord) ? 1 : 0);
+        if (involve(it.lord) >= 2 || (involve(it.lord) >= 1 && score >= 2)) {
+          out.push({
+            start: s < from ? from : s,
+            end: e,
+            strength: score >= 4 ? 'strong' : 'good',
+            why: `${it.lord} sub-phase${adScore ? ` inside the ${ad.lord} phase` : ''} — both connected to this area`,
+          });
+        }
+      }
+    }
+  }
+  // Jupiter transiting any of these houses (counted from the Lagna)
+  const ascIdx = chart.ascendant.sign.index;
+  let segStart: Date | null = null;
+  for (let d = 0; d <= months * 30.44; d += 5) {
+    const day = new Date(from.getTime() + d * 86_400_000);
+    const L = siderealLongitude('Jupiter', day);
+    const h = ((Math.floor(L / 30) - ascIdx + 12) % 12) + 1;
+    const inside = houses.includes(h);
+    if (inside && !segStart) segStart = day;
+    if ((!inside || d + 5 > months * 30.44) && segStart) {
+      out.push({ start: segStart, end: day, strength: 'good', why: 'Jupiter, the planet of growth, moves through this area' });
+      segStart = null;
+    }
+  }
+  return out.sort((a, b) => a.start.getTime() - b.start.getTime());
+}
+
+export interface TopicReport {
+  id: string;
+  title: string;
+  verdict: string;
+  standing: string;
+  how: string[];
+  actions: string[];
+  avoid: string;
+  windows: TimingWindow[];
+  evidence: string;
+}
+
+interface TopicDef {
+  id: string;
+  title: string;
+  houses: number[];
+  karaka: PlanetName;
+  karakaRole: string;
+  actions: [string, string, string, string];
+  weakFix: string;
+  avoid: string;
+}
+
+export const TOPICS: Record<string, TopicDef> = {
+  career: {
+    id: 'career', title: 'Career & reputation', houses: [10, 6], karaka: 'Saturn', karakaRole: 'stamina for long-term work',
+    actions: ['Pick one visible project this quarter that shows your best skill, and own it end to end', 'Book a career conversation with the person who decides your next step — bring three concrete results', 'Keep a running “wins” document; update it every Friday', 'Block two mornings a week for deep work on the thing that builds your reputation'],
+    weakFix: 'Partner with someone whose strengths cover yours, and let results — not self-promotion — speak first',
+    avoid: 'Taking on responsibility without the authority or support to deliver it',
+  },
+  money: {
+    id: 'money', title: 'Money & savings', houses: [2, 11], karaka: 'Jupiter', karakaRole: 'judgement about growth and abundance',
+    actions: ['Automate a fixed transfer to savings on payday — start with 10%', 'List every income source and price; raise the most underpriced one this quarter', 'Keep three to six months of expenses in an easy-access account before taking any investment risk', 'Review subscriptions and recurring costs every quarter'],
+    weakFix: 'Use rules, not willpower — automatic saving and a 48-hour pause before any unplanned purchase over a set amount',
+    avoid: 'Decisions made under time pressure or social pressure',
+  },
+  relationships: {
+    id: 'relationships', title: 'Relationships & partnership', houses: [7], karaka: 'Venus', karakaRole: 'warmth and the capacity to enjoy closeness',
+    actions: ['Schedule one unhurried, phone-free evening a week with your partner or closest person', 'Say expectations out loud — money, time, chores, plans — rather than assuming', 'Put business partnerships and big shared purchases in writing', 'When conflict comes up, settle first, then talk — never in the heat of it'],
+    weakFix: 'Choose fewer, better people, and be explicit early about what you need',
+    avoid: 'Keeping the peace by staying silent about things that matter to you',
+  },
+  health: {
+    id: 'health', title: 'Energy & vitality', houses: [1, 6], karaka: 'Sun', karakaRole: 'core vitality and resilience',
+    actions: ['Fix your wake-up time — the same time every day, weekends included', 'Get 10 minutes of daylight outdoors within an hour of waking', 'Move every day: 30 minutes, whatever form you enjoy', 'Set a hard stop for work and screens in the evening'],
+    weakFix: 'Treat recovery as a scheduled appointment, not something you do when there is time left',
+    avoid: 'Running on caffeine and willpower through tired phases',
+  },
+  home: {
+    id: 'home', title: 'Home & family', houses: [4], karaka: 'Moon', karakaRole: 'emotional security',
+    actions: ['Make one room or corner of your home genuinely calm and clutter-free', 'Have a regular family meal or call — same day, every week', 'Sort property, rent and household paperwork in one sitting', 'Keep work out of the bedroom'],
+    weakFix: 'Build stability through routine rather than waiting for the perfect home',
+    avoid: 'Letting work stress spill into home life',
+  },
+  children: {
+    id: 'children', title: 'Children & creativity', houses: [5], karaka: 'Jupiter', karakaRole: 'patience and guidance',
+    actions: ['Give a creative project a fixed weekly slot, however small', 'Spend 20 minutes of undivided attention with a child or mentee each day', 'Test new ideas small before you invest heavily', 'Learn something just for the joy of it'],
+    weakFix: 'Keep creative bets small and frequent rather than big and rare',
+    avoid: 'Pouring time or money into an untested idea all at once',
+  },
+  learning: {
+    id: 'learning', title: 'Learning, travel & growth', houses: [9, 3], karaka: 'Jupiter', karakaRole: 'wisdom and good teachers',
+    actions: ['Commit to one structured course or qualification this year', 'Find a mentor who is five to ten years ahead of you', 'Plan one meaningful trip that teaches you something', 'Write down the principles you want to work and live by'],
+    weakFix: 'Learn in small, consistent doses with a clear end goal',
+    avoid: 'Collecting courses and ideas without applying them',
+  },
+};
+
+export function topicReport(chart: ComprehensiveKundliResult, topicId: keyof typeof TOPICS, from: Date = new Date()): TopicReport {
+  const T = TOPICS[topicId];
+  const main = T.houses[0];
+  const a = areaSupport(chart, main);
+  const bb = chart.bhavaBala?.find((b) => b.house === main);
+  const lord = chart.houses[main - 1].sign.lord;
+  const lp = chart.planets[lord];
+  const lc = planetCondition(chart, lord);
+  const sb = (chart.shadbala as Record<string, any>)[lord];
+  const vim = chart.vimshopaka?.[lord];
+  const cancelled = chart.extendedYogas?.some((y) => y.name === 'Neechabhanga Raja Yoga' && y.planets.includes(lord));
+  const occupants = chart.houses[main - 1].planets as PlanetName[];
+  const kc = planetCondition(chart, T.karaka);
+  const strongArea = (bb ? bb.rank <= 4 : false) || a.points >= 30;
+  const weakLord = ['Debilitated', 'Enemy'].includes(lp.dignity) && !cancelled;
+
+  const savRank = allAreas(chart).sort((x, y) => y.points - x.points).findIndex((x) => x.house === main) + 1;
+  const standing = `Your ${T.title.toLowerCase()} area has ${a.points} support points (the average is 28), which puts it ${savRank <= 3 ? `among your three best-supported areas (${ORD(savRank)} of 12)` : savRank >= 10 ? `among your least-supported areas (${ORD(savRank)} of 12)` : `in the middle of your chart (${ORD(savRank)} of 12)`}.${
+    bb ? ` On the separate measure of house strength it ranks ${ORD(bb.rank)} of 12${(bb.rank <= 4) !== (savRank <= 4) ? ' — so the opportunity is there, but how much you get out of it depends on your effort' : ''}.` : ''
+  }`;
+
+  const how: string[] = [];
+  how.push(
+    lp.house === main
+      ? `It is run by ${lord}, which sits in this very area — so you are directly in charge here. It responds to your own effort more than to luck or other people.`
+      : `It is run by ${lord === 'Rahu' || lord === 'Ketu' ? `the lunar node ${lord}` : lord}, which sits in your ${ORD(lp.house)} area — ${AREA_PLAYBOOK[lp.house].shows}. So what happens in those parts of your life feeds directly into your ${T.title.toLowerCase()} — look after them and this area follows.`
+  );
+  how.push(
+    `${lord} ${DIGNITY_EFFECT[lp.dignity] ?? DIGNITY_EFFECT.Neutral}${cancelled ? ' — but a classical cancellation applies, so this weakness tends to turn into a strength with time' : ''}.${
+      sb ? ` It is number ${sb.rank} of 7 by overall strength.` : ''
+    }${vim ? ` Across your sixteen divisional charts it scores ${vim.shodashavarga.toFixed(1)} of 20 (${vim.grade}).` : ''}`
+  );
+  if (occupants.length) {
+    how.push(
+      occupants
+        .map((p) => `${p} sits right in this area, bringing ${PLANET_NATURE[p].brings} — it works best through ${PLANET_NATURE[p].works}.`)
+        .join(' ')
+    );
+  }
+  how.push(`${T.karaka}, the natural indicator of ${T.karakaRole}, is ${kc.phrase}.`);
+
+  const actions = [...T.actions.slice(0, 3)];
+  if (weakLord || !strongArea) actions.push(T.weakFix);
+  else actions.push(T.actions[3]);
+
+  const verdict = strongArea && !weakLord
+    ? 'A strong area for you — invest here deliberately.'
+    : strongArea && weakLord
+      ? 'Well supported, but its guiding planet works against itself — structure and allies unlock it.'
+      : !strongArea && !weakLord
+        ? 'Moderate support — consistent effort beats big pushes here.'
+        : 'Less naturally supported — small, steady steps and good advice make the difference.';
+
+  const windows = areaWindows(chart, T.houses, from, 24).slice(0, 4);
+  return {
+    id: T.id,
+    title: T.title,
+    verdict,
+    standing,
+    how,
+    actions,
+    avoid: T.avoid,
+    windows,
+    evidence: `${main}H ${chart.houses[main - 1].sign.name} · SAV ${a.points}${bb ? ` · Bhava Bala ${bb.totalRupas} Rp (rank ${bb.rank})` : ''} · lord ${lc.evidence}${vim ? ` · Vimshopaka ${vim.shodashavarga}` : ''}${occupants.length ? ` · occupants ${occupants.join(', ')}` : ''}`,
+  };
+}

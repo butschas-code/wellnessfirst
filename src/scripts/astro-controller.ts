@@ -23,6 +23,14 @@ import {
   calculateDerivedChart,
   calculateProgenyAnalysis,
   processAstroQuestion,
+  calculateYoginiDasha,
+  calculateAshtottariDasha,
+  calculateCharaDasha,
+  calculateVarshaphal,
+  calculateKPAnalysis,
+  calculateRulingPlanets,
+  findMuhurtas,
+  type MuhurtaActivity,
   type ComprehensiveKundliResult,
   type ElementType,
   type DashaPeriod,
@@ -44,6 +52,8 @@ import {
 } from '../lib/astro-copy.ts';
 import * as C from '../lib/astro-content.ts';
 import * as I from '../lib/astro-insights.ts';
+import { t as tr, LANGS, type Lang } from '../lib/astro-i18n.ts';
+import { chartSvg, type ChartStyle } from './astro-charts.ts';
 import {
   type GeocodedPlace,
   type UserBirthProfile,
@@ -54,6 +64,7 @@ import {
   SAMPLE_PARTNER,
   storageGet,
   storageSet,
+  searchGlobalPlaces,
   buildUtcDate,
   offsetForLocal,
   esc,
@@ -77,13 +88,27 @@ import {
 } from './astro-ui.ts';
 
 const TODAY_PLACE_KEY = 'wfg_astro_today_place';
+const PROFILES_KEY = 'wfg_astro_profiles';
+const LANG_KEY = 'wfg_astro_lang';
+const STYLE_KEY = 'wfg_astro_chart_style';
+let LANG: Lang = 'en';
 
 interface TodayPlace {
   name: string;
   latitude: number;
   longitude: number;
   timeZone: string;
+  /** How we know: chosen by the user, their exact position, their device time zone, or the birth place. */
+  source?: 'chosen' | 'gps' | 'device' | 'birth';
 }
+
+const deviceTimeZone = () => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+};
 
 /* ═══════════ Small render helpers ═══════════ */
 
@@ -122,13 +147,56 @@ function sectionHead(title: string, subText?: string) {
 /** Sub-navigation: pills that switch between sub-sections inside a tab. */
 function subnav(tab: string, items: Array<[string, string]>, active: string) {
   return `<nav class="lr-subnav" aria-label="${esc(tab)} sections">${items
-    .map(([id, label]) => `<button type="button" data-sub="${id}" aria-pressed="${id === active}">${esc(label)}</button>`)
+    .map(([id, label]) => `<button type="button" data-sub="${id}" aria-pressed="${id === active}">${esc(tr(label, LANG))}</button>`)
     .join('')}</nav>`;
 }
 const sub = (id: string, active: string, html: string) =>
   `<div class="lr-sub" data-sub-panel="${id}" ${id === active ? '' : 'hidden'}>${html}</div>`;
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const shortDate = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+/** Quiet invitation to a one-to-one consultation. */
+function consultCta(topic: string, line?: string) {
+  return `<aside class="lr-cta">
+    <div>
+      <p class="lr-label-sm">Go deeper</p>
+      <p class="mt-1.5 text-[0.9875rem] leading-relaxed text-charcoal">${esc(line ?? `Want this turned into a plan for your exact situation? In a one-to-one consultation we go through your ${topic} with you — your questions, your timing, your next steps.`)}</p>
+    </div>
+    <a class="btn-secondary shrink-0" href="/consultations" data-lr-cta="${esc(topic)}">Book a consultation</a>
+  </aside>`;
+}
+
+/** A full life-area report: standing, mechanism, actions, dated timing, what to avoid. */
+function reportHtml(r: I.TopicReport, opts: { cta?: boolean } = {}) {
+  const win = r.windows.length
+    ? `<ul class="mt-3 grid gap-3" role="list">${r.windows
+        .map((w) => `<li class="flex flex-wrap items-baseline gap-x-3 gap-y-1"><span class="lr-pill ${w.strength === 'strong' ? 'lr-tone-good' : 'lr-tone-steady'} !py-0.5 !text-[0.7rem]">${w.strength === 'strong' ? 'Strong' : 'Good'}</span><span class="font-medium tabular-nums text-ink">${esc(shortDate(w.start))} – ${esc(shortDate(w.end))}</span><span class="text-sm text-ink-500">${esc(w.why)}</span></li>`)
+        .join('')}</ul>`
+    : '<p class="mt-3 text-[0.9375rem] text-charcoal">No strong activation in the next two years — a time for steady maintenance rather than big moves here.</p>';
+  return `<article class="lr-card lr-report">
+    <p class="lr-label-sm">${esc(r.title)}</p>
+    <h4 class="lr-h2 mt-2">${esc(r.verdict)}</h4>
+    <p class="mt-3 max-w-3xl text-[0.9875rem] leading-relaxed text-charcoal">${esc(r.standing)}</p>
+    <div class="mt-7 grid gap-8 lg:grid-cols-2">
+      <div>
+        <p class="lr-label-sm">How it works for you</p>
+        <ul class="lr-list" role="list">${r.how.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
+      </div>
+      <div>
+        <p class="lr-label-sm">Do this</p>
+        <ol class="mt-3 grid gap-3" role="list">${r.actions.map((a, i) => `<li class="grid grid-cols-[1.75rem_1fr] gap-2 text-[0.9375rem] leading-relaxed text-ink"><span class="lr-num !h-6 !w-6 !text-[0.65rem]">${i + 1}</span><span>${esc(a)}</span></li>`).join('')}</ol>
+        <div class="mt-5 rounded-xl bg-warm-cream p-4 text-[0.9375rem]"><span class="font-medium text-ink">Avoid:</span> ${esc(r.avoid)}</div>
+      </div>
+    </div>
+    <div class="mt-7 border-t border-line pt-6">
+      <p class="lr-label-sm">Your timing for this — next 24 months</p>
+      ${win}
+    </div>
+    ${ev(r.evidence)}
+    ${opts.cta ? consultCta(r.title.toLowerCase()) : ''}
+  </article>`;
+}
 const longDate = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 /* ═══════════ Controller ═══════════ */
@@ -145,8 +213,11 @@ class LifeRhythm {
   private partnerPlace: GeocodedPlace | null = null;
   private timePicker: TimePicker | null = null;
   private todayPlace: TodayPlace | null = null;
+  private autoPlace: TodayPlace | null = null;
   private mode: 'simple' | 'pro' = 'simple';
   private tab: Tab = 'today';
+  private chartStyle: ChartStyle = 'north';
+  private varga = 'D1';
   private subs: Record<string, string> = { today: 'overview', you: 'profile', seasons: 'chapter', people: 'partner', decide: 'ask' };
 
   private app = document.getElementById('lr-app') as HTMLElement;
@@ -157,6 +228,9 @@ class LifeRhythm {
     this.bindIntake();
     this.bindChrome();
     this.setMode(storageGet<string>(MODE_KEY) === 'pro' ? 'pro' : 'simple', false);
+    this.chartStyle = (storageGet<string>(STYLE_KEY) as ChartStyle) || 'north';
+    this.bindHeaderTools();
+    this.setLang((storageGet<string>(LANG_KEY) as Lang) || 'en', false);
     this.todayPlace = storageGet<TodayPlace>(TODAY_PLACE_KEY);
 
     const saved = storageGet<UserBirthProfile>(STORAGE_KEY);
@@ -297,11 +371,98 @@ class LifeRhythm {
     }
   }
 
+  /* ─── Header tools: profiles, language, PDF ─── */
+
+  private profiles(): UserBirthProfile[] {
+    return storageGet<UserBirthProfile[]>(PROFILES_KEY) ?? [];
+  }
+
+  private saveProfile(p: UserBirthProfile) {
+    const key = (x: UserBirthProfile) => `${x.name}|${x.birthDate}|${x.birthTime}|${x.cityName}`;
+    const list = this.profiles().filter((x) => key(x) !== key(p));
+    list.unshift(p);
+    storageSet(PROFILES_KEY, list.slice(0, 20));
+    this.renderProfileSwitch();
+  }
+
+  private renderProfileSwitch() {
+    const sel = document.getElementById('lr-profile-switch') as HTMLSelectElement | null;
+    if (!sel) return;
+    const list = this.profiles();
+    sel.innerHTML =
+      list.map((x, i) => `<option value="${i}">${esc(x.name || 'Unnamed')} · ${esc(fmtBirthDate(x.birthDate))}</option>`).join('') +
+      `<option value="add">＋ ${esc(tr('Add someone', LANG))}</option>`;
+    sel.value = '0';
+    sel.closest<HTMLElement>('[data-lr-profiles]')!.hidden = list.length === 0;
+  }
+
+  private bindHeaderTools() {
+    const sel = document.getElementById('lr-profile-switch') as HTMLSelectElement | null;
+    sel?.addEventListener('change', () => {
+      if (sel.value === 'add') {
+        (document.getElementById('lr-form') as HTMLFormElement).reset();
+        this.place = null;
+        this.timePicker?.set('12:00');
+        document.getElementById('lr-intake')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sel.value = '0';
+        return;
+      }
+      const p = this.profiles()[Number(sel.value)];
+      if (p) {
+        this.fillForm(p);
+        this.run(p, false);
+      }
+    });
+    const langSel = document.getElementById('lr-lang') as HTMLSelectElement | null;
+    if (langSel) {
+      langSel.innerHTML = LANGS.map((l) => `<option value="${l.id}">${esc(l.label)}</option>`).join('');
+      langSel.addEventListener('change', () => this.setLang(langSel.value as Lang));
+    }
+    document.getElementById('lr-print')?.addEventListener('click', () => this.printReport());
+    window.addEventListener('afterprint', () => this.app.classList.remove('lr-printing'));
+    this.renderProfileSwitch();
+  }
+
+  private setLang(lang: Lang, persist = true) {
+    LANG = lang;
+    if (persist) storageSet(LANG_KEY, lang);
+    const langSel = document.getElementById('lr-lang') as HTMLSelectElement | null;
+    if (langSel) langSel.value = lang;
+    document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
+      el.dataset.i18nSrc ??= el.textContent?.trim() ?? '';
+      el.textContent = tr(el.dataset.i18nSrc, lang);
+    });
+    const note = document.getElementById('lr-lang-note');
+    if (note) {
+      note.hidden = lang === 'en';
+      note.textContent = tr('Readings are written in English for now.', lang);
+    }
+    this.app.setAttribute('lang', lang);
+    if (this.chart) {
+      this.renderToday();
+      this.renderYou();
+      this.renderSeasons();
+      this.renderPeople();
+      this.renderDecide();
+    }
+    this.renderProfileSwitch();
+  }
+
+  /** Print-ready report of every section (the browser's “Save as PDF”). */
+  private printReport() {
+    this.app.classList.add('lr-printing');
+    this.app.querySelectorAll('details').forEach((d) => d.setAttribute('open', ''));
+    const stamp = document.getElementById('lr-print-stamp');
+    if (stamp) stamp.textContent = `Life Rhythm report · ${this.profile?.name || 'Personal'} · created ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} · wellnessfirstglobal.com`;
+    window.setTimeout(() => window.print(), 50);
+  }
+
   /* ─── Run ─── */
 
   private run(profile: UserBirthProfile, scroll: boolean) {
     this.profile = profile;
     storageSet(STORAGE_KEY, profile);
+    this.saveProfile(profile);
     this.chart = this.compute(profile);
     this.partnerChart = this.partner ? this.compute(this.partner) : null;
     this.renderHeader();
@@ -314,6 +475,7 @@ class LifeRhythm {
     this.results.hidden = false;
     this.setTab(this.mode === 'simple' && this.tab === 'chart' ? 'today' : this.tab, false);
     if (scroll) this.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    void this.resolveAutoPlace();
   }
 
   private compute(p: UserBirthProfile): ComprehensiveKundliResult {
@@ -330,11 +492,53 @@ class LifeRhythm {
     note.textContent = 'Without a birth time we’ve used midday. Your life chapters are still reliable; your rising sign, life areas and daily details are approximate.';
   }
 
-  /** Where the person is today (for sunrise-based hours). Defaults to the birth place. */
+  /**
+   * Where the person is today (for sunrise-based hours).
+   * Priority: their choice / exact position → their device's time zone city → their birth place.
+   */
   private place4Today(): TodayPlace {
     if (this.todayPlace) return this.todayPlace;
+    if (this.autoPlace) return this.autoPlace;
     const p = this.profile!;
-    return { name: p.cityName, latitude: p.latitude, longitude: p.longitude, timeZone: p.ianaTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone };
+    return { name: p.cityName, latitude: p.latitude, longitude: p.longitude, timeZone: p.ianaTimezone || deviceTimeZone(), source: 'birth' };
+  }
+
+  /** If the device is in a different time zone from the birth place, use the time zone's city (e.g. Europe/Riga → Riga). */
+  private async resolveAutoPlace() {
+    if (this.todayPlace || this.autoPlace) return;
+    const tz = deviceTimeZone();
+    if (!this.profile || tz === this.profile.ianaTimezone || !tz.includes('/')) return;
+    const city = tz.split('/').pop()!.replace(/_/g, ' ');
+    try {
+      const hits = await searchGlobalPlaces(city);
+      const hit = hits.find((h) => h.timezone === tz) ?? hits[0];
+      if (!hit) return;
+      this.autoPlace = { name: [hit.name, hit.country].filter(Boolean).join(', '), latitude: hit.latitude, longitude: hit.longitude, timeZone: hit.timezone, source: 'device' };
+      this.renderToday();
+      this.renderDecide();
+    } catch {
+      /* offline — keep the birth place */
+    }
+  }
+
+  private locationBar(loc: TodayPlace) {
+    const why = {
+      chosen: 'the place you chose',
+      gps: 'your current position',
+      device: 'your device’s time zone',
+      birth: 'your birth place — change it if you live somewhere else',
+    }[loc.source ?? 'chosen'];
+    return `
+      <div class="mb-8 flex flex-wrap items-center gap-3" data-lr-locbar>
+        <span class="lr-loc">Times for <strong class="font-medium">${esc(loc.name.split(',')[0])}</strong><button type="button" data-lr-loc-change>Change</button></span>
+        <span class="text-sm text-ink-500">Based on ${esc(why)}.</span>
+        ${'geolocation' in navigator && loc.source !== 'gps' ? '<button type="button" class="lr-textbtn" data-lr-loc-gps>Use my exact location</button>' : ''}
+      </div>
+      <div class="relative -mt-4 mb-8 hidden max-w-md" data-lr-loc-form>
+        <label for="lr-today-place" class="lr-label">Where are you today?</label>
+        <input id="lr-today-place" class="input-wfg" autocomplete="off" placeholder="Start typing a town or city" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lr-today-place-list" />
+        <div id="lr-today-place-list" class="lr-places !top-full mt-1" role="listbox" hidden></div>
+      </div>`;
   }
 
   private timeIn(d: Date, tz: string) {
@@ -365,7 +569,12 @@ class LifeRhythm {
     const keyMu = keyPanchang.muhuratTimes!;
     const keySlots = afterSunset ? calculateTimedChoghadiya(keySolar) : slots;
     const firstPeople = keySlots.find((s) => s.isDay && s.end > now && (s.name === 'Shubh' || s.name === 'Amrit' || s.name === 'Labh'));
-    const keyWhen = afterSunset ? 'Tomorrow · ' : '';
+    // Label the windows by calendar date in the user's time zone (a Vedic day runs sunrise to sunrise,
+    // so after midnight the coming daylight is still "today" on the calendar).
+    const calDay = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: loc.timeZone });
+    const keyDateLabel = keySolar.sunrise.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: loc.timeZone });
+    const keyIsToday = calDay(keySolar.sunrise) === calDay(now);
+    const keyWhen = afterSunset ? (keyIsToday ? 'Later today · ' : 'Tomorrow · ') : '';
 
     const overview = `
       ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. The Moon is moving through your area of ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()} — so that is a natural focus today.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}
@@ -395,7 +604,7 @@ class LifeRhythm {
       </div>
 
       <section class="lr-section">
-        ${sectionHead(afterSunset ? 'Tomorrow’s key windows' : 'Today’s key windows', `From the real sunrise (${t(keySolar.sunrise)}) and sunset (${t(keySolar.sunset)}) in ${town}.`)}
+        ${sectionHead(`Key windows · ${keyIsToday ? 'today, ' : 'tomorrow, '}${keyDateLabel}`, `From the real sunrise (${t(keySolar.sunrise)}) and sunset (${t(keySolar.sunset)}) in ${town}.`)}
         <div class="grid gap-5 md:grid-cols-3">
           ${card(`${t(keyMu.abhijitMuhurat.start)} – ${t(keyMu.abhijitMuhurat.end)}`, 'Around local noon — a strong window for important decisions and starting things.', 'Abhijit muhurta (8th of 15 daytime muhurtas)', { kicker: `${keyWhen}Best for decisions` })}
           ${firstPeople ? card(`${t(firstPeople.start)} – ${t(firstPeople.end)}`, `${HOURS[firstPeople.name].label}: ${HOURS[firstPeople.name].tip.toLowerCase()}.`, `${firstPeople.name} choghadiya`, { kicker: `${keyWhen}Good for people` }) : card('Later', 'The best daytime windows for meetings have passed.', undefined, { kicker: 'Good for people' })}
@@ -425,6 +634,7 @@ class LifeRhythm {
     const a = this.subs.today;
     panel.innerHTML =
       subnav('Today', [['overview', 'Today'], ['hours', 'Best hours'], ['ahead', 'Coming up'], ['travel', 'Travel'], ['reset', 'Reset plan']], a) +
+      this.locationBar(loc) +
       sub('overview', a, overview) +
       sub('hours', a, this.hoursHtml(slots, solar, loc, now)) +
       sub('ahead', a, this.comingUpHtml()) +
@@ -454,17 +664,10 @@ class LifeRhythm {
           .join('')
       : `<p class="text-[0.9875rem] leading-relaxed text-charcoal">The strongest periods of this day have passed. Wind down — tomorrow brings a fresh set.</p>`;
 
+    const dl = (d: Date) => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: loc.timeZone });
     return `
-      ${intro('Best hours', 'When to do what today', 'Each day and night is split into eight equal parts, based on the real sunrise and sunset where you are. Some parts suit focus or people; others suit quieter work.')}
-      <div class="mt-8 flex flex-wrap items-center gap-3">
-        <span class="lr-loc">Times for <strong class="font-medium">${esc(loc.name.split(',')[0])}</strong> <button type="button" data-lr-loc-change>Change</button></span>
-        ${solar.isApproximate ? '<span class="text-sm text-ink-500">The sun doesn’t rise or set here today, so a 6am–6pm day is used.</span>' : ''}
-      </div>
-      <div class="relative mt-4 hidden max-w-md" data-lr-loc-form>
-        <label for="lr-today-place" class="lr-label">Where are you today?</label>
-        <input id="lr-today-place" class="input-wfg" autocomplete="off" placeholder="Start typing a town or city" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lr-today-place-list" />
-        <div id="lr-today-place-list" class="lr-places !top-full mt-1" role="listbox" hidden></div>
-      </div>
+      ${intro('Best hours', 'When to do what', `This traditional day runs from sunrise to sunrise: ${dl(solar.sunrise)} ${t(solar.sunrise)} until ${dl(solar.nextSunrise)} ${t(solar.nextSunrise)}. Daytime and night-time are each split into eight equal parts. Some suit focus or people; others suit quieter work.`)}
+      ${solar.isApproximate ? '<p class="mt-6 text-sm text-ink-500">The sun doesn’t rise or set here today, so a 6am–6pm day is used.</p>' : ''}
       <div class="lr-card mt-6">
         <div class="lr-ribbon !flex" role="img" aria-label="Today from sunrise to the next sunrise">
           ${ribbon}
@@ -506,11 +709,24 @@ class LifeRhythm {
       form.classList.remove('hidden');
       input.focus();
     });
+    const apply = (place: TodayPlace) => {
+      this.todayPlace = place;
+      storageSet(TODAY_PLACE_KEY, place);
+      this.renderToday();
+      this.renderDecide();
+    };
     attachPlaceSearch(input, listEl, (p) => {
       if (!p) return;
-      this.todayPlace = { name: [p.name, p.country].filter(Boolean).join(', '), latitude: p.latitude, longitude: p.longitude, timeZone: p.timezone };
-      storageSet(TODAY_PLACE_KEY, this.todayPlace);
-      this.renderToday();
+      apply({ name: [p.name, p.country].filter(Boolean).join(', '), latitude: p.latitude, longitude: p.longitude, timeZone: p.timezone, source: 'chosen' });
+    });
+    panel.querySelector<HTMLButtonElement>('[data-lr-loc-gps]')?.addEventListener('click', (e) => {
+      const b = e.currentTarget as HTMLButtonElement;
+      b.textContent = 'Finding you…';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => apply({ name: 'Your location', latitude: pos.coords.latitude, longitude: pos.coords.longitude, timeZone: deviceTimeZone(), source: 'gps' }),
+        () => (b.textContent = 'Location not available — choose a city instead'),
+        { maximumAge: 3_600_000, timeout: 10_000 }
+      );
     });
   }
 
@@ -526,22 +742,46 @@ class LifeRhythm {
     }
     const days = Math.max(0, Math.round((ad.endDate.getTime() - now.getTime()) / 86_400_000));
     const countdown = days > 60 ? `in about ${Math.round(days / 30.4)} months` : `in ${days} days`;
-    const cur = C.PERIOD_THEME[ad.lord];
-    const nxt = next ? C.PERIOD_THEME[next.lord] : null;
-    const nextInsight = next ? I.chapterInsight(chart, next) : null;
+    const curB = I.phaseBrief(chart, ad);
+    const nextB = next ? I.phaseBrief(chart, next) : null;
+    const areaList = (b: I.PhaseBrief) => b.areas.map((x) => x.name.toLowerCase()).join(' and ');
+    const roadmap = (b: I.PhaseBrief) => `<ol class="lr-timeline mt-4" role="list">${b.roadmap
+      .map((r) => {
+        const isNow = r.start <= now && r.end > now;
+        return `<li class="${isNow ? 'is-now' : ''}"><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(shortDate(r.start))} – ${esc(shortDate(r.end))}${isNow ? ' · now' : ''}</p><p class="mt-1 text-[0.9375rem] text-ink"><strong class="font-medium">${esc(cap(r.area.name))}</strong> <span class="text-ink-500">— ${esc(C.AREA_PLAYBOOK[r.area.house].shows)}</span></p><p class="lr-pro lr-ev">${esc(`${b.lord}–${r.lord} pratyantardasha · ${r.lord} in H${r.area.house} (SAV ${r.area.points})`)}</p></div></li>`;
+      })
+      .join('')}</ol>`;
 
     return `
-      ${intro('Coming up', `Your focus shifts ${countdown}`, `Right now your focus is on ${cur.title.toLowerCase()}. On ${longDate(ad.endDate)} a new phase begins.`)}
-      <div class="lr-feature mt-10">
-        <p class="lr-label-sm !text-white/60">Next phase · from ${esc(longDate(ad.endDate))}</p>
-        <p class="mt-2 font-display text-3xl font-medium">${esc(nxt?.title ?? '—')}</p>
-        <p class="mt-4 max-w-2xl text-[0.9875rem] leading-relaxed text-white/85">Your focus moves towards ${esc(nxt?.incoming ?? '')}.${nextInsight ? ` In your chart it plays out mainly in your area of ${esc(nextInsight.stage.name.toLowerCase())}. ${esc(nextInsight.supportText)}` : ''}</p>
-        ${nextInsight ? `<p class="lr-pro lr-ev !text-white/70">${esc(nextInsight.evidence)}</p>` : ''}
+      ${intro('Coming up', `Your focus shifts ${countdown}`, `Until ${longDate(ad.endDate)} the spotlight is on ${areaList(curB)}. Then ${nextB ? areaList(nextB) : 'a new area'} move${nextB && nextB.areas.length === 1 ? 's' : ''} to the centre.`)}
+
+      <div class="lr-card mt-10">
+        <p class="lr-label-sm">Right now · until ${esc(longDate(ad.endDate))}</p>
+        <h4 class="lr-h2 mt-2">${esc(cap(areaList(curB)))}</h4>
+        <p class="mt-3 max-w-3xl text-[0.9875rem] leading-relaxed text-charcoal">${esc(curB.why)}</p>
+        <p class="mt-3 max-w-3xl text-[0.9875rem] leading-relaxed text-charcoal">${esc(curB.strength)}</p>
+        <div class="mt-6 grid gap-8 lg:grid-cols-2">
+          <div><p class="lr-label-sm">Make the most of the time left</p>${list(curB.actions)}</div>
+          <div><p class="lr-label-sm">Finish before ${esc(ad.endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }))}</p>${list(curB.close)}${curB.risk ? `<div class="mt-4 rounded-xl bg-warm-cream p-4 text-[0.9375rem]"><span class="font-medium text-ink">Watch out:</span> ${esc(curB.risk)}</div>` : ''}</div>
+        </div>
+        <details class="mt-6"><summary class="cursor-pointer font-medium text-ink">The smaller phases inside this one</summary>${roadmap(curB)}</details>
+        ${ev(curB.evidence)}
       </div>
-      <div class="mt-5 grid gap-5 md:grid-cols-2">
-        <div class="lr-card"><p class="lr-label-sm">Before ${esc(ad.endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }))}</p>${list(C.WRAP_UP)}</div>
-        <div class="lr-card-quiet"><p class="lr-label-sm">How to prepare</p><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">${esc(C.SEASON[ad.lord].prepare)}</p></div>
+
+      ${nextB ? `<div class="lr-feature mt-5">
+        <p class="lr-label-sm !text-white/60">Next phase · ${esc(longDate(nextB.start))} – ${esc(longDate(nextB.end))}</p>
+        <p class="mt-2 font-display text-3xl font-medium">${esc(cap(areaList(nextB)))}</p>
+        <p class="mt-4 max-w-3xl text-[0.9875rem] leading-relaxed text-white/85">${esc(nextB.why)}</p>
+        <p class="mt-3 max-w-3xl text-[0.9875rem] leading-relaxed text-white/85">${esc(nextB.strength)}</p>
+        <div class="mt-6 grid gap-6 border-t border-white/15 pt-6 lg:grid-cols-2">
+          <div><p class="lr-label-sm !text-white/60">Prepare now</p><ul class="mt-3 grid gap-2.5 text-[0.9375rem] text-white/90" role="list">${nextB.actions.map((x) => `<li>— ${esc(x)}</li>`).join('')}</ul></div>
+          <div><p class="lr-label-sm !text-white/60">Watch out</p><p class="mt-3 text-[0.9375rem] text-white/90">${esc(nextB.risk ?? 'No weak spot stands out — the main risk is simply not using the window.')}</p></div>
+        </div>
+        <p class="lr-pro lr-ev !text-white/70">${esc(nextB.evidence)}</p>
       </div>
+      <details class="lr-card-quiet mt-5"><summary class="cursor-pointer font-medium text-ink">Month-by-month inside the next phase</summary>${roadmap(nextB)}</details>` : ''}
+
+      ${consultCta('upcoming phase', 'Phase changes are the best moment for a consultation: we map the next months with you and decide what to start, finish and let go — specific to your situation.')}
       ${proBlock(kv([['Current', `${esc(md.lord)} MD / ${esc(ad.lord)} AD`], ['AD ends', fmtISO(ad.endDate)], ['Next AD', next ? `${esc(next.lord)} from ${fmtISO(next.startDate)}` : '—']]), 'Pro detail · Vimshottari transition')}`;
   }
 
@@ -632,7 +872,10 @@ class LifeRhythm {
 
     const ns = I.naturalStrengths(chart, STRENGTHS);
     const ext = I.areaExtremes(chart);
-    const yogas = (chart.yogas as any[]).map((y) => ({ y, plain: C.YOGA_PLAIN[y.name] })).filter((x) => x.plain);
+    const baseYogas = (chart.yogas as any[]).map((y) => ({ name: y.name, title: C.YOGA_PLAIN[y.name]?.title, use: C.YOGA_PLAIN[y.name]?.use, ev: `${y.name} · ${y.category}`, strength: '' })).filter((x) => x.title);
+    const extYogas = chart.extendedYogas ?? [];
+    const supportive = [...baseYogas, ...extYogas.filter((y) => y.nature === 'supportive').map((y) => ({ name: y.name, title: y.plainTitle, use: y.plainUse, ev: `${y.name} · ${y.description} · strength ${y.strength}`, strength: y.strength }))];
+    const challenging = extYogas.filter((y) => y.nature === 'challenging');
     const strengths = `
       ${intro('Strengths & watch-outs', 'What comes easily — and what needs care', 'Based on the classical six-part strength of each planet in your chart, and how much support each area of your life receives.')}
       <section class="lr-section !mt-10">
@@ -645,7 +888,8 @@ class LifeRhythm {
           ${ext.best.map((x) => `<article class="lr-card"><div class="flex items-center justify-between gap-3"><p class="lr-label-sm">${LEVEL_WORD[x.level]}</p>${meter(x.level)}</div><h4 class="lr-h3 mt-2">${esc(x.name)}</h4><p class="mt-2 text-[0.9375rem] text-charcoal">${esc(x.about)}. ${x.points} support points — the average is 28.</p>${ev(`SAV H${x.house} = ${x.points}`)}</article>`).join('')}
         </div>
       </section>
-      ${yogas.length ? `<section class="lr-section">${sectionHead('Special strengths in your chart', 'Rare combinations in your chart, and how to put them to use.')}<div class="grid gap-5 md:grid-cols-2">${yogas.slice(0, 6).map(({ y, plain }) => card(plain.title, plain.use, `${y.name} · ${y.category}`)).join('')}</div></section>` : ''}
+      ${supportive.length ? `<section class="lr-section">${sectionHead(`${supportive.length} special combinations in your chart`, 'Classical planetary combinations (yogas) found in your chart, graded by how strong the planets forming them are.')}<div class="grid gap-5 md:grid-cols-2">${supportive.map((y) => card(y.title!, y.use!, y.ev, { kicker: y.strength ? `${cap(y.strength)} · ${y.name}` : y.name })).join('')}</div></section>` : ''}
+      ${challenging.length ? `<section class="lr-section">${sectionHead('Combinations that ask for care', 'Not bad luck — patterns where a little structure makes a big difference.')}<div class="grid gap-5 md:grid-cols-2">${challenging.map((y) => card(y.plainTitle, y.plainUse, `${y.name} · ${y.description}`, { quiet: true, kicker: y.name })).join('')}</div></section>` : ''}
       <section class="lr-section">
         ${sectionHead('What may take more effort', 'Not weaknesses — areas where a little structure goes a long way.')}
         <div class="grid gap-5 md:grid-cols-2">${ns.low.map((f) => card(f.title, f.text, f.evidence, { quiet: true })).join('')}</div>
@@ -679,11 +923,10 @@ class LifeRhythm {
     const d10 = (chart.shodashvarga as any)?.D10?.placements as Array<any> | undefined;
     const workMoney = `
       ${intro('Work & money', ws.title, ws.summary, `<span class="lr-pill lr-tone-steady">${esc(ws.label)}</span>`)}
-      <div class="mt-10 grid gap-5 md:grid-cols-2">
+      <div class="mt-10 grid gap-5">
         ${card(cf.direction.title, cf.direction.text, cf.direction.evidence)}
-        ${card(cf.career.title, cf.career.text, cf.career.evidence)}
-        ${card(cf.savings.title, cf.savings.text, cf.savings.evidence)}
-        ${card(cf.gains.title, cf.gains.text, cf.gains.evidence)}
+        ${reportHtml(I.topicReport(chart, 'career'))}
+        ${reportHtml(I.topicReport(chart, 'money'), { cta: true })}
       </div>
       <div class="lr-card-quiet mt-5">
         <p class="lr-label-sm">In this chapter of your life</p>
@@ -702,7 +945,8 @@ class LifeRhythm {
     const hf = I.healthFindings(chart);
     const health = `
       ${intro('Health & energy', et.title, et.summary, `<span class="lr-pill lr-tone-${fast ? 'steady' : 'good'}">${esc(et.label)}</span>`)}
-      <div class="mt-10 grid gap-5 md:grid-cols-3">${hf.map((f) => card(f.title, f.text, f.evidence)).join('')}</div>
+      <div class="mt-10 grid gap-5">${reportHtml(I.topicReport(chart, 'health'))}</div>
+      <div class="mt-5 grid gap-5 md:grid-cols-2">${hf.slice(1).map((f) => card(f.title, f.text, f.evidence, { quiet: true })).join('')}</div>
       <section class="lr-section">
         ${sectionHead('Where stress tends to show up', 'Common places tension collects for people with your pace.')}
         <div class="grid gap-5 md:grid-cols-3">${C.STRESS_SPOTS.map((s) => card(s.title, s.text, undefined, { quiet: true })).join('')}</div>
@@ -717,13 +961,18 @@ class LifeRhythm {
         </div>
         <p class="mt-6 text-xs text-ink-500">${esc(C.HEALTH_NOTE)}</p>
         ${ev(`Element balance: Fire+Air ${bal.Fire + bal.Air} vs Earth+Water ${bal.Earth + bal.Water}`)}
+        ${consultCta('energy and recovery')}
       </section>`;
+
+    const homeLearning = `
+      ${intro('Home & growth', 'Home, family and learning', 'Two more areas of your life, read the same way — where you stand, how it works for you, what to do and when.')}
+      <div class="mt-10 grid gap-5">${reportHtml(I.topicReport(chart, 'home'))}${reportHtml(I.topicReport(chart, 'learning'), { cta: true })}</div>`;
 
     const panel = document.getElementById('lr-panel-you')!;
     const a = this.subs.you;
     panel.innerHTML =
-      subnav('You', [['profile', 'Profile'], ['work-style', 'How you work'], ['strengths', 'Strengths'], ['routine', 'Daily routine'], ['work', 'Work & money'], ['health', 'Health & energy']], a) +
-      sub('profile', a, profile) + sub('work-style', a, work) + sub('strengths', a, strengths) + sub('routine', a, routine) + sub('work', a, workMoney) + sub('health', a, health);
+      subnav('You', [['profile', 'Profile'], ['work-style', 'How you work'], ['strengths', 'Strengths'], ['routine', 'Daily routine'], ['work', 'Work & money'], ['health', 'Health & energy'], ['home', 'Home & growth']], a) +
+      sub('profile', a, profile) + sub('work-style', a, work) + sub('strengths', a, strengths) + sub('routine', a, routine) + sub('work', a, workMoney) + sub('health', a, health) + sub('home', a, homeLearning);
   }
 
   /* ═══════════ SEASONS ═══════════ */
@@ -776,6 +1025,7 @@ class LifeRhythm {
           <div class="lr-card-quiet"><p class="lr-label-sm">Say no to</p>${list(SA.no, true)}</div>
         </div>
         <div class="lr-card-quiet mt-5"><p class="lr-label-sm">Common pitfalls in this phase</p>${list(SA.pitfalls, true)}</div>
+        ${consultCta('life chapter', 'A chapter like this lasts years. In a consultation we look at how it plays out in your life specifically, and plan the key decisions inside it.')}
       </section>
       ${proBlock(table(['Level', 'Lord', 'Start', 'End'], ([['Mahadasha', md], ['Antardasha', ad], ['Pratyantardasha', cd.pratyantardasha], ['Sookshma', cd.sookshmaDasha], ['Prana', cd.praanaDasha]] as Array<[string, DashaPeriod | undefined]>).filter(([, d]) => d).map(([n, d]) => [esc(n), esc(d!.lord), fmtISO(d!.startDate), fmtISO(d!.endDate)])) + `<p class="mt-3">Vimshottari from Moon ${esc(chart.planets.Moon.formattedDegree)} ${esc(chart.planets.Moon.sign.name)} (${esc(chart.planets.Moon.nakshatra.name)}). Birth lord ${esc(chart.dasha.birthLord)}, balance ${chart.dasha.birthBalanceYears.toFixed(2)} y.</p>`, 'Pro detail · Vimshottari (5 levels)')}`;
 
@@ -847,7 +1097,68 @@ class LifeRhythm {
 
     const panel = document.getElementById('lr-panel-seasons')!;
     const a = this.subs.seasons;
-    panel.innerHTML = subnav('Seasons', [['chapter', 'This chapter'], ['year', 'This year'], ['life', 'Life map'], ['cycles', 'Long cycles']], a) + sub('chapter', a, chapter) + sub('year', a, year) + sub('life', a, life) + sub('cycles', a, cycles);
+    panel.innerHTML =
+      subnav('Seasons', [['chapter', 'This chapter'], ['year', 'This year'], ['annual', 'Year chart'], ['life', 'Life map'], ['cycles', 'Long cycles'], ['systems', 'Other systems']], a) +
+      sub('chapter', a, chapter) + sub('year', a, year) + sub('annual', a, this.annualHtml()) + sub('life', a, life) + sub('cycles', a, cycles) + sub('systems', a, this.systemsHtml());
+  }
+
+  private annualHtml() {
+    const chart = this.chart!;
+    const now = new Date();
+    const loc = this.place4Today();
+    const v = calculateVarshaphal(chart, now, { latitude: loc.latitude, longitude: loc.longitude });
+    const munthaArea = C.LIFE_AREA[v.muntha.house];
+    const yl = v.yearLord;
+    const ylHouse = v.planets[yl].house;
+    const nextBirthday = new Date(v.pravesha.getTime() + 365.2564 * 86_400_000);
+    const ylNatal = I.planetCondition(chart, yl);
+    return `
+      ${intro('Year chart', `Your year since ${longDate(v.pravesha)}`, `Each year a new chart is cast for the exact moment the Sun returns to where it was when you were born — your astronomical birthday. This one runs until about ${longDate(nextBirthday)}.`)}
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        <article class="lr-card"><p class="lr-label-sm">The theme of this year</p><h4 class="lr-h2 mt-2">${esc(cap(munthaArea.name))}</h4><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">The year’s focal point (Muntha) falls in your ${esc(munthaArea.name.toLowerCase())} area this year — ${esc(C.AREA_PLAYBOOK[v.muntha.house].shows)}. ${[6, 8, 12].includes(v.muntha.house) ? 'That is one of the more demanding positions, so pace yourself and keep a buffer.' : [1, 9, 10, 11].includes(v.muntha.house) ? 'That is one of the most supportive positions — a year to move things forward.' : 'A year to work steadily on this area.'}</p>
+          <p class="lr-label-sm mt-6">Do this year</p>${list(C.AREA_PLAYBOOK[v.muntha.house].act)}
+          ${ev(`Muntha ${v.muntha.sign} · H${v.muntha.house} of the annual chart · lord ${v.muntha.lord}`)}</article>
+        <article class="lr-card"><p class="lr-label-sm">The planet in charge of this year</p><h4 class="lr-h2 mt-2">${esc(yl)}</h4><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">${esc(yl)} brings ${esc(I.PLANET_NATURE[yl].brings)} to this year, and works best through ${esc(I.PLANET_NATURE[yl].works)}. In the year chart it sits in your ${esc(C.LIFE_AREA[ylHouse].name.toLowerCase())} area. In your birth chart it is ${esc(ylNatal.phrase)}.</p>
+          ${ev(`Varsheshvara by Pancha-adhikari: ${v.candidates.map((c) => `${c.role} ${c.planet}${c.aspectsLagna ? ' (aspects)' : ''}`).join(' · ')}`)}</article>
+      </div>
+      <section class="lr-section">
+        ${sectionHead('Month by month', 'The year is split into nine periods — each lights up a different part of life.')}
+        <ol class="lr-timeline" role="list">
+          ${v.mudda.map((m) => {
+            const isNow = now >= m.start && now < m.end;
+            const area = C.LIFE_AREA[chart.planets[m.lord].house];
+            return `<li class="${isNow ? 'is-now' : ''}"><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(shortDate(m.start))} – ${esc(shortDate(m.end))}${isNow ? ' · now' : ''}</p><p class="mt-1 text-[0.9375rem] text-ink"><strong class="font-medium">${esc(cap(area.name))}</strong> <span class="text-ink-500">— ${esc(C.AREA_PLAYBOOK[chart.planets[m.lord].house].act[0])}</span></p><p class="lr-pro lr-ev">${esc(`Mudda dasha: ${m.lord} · ${m.days.toFixed(0)} days`)}</p></div></li>`;
+          }).join('')}
+        </ol>
+        ${consultCta('year ahead', 'A birthday-year consultation maps this year with you month by month — what to start, when to push and when to rest.')}
+      </section>
+      ${proBlock(kv([['Varsha Pravesha', v.pravesha.toISOString().replace('T', ' ').slice(0, 16) + ' UTC'], ['Completed years', String(v.age)], ['Annual Lagna', `${esc(v.ascendant.sign.name)} ${esc(v.ascendant.formattedDegree)}`], ['Year lord', esc(yl)]]) + `<div class="mt-5">${table(['Graha', 'Sign', 'Degree', 'House'], PLANET_ORDER.map((n) => [esc(n), esc(v.planets[n].sign.name), esc(v.planets[n].formattedDegree), String(v.planets[n].house)]))}</div>`, 'Pro detail · Varshaphal (Tajika)')}`;
+  }
+
+  private systemsHtml() {
+    const chart = this.chart!;
+    const now = new Date();
+    const systems = [calculateYoginiDasha(chart, now), calculateCharaDasha(chart, now), calculateAshtottariDasha(chart, now)];
+    const meaning = (r: ReturnType<typeof calculateYoginiDasha>) => {
+      const m = r.current.main;
+      if (r.system === 'Chara') {
+        const signIdx = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'].indexOf(m.label);
+        const house = ((signIdx - chart.ascendant.sign.index + 12) % 12) + 1;
+        return { area: C.LIFE_AREA[house], house };
+      }
+      const house = chart.planets[m.lord!].house;
+      return { area: C.LIFE_AREA[house], house };
+    };
+    const names = { Yogini: 'Yogini (36-year cycle)', Chara: 'Jaimini Chara (sign-based)', Ashtottari: 'Ashtottari (108-year cycle)' };
+    return `
+      ${intro('Other systems', 'A second and third opinion on timing', 'Classical astrology uses several independent timing systems. When they point to the same area of life at the same time, that theme is especially reliable.')}
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        ${systems.map((r) => {
+          const mm = meaning(r);
+          return `<article class="${r.applicable === false ? 'lr-card-quiet' : 'lr-card'}"><p class="lr-label-sm">${esc(names[r.system])}</p><h4 class="lr-h3 mt-2">${esc(cap(mm.area.name))}</h4><p class="mt-2 text-[0.9375rem] leading-relaxed text-charcoal">Until ${esc(longDate(r.current.main.end))} this system highlights ${esc(C.AREA_PLAYBOOK[mm.house].shows)}.${r.current.sub ? ` Within it, the current sub-period runs until ${esc(shortDate(r.current.sub.end))}.` : ''}</p>${r.applicable === false ? `<p class="mt-3 text-sm text-ink-500">Shown for reference — the classical condition for using this system isn’t met in your chart.</p>` : ''}${ev(`${r.system}: ${r.current.main.label}${r.current.main.lord ? ` (${r.current.main.lord})` : ''} ${fmtISO(r.current.main.start)} → ${fmtISO(r.current.main.end)}${r.current.sub ? ` · sub ${r.current.sub.label}` : ''}${r.note ? ` · ${r.note}` : ''}`)}</article>`;
+        }).join('')}
+      </div>
+      ${proBlock(systems.map((r) => `<p class="lr-pro-tag mt-4">${esc(r.system)}</p>${table(['Period', 'Start', 'End', 'Years'], r.periods.slice(0, 16).map((x) => [`${esc(x.label)}${x.lord && x.lord !== x.label ? ` <span class="muted">${esc(x.lord)}</span>` : ''}`, fmtISO(x.start), fmtISO(x.end), x.years.toFixed(2)]), (i) => (r.periods[i] === r.current.main ? 'is-now' : ''))}`).join(''), 'Pro detail · Yogini, Chara, Ashtottari')}`;
   }
 
   /* ═══════════ PEOPLE ═══════════ */
@@ -855,12 +1166,11 @@ class LifeRhythm {
   private renderPeople() {
     const chart = this.chart!;
     const rf = I.relationshipFindings(chart);
-    let partner = intro('Partner', 'How your rhythms fit together', 'Start with what your own chart says about relationships — then add someone’s details to compare.') + `<div class="mt-10 grid gap-5 md:grid-cols-2">${rf.map((f) => card(f.title, f.text, f.evidence)).join('')}</div>`;
+    let partner = intro('Partner', 'How your rhythms fit together', 'Start with what your own chart says about relationships — then add someone’s details to compare.') + `<div class="mt-10 grid gap-5">${reportHtml(I.topicReport(chart, 'relationships'))}</div><div class="mt-5 grid gap-5 md:grid-cols-2">${rf.map((f) => card(f.title, f.text, f.evidence, { quiet: true })).join('')}</div>`;
     partner += `<section class="lr-section">${this.partner && this.partnerChart ? this.partnerResult() : sectionHead('Compare with someone') + this.partnerForm()}</section>`;
 
     const h5el = chart.houses[4].sign.element as ElementType;
     const cs = C.CHILD_STYLE[h5el];
-    const cfnd = I.childrenFindings(chart);
     let progenyPro = '';
     try {
       const pg = calculateProgenyAnalysis(chart, 'Joint');
@@ -879,7 +1189,7 @@ class LifeRhythm {
     }
     const children = `
       ${intro('Children', cs.title, cs.learning)}
-      <div class="mt-10 grid gap-5 md:grid-cols-2">${cfnd.map((f) => card(f.title, f.text, f.evidence)).join('')}</div>
+      <div class="mt-10 grid gap-5">${reportHtml(I.topicReport(chart, 'children'), { cta: true })}</div>
       <div class="lr-card-quiet mt-5"><p class="lr-label-sm">Pace and routine</p><p class="mt-3 text-[0.9875rem] leading-relaxed text-charcoal">${esc(cs.pacing)}</p>${ev(`5H ${chart.houses[4].sign.name} (${h5el})`)}</div>
       <section class="lr-section">${sectionHead('Three principles that help')}<div class="grid gap-5 md:grid-cols-3">${C.PARENTING_PRINCIPLES.map((p, i) => card(p.title, p.text, undefined, { num: i + 1 })).join('')}</div></section>
       ${progenyPro}`;
@@ -928,6 +1238,7 @@ class LifeRhythm {
           }).join('')}
         </div>
         <p class="mt-8 max-w-2xl text-sm leading-relaxed text-ink-500">Areas marked “needs care” are where clear, kind conversations help most. No score decides a relationship.</p>
+        ${consultCta('relationship', 'Want to understand this relationship properly? A couples or partnership consultation goes through both charts with you — strengths, friction points and timing.')}
       </div>
       ${proBlock(table(['Koota', 'Score', 'Max', 'Note'], cats.map(([, c]) => [esc(c.name), String(c.obtainedScore), String(c.maxScore), `<span class="muted">${esc(c.description)}</span>`])) + `<div class="mt-5">${kv([['Ashtakoota', `${k.totalScore} / 36 (${k.percentage}%) · ${esc(k.verdict)}`], ['Moon nakshatras', `${esc(a.planets.Moon.nakshatra.name)} · ${esc(b.planets.Moon.nakshatra.name)}`], ['Mahadashas', `${esc(syn.dashaResonance.partnerAMahadasha)} · ${esc(syn.dashaResonance.partnerBMahadasha)}`], ['Manglik A / B', `${a.doshas.manglik.isManglik ? esc(a.doshas.manglik.severity) : 'No'} / ${b.doshas.manglik.isManglik ? esc(b.doshas.manglik.severity) : 'No'}`]])}</div>` + (syn.crossContacts.length ? `<div class="mt-5">${table(['A planet', 'In B house', 'Contact', 'With'], syn.crossContacts.map((c) => [esc(c.planetA), `H${c.houseInChartB}`, esc(c.contactType), esc(c.contactPartnerPlanet ?? '—')]))}</div>` : '') + `<p class="mt-3">${esc(syn.dashaResonance.guidance)} ${esc(syn.overallPacingVerdict)}</p>`, 'Pro detail · Ashtakoota & synastry')}`;
   }
@@ -1005,9 +1316,50 @@ class LifeRhythm {
       </div>`;
     const panel = document.getElementById('lr-panel-decide')!;
     const a = this.subs.decide;
-    panel.innerHTML = subnav('Decisions', [['ask', 'Ask a question'], ['check', 'Check a decision']], a) + sub('ask', a, ask) + sub('check', a, check);
+    const dates = `
+      ${intro('Find a good date', 'When should you do it?', 'Pick what you are planning. We scan the next three months for days and hours that suit it — using the traditional rules for that activity and your own birth Moon — and rank the best.')}
+      <div class="lr-card mt-10">
+        <form class="grid gap-5 md:grid-cols-[1fr_12rem_auto] md:items-end" data-lr-muhurta novalidate>
+          <div><label for="lr-mu-act" class="lr-label">What are you planning?</label><select id="lr-mu-act" class="input-wfg !min-h-12">
+            <option value="venture">Starting a business, job or project</option>
+            <option value="contract">Signing a contract or buying property</option>
+            <option value="moving">Moving into a new home</option>
+            <option value="marriage">A wedding or engagement</option>
+            <option value="travel">An important journey</option>
+            <option value="learning">Starting a course or studies</option>
+          </select></div>
+          <div><label for="lr-mu-days" class="lr-label">Search ahead</label><select id="lr-mu-days" class="input-wfg !min-h-12"><option value="30">1 month</option><option value="90" selected>3 months</option><option value="180">6 months</option></select></div>
+          <button type="submit" class="btn-primary !min-h-12">Find dates</button>
+        </form>
+        <p class="mt-3 text-sm text-ink-500">Times are for ${esc(this.place4Today().name.split(',')[0])} — change your location under Today.</p>
+        <div id="lr-mu-out" aria-live="polite"></div>
+      </div>`;
+    panel.innerHTML = subnav('Decisions', [['ask', 'Ask a question'], ['check', 'Check a decision'], ['dates', 'Find a good date']], a) + sub('ask', a, ask) + sub('check', a, check) + sub('dates', a, dates);
     this.bindAsk(panel);
     this.bindPrashna(panel);
+    this.bindMuhurta(panel);
+  }
+
+  private bindMuhurta(panel: HTMLElement) {
+    const form = panel.querySelector<HTMLFormElement>('[data-lr-muhurta]');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const act = (panel.querySelector('#lr-mu-act') as HTMLSelectElement).value as MuhurtaActivity;
+      const days = Number((panel.querySelector('#lr-mu-days') as HTMLSelectElement).value);
+      const out = panel.querySelector<HTMLElement>('#lr-mu-out')!;
+      out.innerHTML = '<p class="mt-6 text-sm text-ink-500">Scanning…</p>';
+      window.setTimeout(() => {
+        const loc = this.place4Today();
+        const res = findMuhurtas(this.chart!, act, { latitude: loc.latitude, longitude: loc.longitude, timeZone: loc.timeZone, days, limit: 8 });
+        const day = (d: Date) => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: loc.timeZone });
+        out.innerHTML = res.length
+          ? `<div class="lr-answer"><p class="lr-label-sm">The ${res.length} best dates, in date order</p><ol class="mt-4 grid gap-4" role="list">${res
+              .map((r, i) => `<li class="rounded-xl border border-line p-4 ${i === 0 ? 'bg-muted-bg' : ''}"><div class="flex flex-wrap items-baseline justify-between gap-2"><p class="font-medium text-ink">${esc(day(r.start))} · ${this.timeIn(r.start, loc.timeZone)} – ${this.timeIn(r.end, loc.timeZone)}</p><span class="lr-pill ${r.score >= 80 ? 'lr-tone-good' : 'lr-tone-steady'} !py-0.5 !text-[0.7rem]">${r.score >= 80 ? 'Excellent' : 'Good'} · ${r.score}</span></div><p class="mt-1.5 text-sm text-charcoal">${esc(r.reasons.join(' · '))}</p>${r.cautions.length ? `<p class="mt-1 text-sm text-ink-500">Note: ${esc(r.cautions.join(' · '))}</p>` : ''}<p class="lr-pro lr-ev">${esc(`${r.windowKind} · ${r.tithi} (${r.paksha}) · ${r.nakshatra} · ${r.karana}`)}</p></li>`)
+              .join('')}</ol><p class="mt-5 text-xs text-ink-500">Based on traditional timing rules (tithi, nakshatra, weekday, karana) and your birth Moon. Practical factors always come first.</p>${consultCta('important date', 'For weddings, moves and launches, a consultation checks the shortlist against both charts and your practical constraints.')}</div>`
+          : `<p class="mt-6 text-[0.9875rem] text-charcoal">No clearly good windows in this range — try a longer search.</p>`;
+      }, 20);
+    });
   }
 
   private bindAsk(panel: HTMLElement) {
@@ -1085,7 +1437,15 @@ class LifeRhythm {
     document.getElementById('lr-panel-chart')!.innerHTML = `
       ${intro('Chart data', 'The full workings', `Apparent sidereal positions (true node), ${c.ayanamsha.name} ayanamsha ${c.ayanamsha.formatted}, cast for ${fmtBirthDate(p.birthDate)} ${p.isTimeUnknown ? '12:00 (time unknown)' : p.birthTime} ${fmtOffset(c.birthDetails.timezone)} at ${c.birthDetails.latitude.toFixed(4)}°, ${c.birthDetails.longitude.toFixed(4)}°.`)}
       <div class="mt-10 grid gap-5 lg:grid-cols-[minmax(0,26rem)_1fr]">
-        <div class="lr-card"><p class="lr-label-sm">Rashi chart (D1) · North Indian</p><div class="mt-4">${this.northIndianChart(c)}</div></div>
+        <div class="lr-card">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <label class="sr-only" for="lr-varga">Divisional chart</label>
+            <select id="lr-varga" class="input-wfg !min-h-10 !w-auto !py-1.5 !text-sm">${['D1', 'D2', 'D3', 'D4', 'D7', 'D9', 'D10', 'D12', 'D16', 'D20', 'D24', 'D27', 'D30', 'D40', 'D45', 'D60'].map((id) => `<option value="${id}" ${id === this.varga ? 'selected' : ''}>${id} · ${esc((c.shodashvarga as any)?.[id]?.name ?? 'Rasi')}</option>`).join('')}</select>
+            <div class="lr-mode !bg-muted-bg !border-line" role="radiogroup" aria-label="Chart style">${(['north', 'south', 'east'] as ChartStyle[]).map((st) => `<button type="button" role="radio" aria-checked="${st === this.chartStyle}" data-lr-style="${st}" class="!text-ink-500 aria-checked:!bg-white aria-checked:!text-primary !min-h-8 !px-3 !text-xs">${cap(st)}</button>`).join('')}</div>
+          </div>
+          <div class="mt-4" id="lr-chart-draw">${this.chartFor(c)}</div>
+          <p class="mt-3 text-xs text-ink-500">${esc((c.shodashvarga as any)?.[this.varga]?.description ?? '')}</p>
+        </div>
         <div class="lr-card"><p class="lr-label-sm">Key points</p><div class="mt-5">${kv([
           ['Lagna', `${esc(c.ascendant.sign.name)} ${esc(c.ascendant.formattedDegree)}`],
           ['Lagna nakshatra', `${esc(c.ascendant.nakshatra.name)} ${c.ascendant.nakshatraPada}`],
@@ -1124,26 +1484,82 @@ class LifeRhythm {
         <h3 class="lr-h2">Shadbala components</h3>
         <div class="mt-5">${table(['Graha', 'Uccha', 'Saptavarga', 'Ojha', 'Kendra', 'Drekk.', 'Nathon.', 'Paksha', 'Tribh.', 'Abda', 'Masa', 'Vara', 'Hora', 'Ayana', 'Yuddha'], Object.values(c.shadbala as Record<string, any>).map((s) => { const k = s.components ?? {}; return [esc(s.planet), ...['uccha', 'saptavargaja', 'ojhayugma', 'kendradi', 'drekkana', 'nathonnata', 'paksha', 'tribhaga', 'abda', 'masa', 'vara', 'hora', 'ayana', 'yuddha'].map((x) => String(k[x] ?? '—'))]; }))}</div>
       </section>
+      ${this.chartExtrasHtml(c)}
       ${c.yogas.length ? `<section class="lr-section !mt-12"><h3 class="lr-h2">Yogas detected</h3><div class="mt-5">${table(['Yoga', 'Category', 'Classical description'], c.yogas.map((y: any) => [`${esc(y.name)}${y.sanskrit && y.sanskrit !== y.name ? ` <span class="muted">${esc(y.sanskrit)}</span>` : ''}`, esc(y.category), `<span class="muted whitespace-normal">${esc(y.description)}</span>`]))}</div></section>` : ''}`;
+    this.bindChartTools();
   }
 
-  /** North Indian diamond chart. House 1 at top centre, counter-clockwise. */
-  private northIndianChart(c: ComprehensiveKundliResult): string {
-    const S = 320, h = S / 2, q = S / 4;
-    const anchors: Array<[number, number]> = [[h, q], [q, q / 2.2], [q / 2.2, q], [q, h], [q / 2.2, S - q], [q, S - q / 2.2], [h, S - q], [S - q, S - q / 2.2], [S - q / 2.2, S - q], [S - q, h], [S - q / 2.2, q], [S - q, q / 2.2]];
-    const byHouse: string[][] = Array.from({ length: 12 }, () => []);
-    for (const n of PLANET_ORDER) byHouse[c.planets[n].house - 1].push(PLANET_ABBR[n] + (c.planets[n].isRetrograde && n !== 'Rahu' && n !== 'Ketu' ? 'ʳ' : ''));
-    const ascIdx = c.ascendant.sign.index;
-    const cells = anchors.map(([x, y], i) => {
-      const big = i % 3 === 0;
-      const ps = byHouse[i];
-      const lines: string[] = [];
-      for (let k = 0; k < ps.length; k += big ? 3 : 2) lines.push(ps.slice(k, k + (big ? 3 : 2)).join(' '));
-      const startY = y - ((lines.length - 1) * 13) / 2 + (big ? 6 : 4);
-      return `<text x="${x}" y="${big ? y - 22 : y - 12}" text-anchor="middle" font-size="10" fill="var(--color-cool-gray)">${((ascIdx + i) % 12) + 1}</text>${i === 0 ? `<text x="${x}" y="${y - 34}" text-anchor="middle" font-size="9" letter-spacing="1.5" fill="var(--color-secondary)">ASC</text>` : ''}${lines.map((l, li) => `<text x="${x}" y="${startY + li * 13}" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--color-ink)">${esc(l)}</text>`).join('')}`;
-    }).join('');
-    return `<svg class="lr-chart-svg w-full" viewBox="-1 -1 ${S + 2} ${S + 2}" role="img" aria-label="North Indian birth chart"><rect x="0" y="0" width="${S}" height="${S}" rx="10" fill="color-mix(in srgb, var(--color-accent) 6%, #fff)" stroke="var(--color-line-strong)"/><g stroke="var(--color-line-strong)" stroke-width="1"><line x1="0" y1="0" x2="${S}" y2="${S}"/><line x1="${S}" y1="0" x2="0" y2="${S}"/><polygon points="${h},0 ${S},${h} ${h},${S} 0,${h}" fill="none"/></g>${cells}</svg>`;
+  private chartFor(c: ComprehensiveKundliResult): string {
+    const bySign: string[][] = Array.from({ length: 12 }, () => []);
+    let ascSign = c.ascendant.sign.index;
+    if (this.varga === 'D1') {
+      for (const n of PLANET_ORDER) bySign[c.planets[n].sign.index].push(PLANET_ABBR[n] + (c.planets[n].isRetrograde && n !== 'Rahu' && n !== 'Ketu' ? 'ʳ' : ''));
+    } else {
+      const pl = ((c.shodashvarga as any)?.[this.varga]?.placements ?? []) as Array<{ planet: string; sign: { index: number } }>;
+      for (const x of pl) {
+        if (x.planet === 'Ascendant') ascSign = x.sign.index;
+        else bySign[x.sign.index].push(PLANET_ABBR[x.planet as keyof typeof PLANET_ABBR] ?? x.planet);
+      }
+    }
+    return chartSvg(this.chartStyle, { bySign, ascSign, label: this.varga });
   }
+
+  private bindChartTools() {
+    const panel = document.getElementById('lr-panel-chart')!;
+    panel.querySelector<HTMLSelectElement>('#lr-varga')?.addEventListener('change', (e) => {
+      this.varga = (e.target as HTMLSelectElement).value;
+      panel.querySelector('#lr-chart-draw')!.innerHTML = this.chartFor(this.chart!);
+    });
+    panel.querySelectorAll<HTMLButtonElement>('[data-lr-style]').forEach((b) =>
+      b.addEventListener('click', () => {
+        this.chartStyle = b.dataset.lrStyle as ChartStyle;
+        storageSet(STYLE_KEY, this.chartStyle);
+        panel.querySelectorAll<HTMLButtonElement>('[data-lr-style]').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+        panel.querySelector('#lr-chart-draw')!.innerHTML = this.chartFor(this.chart!);
+      })
+    );
+  }
+
+  private chartExtrasHtml(c: ComprehensiveKundliResult): string {
+    const p = this.profile!;
+    const kp = calculateKPAnalysis(c.birthDetails.date, c.birthDetails.latitude, c.birthDetails.longitude, c.planets);
+    const loc = this.place4Today();
+    const rp = calculateRulingPlanets(new Date(), loc.latitude, loc.longitude, loc.timeZone);
+    const vim = c.vimshopaka ?? {};
+    const bb = c.bhavaBala ?? [];
+    const ext = c.extendedYogas ?? [];
+    void p;
+    return `
+      <section class="lr-section !mt-12">
+        <h3 class="lr-h2">Vimshopaka bala</h3>
+        <p class="lr-sub">Dignity across divisional charts, out of 20 points per scheme.</p>
+        <div class="mt-5">${table(['Graha', 'Shadvarga', 'Saptavarga', 'Dashavarga', 'Shodashavarga', 'Grade'], Object.values(vim).map((v) => [esc(v.planet), v.shadvarga.toFixed(2), v.saptavarga.toFixed(2), v.dashavarga.toFixed(2), `<strong class="font-medium">${v.shodashavarga.toFixed(2)}</strong>`, esc(v.grade)]))}</div>
+      </section>
+      <section class="lr-section !mt-12">
+        <h3 class="lr-h2">Bhava bala</h3>
+        <p class="lr-sub">House strength: lord’s Shadbala + directional strength + aspects on the bhava madhya + occupation.</p>
+        <div class="mt-5">${table(['House', 'Adhipati', 'Dig', 'Drishti', 'Occupation', 'Virupas', 'Rupas', 'Rank'], bb.map((b) => [`H${b.house}`, b.adhipati.toFixed(1), String(b.dig), b.drishti.toFixed(1), String(b.occupation), b.totalVirupas.toFixed(1), `<strong class="font-medium">${b.totalRupas.toFixed(2)}</strong>`, String(b.rank)]))}</div>
+      </section>
+      <section class="lr-section !mt-12">
+        <h3 class="lr-h2">KP — Placidus cusps</h3>
+        <p class="lr-sub">KP ayanamsha ${kp.ayanamsha.toFixed(4)}°.</p>
+        <div class="mt-5">${table(['Cusp', 'Longitude', 'Sign', 'Sign lord', 'Star lord', 'Sub lord', 'Sub-sub'], kp.cusps.map((x) => [`${x.house}`, `${(x.longitude % 30).toFixed(2)}° ${esc(x.sign)}`, esc(x.sign), esc(x.kp.signLord), esc(x.kp.starLord), `<strong class="font-medium">${esc(x.kp.subLord)}</strong>`, esc(x.kp.subSubLord)]))}</div>
+        <h4 class="lr-h3 mt-8">House significators</h4>
+        <div class="mt-4">${table(['House', 'L1 · star of occupants', 'L2 · occupants', 'L3 · star of owner', 'L4 · owner'], kp.significators.map((x) => [`${x.house}`, esc(x.starOfOccupants.join(', ') || '—'), esc(x.occupants.join(', ') || '—'), esc(x.starOfOwner.join(', ') || '—'), esc(x.owner)]))}</div>
+        <h4 class="lr-h3 mt-8">Planet significations</h4>
+        <div class="mt-4">${table(['Planet', 'Placidus house', 'Star lord', 'Sub lord', 'Signifies houses'], PLANET_ORDER.map((n) => [esc(n), String(kp.placidusHouse[n]), esc(kp.planetKP[n].starLord), esc(kp.planetKP[n].subLord), esc(kp.planetSignifies[n].join(', '))]))}</div>
+        <h4 class="lr-h3 mt-8">Ruling planets now</h4>
+        <div class="mt-4">${kv([
+          ['For', `${esc(loc.name.split(',')[0])} · ${esc(new Date().toLocaleString('en-GB', { timeZone: loc.timeZone }))}`],
+          ['Day lord', esc(rp.dayLord)],
+          ['Lagna sign / star / sub', `${esc(rp.lagnaSignLord)} / ${esc(rp.lagnaStarLord)} / ${esc(rp.lagnaSubLord)}`],
+          ['Moon sign / star / sub', `${esc(rp.moonSignLord)} / ${esc(rp.moonStarLord)} / ${esc(rp.moonSubLord)}`],
+          ['Ruling planets (ordered)', esc(rp.ordered.join(', '))],
+        ])}</div>
+      </section>
+      ${ext.length ? `<section class="lr-section !mt-12"><h3 class="lr-h2">Extended yogas</h3><div class="mt-5">${table(['Yoga', 'Nature', 'Strength', 'Planets', 'Configuration'], ext.map((y) => [esc(y.name), esc(y.nature), esc(y.strength), esc(y.planets.join(', ') || '—'), `<span class="muted whitespace-normal">${esc(y.description)}</span>`]))}</div></section>` : ''}`;
+  }
+
 }
 
 if (typeof document !== 'undefined') {
