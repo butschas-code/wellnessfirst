@@ -52,7 +52,6 @@ import {
 } from '../lib/astro-copy.ts';
 import * as C from '../lib/astro-content.ts';
 import * as I from '../lib/astro-insights.ts';
-import { t as tr, LANGS, type Lang } from '../lib/astro-i18n.ts';
 import { chartSvg, type ChartStyle } from './astro-charts.ts';
 import {
   type GeocodedPlace,
@@ -89,9 +88,7 @@ import {
 
 const TODAY_PLACE_KEY = 'wfg_astro_today_place';
 const PROFILES_KEY = 'wfg_astro_profiles';
-const LANG_KEY = 'wfg_astro_lang';
 const STYLE_KEY = 'wfg_astro_chart_style';
-let LANG: Lang = 'en';
 
 interface TodayPlace {
   name: string;
@@ -147,7 +144,7 @@ function sectionHead(title: string, subText?: string) {
 /** Sub-navigation: pills that switch between sub-sections inside a tab. */
 function subnav(tab: string, items: Array<[string, string]>, active: string) {
   return `<nav class="lr-subnav" aria-label="${esc(tab)} sections">${items
-    .map(([id, label]) => `<button type="button" data-sub="${id}" aria-pressed="${id === active}">${esc(tr(label, LANG))}</button>`)
+    .map(([id, label]) => `<button type="button" data-sub="${id}" aria-pressed="${id === active}">${esc(label)}</button>`)
     .join('')}</nav>`;
 }
 const sub = (id: string, active: string, html: string) =>
@@ -230,7 +227,6 @@ class LifeRhythm {
     this.setMode(storageGet<string>(MODE_KEY) === 'pro' ? 'pro' : 'simple', false);
     this.chartStyle = (storageGet<string>(STYLE_KEY) as ChartStyle) || 'north';
     this.bindHeaderTools();
-    this.setLang((storageGet<string>(LANG_KEY) as Lang) || 'en', false);
     this.todayPlace = storageGet<TodayPlace>(TODAY_PLACE_KEY);
 
     const saved = storageGet<UserBirthProfile>(STORAGE_KEY);
@@ -391,7 +387,7 @@ class LifeRhythm {
     const list = this.profiles();
     sel.innerHTML =
       list.map((x, i) => `<option value="${i}">${esc(x.name || 'Unnamed')} · ${esc(fmtBirthDate(x.birthDate))}</option>`).join('') +
-      `<option value="add">＋ ${esc(tr('Add someone', LANG))}</option>`;
+      `<option value="add">＋ ${'Add someone'}</option>`;
     sel.value = '0';
     sel.closest<HTMLElement>('[data-lr-profiles]')!.hidden = list.length === 0;
   }
@@ -413,38 +409,8 @@ class LifeRhythm {
         this.run(p, false);
       }
     });
-    const langSel = document.getElementById('lr-lang') as HTMLSelectElement | null;
-    if (langSel) {
-      langSel.innerHTML = LANGS.map((l) => `<option value="${l.id}">${esc(l.label)}</option>`).join('');
-      langSel.addEventListener('change', () => this.setLang(langSel.value as Lang));
-    }
     document.getElementById('lr-print')?.addEventListener('click', () => this.printReport());
     window.addEventListener('afterprint', () => this.app.classList.remove('lr-printing'));
-    this.renderProfileSwitch();
-  }
-
-  private setLang(lang: Lang, persist = true) {
-    LANG = lang;
-    if (persist) storageSet(LANG_KEY, lang);
-    const langSel = document.getElementById('lr-lang') as HTMLSelectElement | null;
-    if (langSel) langSel.value = lang;
-    document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
-      el.dataset.i18nSrc ??= el.textContent?.trim() ?? '';
-      el.textContent = tr(el.dataset.i18nSrc, lang);
-    });
-    const note = document.getElementById('lr-lang-note');
-    if (note) {
-      note.hidden = lang === 'en';
-      note.textContent = tr('Readings are written in English for now.', lang);
-    }
-    this.app.setAttribute('lang', lang);
-    if (this.chart) {
-      this.renderToday();
-      this.renderYou();
-      this.renderSeasons();
-      this.renderPeople();
-      this.renderDecide();
-    }
     this.renderProfileSwitch();
   }
 

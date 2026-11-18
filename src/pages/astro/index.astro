@@ -89,13 +89,13 @@ const steps = [
             </div>
 
             <div>
-              <label for="lr-date" class="lr-label" data-i18n>Date of birth</label>
+              <label for="lr-date" class="lr-label">Date of birth</label>
               <input id="lr-date" name="birthDate" type="date" class="input-wfg" required min="1900-01-01" />
             </div>
 
             <div>
               <div class="flex items-center justify-between gap-3">
-                <label for="lr-time-h" class="lr-label" data-i18n>Time of birth</label>
+                <label for="lr-time-h" class="lr-label">Time of birth</label>
                 <label class="lr-check">
                   <input id="lr-time-unknown" type="checkbox" />
                   <span>I don’t know it</span>
@@ -107,7 +107,7 @@ const steps = [
             </div>
 
             <div class="relative">
-              <label for="lr-place" class="lr-label" data-i18n>Place of birth</label>
+              <label for="lr-place" class="lr-label">Place of birth</label>
               <input
                 id="lr-place"
                 type="text"
@@ -126,7 +126,7 @@ const steps = [
 
             <p id="lr-form-error" class="lr-error" role="alert" hidden></p>
 
-            <button type="submit" class="btn-primary w-full !min-h-12 !text-base" data-i18n>Show my rhythm</button>
+            <button type="submit" class="btn-primary w-full !min-h-12 !text-base">Show my rhythm</button>
             <p class="flex items-center justify-center gap-2 text-center text-xs text-ink-500">
               <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
               Worked out on your device. Nothing is stored on our servers.
@@ -151,20 +151,18 @@ const steps = [
             <div class="flex flex-col items-start gap-3 md:items-end">
               <div class="flex flex-wrap items-center gap-3">
                 <div class="lr-mode" role="radiogroup" aria-label="Level of detail">
-                  <button type="button" role="radio" aria-checked="true" data-lr-mode="simple" data-i18n>Simple</button>
-                  <button type="button" role="radio" aria-checked="false" data-lr-mode="pro" data-i18n>Pro detail</button>
+                  <button type="button" role="radio" aria-checked="true" data-lr-mode="simple">Simple</button>
+                  <button type="button" role="radio" aria-checked="false" data-lr-mode="pro">Pro detail</button>
                 </div>
-                <button type="button" id="lr-print" class="lr-head-btn" data-i18n>Download report (PDF)</button>
+                <button type="button" id="lr-print" class="lr-head-btn">Download report (PDF)</button>
               </div>
               <div class="flex flex-wrap items-center gap-3">
                 <span data-lr-profiles hidden><label for="lr-profile-switch" class="sr-only">Profile</label><select id="lr-profile-switch" class="lr-head-select"></select></span>
-                <label for="lr-lang" class="sr-only">Language</label><select id="lr-lang" class="lr-head-select"></select>
-                <a href="#lr-intake" id="lr-edit" class="lr-head-link" data-i18n>Edit details</a>
+                <a href="#lr-intake" id="lr-edit" class="lr-head-link">Edit details</a>
               </div>
             </div>
           </div>
           <p id="lr-head-note" class="lr-head-note" hidden></p>
-          <p id="lr-lang-note" class="lr-head-note" hidden></p>
           <p id="lr-print-stamp" class="lr-print-only"></p>
         </div>
       </header>
@@ -172,12 +170,12 @@ const steps = [
       <div class="lr-tabs-wrap">
         <div class="container-wfg">
           <div class="lr-tabs" role="tablist" aria-label="Sections">
-            <button type="button" role="tab" id="lr-tab-today" aria-controls="lr-panel-today" aria-selected="true" data-lr-tab="today" data-i18n>Today</button>
-            <button type="button" role="tab" id="lr-tab-you" aria-controls="lr-panel-you" aria-selected="false" tabindex="-1" data-lr-tab="you" data-i18n>You</button>
-            <button type="button" role="tab" id="lr-tab-seasons" aria-controls="lr-panel-seasons" aria-selected="false" tabindex="-1" data-lr-tab="seasons" data-i18n>Your seasons</button>
-            <button type="button" role="tab" id="lr-tab-people" aria-controls="lr-panel-people" aria-selected="false" tabindex="-1" data-lr-tab="people" data-i18n>People</button>
-            <button type="button" role="tab" id="lr-tab-decide" aria-controls="lr-panel-decide" aria-selected="false" tabindex="-1" data-lr-tab="decide" data-i18n>Decisions</button>
-            <button type="button" role="tab" id="lr-tab-chart" aria-controls="lr-panel-chart" aria-selected="false" tabindex="-1" data-lr-tab="chart" class="lr-pro-tab" data-i18n>Chart data</button>
+            <button type="button" role="tab" id="lr-tab-today" aria-controls="lr-panel-today" aria-selected="true" data-lr-tab="today">Today</button>
+            <button type="button" role="tab" id="lr-tab-you" aria-controls="lr-panel-you" aria-selected="false" tabindex="-1" data-lr-tab="you">You</button>
+            <button type="button" role="tab" id="lr-tab-seasons" aria-controls="lr-panel-seasons" aria-selected="false" tabindex="-1" data-lr-tab="seasons">Your seasons</button>
+            <button type="button" role="tab" id="lr-tab-people" aria-controls="lr-panel-people" aria-selected="false" tabindex="-1" data-lr-tab="people">People</button>
+            <button type="button" role="tab" id="lr-tab-decide" aria-controls="lr-panel-decide" aria-selected="false" tabindex="-1" data-lr-tab="decide">Decisions</button>
+            <button type="button" role="tab" id="lr-tab-chart" aria-controls="lr-panel-chart" aria-selected="false" tabindex="-1" data-lr-tab="chart" class="lr-pro-tab">Chart data</button>
           </div>
         </div>
       </div>
