@@ -248,13 +248,13 @@ export function detectExtendedYogas(
   // ── Nabhasa: Sankhya (number of signs occupied by the seven planets) ──
   const occupied = new Set(SEVEN.map(signOf)).size;
   const sankhya: Record<number, [string, string, string]> = {
-    7: ['Vallaki Yoga', 'Many interests', 'You have wide-ranging interests. Pick a few to go deep on.'],
-    6: ['Dama Yoga', 'Generous and helpful', 'Your generosity is a strength — let it be returned too.'],
-    5: ['Pasha Yoga', 'Capable and resourceful', 'You can handle a lot. Watch out for over-committing.'],
-    4: ['Kedara Yoga', 'Hard-working and grounded', 'Your steady, practical effort is your edge.'],
-    3: ['Shula Yoga', 'Sharp and determined', 'You have focus and drive. Channel it into one clear goal at a time.'],
-    2: ['Yuga Yoga', 'Independent', 'You prefer your own path. Build a few trusted allies.'],
-    1: ['Gola Yoga', 'Concentrated energy', 'Your energy is highly focused. Balance it with rest.'],
+    7: ['Vallaki Yoga', 'Many interests', 'Your planets spread across seven signs, so your interests run wide. Pick two or three to go deep on, or you end up good at many things and known for none.'],
+    6: ['Dama Yoga', 'Generous and helpful', 'People come to you for help, and you give it. Let it be returned — ask for favours too, not just grant them.'],
+    5: ['Pasha Yoga', 'Capable and resourceful', 'You can juggle a lot at once. The risk is saying yes to everything: cap your commitments at a number you set in advance.'],
+    4: ['Kedara Yoga', 'Hard-working and grounded', 'You do best with practical work that produces something you can see — a product, a building, a garden, a business. Abstract or purely talk-based work drains you faster.'],
+    3: ['Shula Yoga', 'Sharp and determined', 'Your energy is narrow and pointed. One clear goal at a time gets results; three at once gets conflict.'],
+    2: ['Yuga Yoga', 'Independent', 'You prefer your own path and resist being managed. Build two or three trusted allies so independence doesn’t turn into isolation.'],
+    1: ['Gola Yoga', 'Concentrated energy', 'Your energy is packed into one place. Use it for a single big project, and schedule rest on purpose — you won’t stop on your own.'],
   };
   const [sName, sTitle, sUse] = sankhya[occupied];
   add({ name: sName, category: 'Special', planets: [], nature: 'supportive', description: `Seven planets occupy ${occupied} signs (Nabhasa Sankhya yoga).`, wellnessMeaning: sTitle, plainTitle: sTitle, plainUse: sUse });

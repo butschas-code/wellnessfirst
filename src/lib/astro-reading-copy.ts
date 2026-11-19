@@ -181,6 +181,32 @@ export const COMES_THROUGH: Record<number, string> = {
   12: 'foreign places, retreat, behind-the-scenes work and spending',
 };
 
+/**
+ * What it looks like in real life when an area "runs through" house n (its ruler sits there):
+ * where help for that area actually comes from, written so it reads after "X runs through …".
+ */
+export const LINK_HOW: Record<number, string> = {
+  1: 'your own initiative: it moves when you act on it yourself, and stalls while you wait for others',
+  2: 'money and family: it is steadier when your income is steady, and family often has a hand in it',
+  3: 'your own effort and skills: it improves when you learn, write, pitch and follow up yourself',
+  4: 'home and a settled base: it goes better when your home life is calm and secure',
+  5: 'creativity, learning and children: it goes best when you are making something of your own',
+  6: 'hard work, service and daily routines: it improves through effort and problem-solving, usually with some conflict on the way',
+  7: 'partners, clients and contracts: the right partner or client moves it forward, the wrong one blocks it',
+  8: 'change, research and shared money: it tends to shift after an upheaval, a joint financial arrangement or a crisis you come through',
+  9: 'teachers, study and travel: a mentor, a course or time abroad tends to open it up',
+  10: 'your career and public role: it rises and falls with how your work is going',
+  11: 'friends, networks and organisations: it improves through people you know — a friend’s tip, a community, an employer or club',
+  12: 'distance, retreat and private spending: it improves through time away, a move or quiet behind-the-scenes work, and it tends to cost money',
+};
+
+/** Why a link 6, 8 or 12 places on is harder, in practical terms. */
+export const UPHILL: Record<number, string> = {
+  6: 'This is an uphill link: expect to work, compete or negotiate for what it brings.',
+  8: 'This is an unsteady link: what it brings tends to arrive after a delay, a disruption or a renegotiation.',
+  12: 'This is a costly link: it tends to take money, time or distance before it pays back.',
+};
+
 /** The practical lever: what to do when an area comes through house n. */
 export const LEVER: Record<number, string> = {
   1: 'take the initiative yourself rather than waiting to be asked',
