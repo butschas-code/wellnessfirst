@@ -15,7 +15,8 @@ import { calculateVarshaphal } from './astro-engine/annual/varshaphal.ts';
 import * as I from './astro-insights.ts';
 import { AREA_PLAYBOOK, LEAK, LIFE_AREA, MOON_RESET, RISING } from './astro-content.ts';
 import { CHAPTERS, STRENGTHS } from './astro-copy.ts';
-import { BASE_YOGA_PLAIN, COMES_THROUGH, LEVER, LINK_HOW, NAKSHATRA_PLAIN, PLANET_IN_HOUSE, UPHILL } from './astro-reading-copy.ts';
+import { BASE_YOGA_PLAIN, COMES_THROUGH, DEEP_PARTNER, LEVER, LOVE_IN_7, LINK_HOW, LOVE_STYLE, MARRIAGE_STRAIN, NAKSHATRA_PLAIN, PARTNER_TYPE, PLANET_IN_HOUSE, UPHILL } from './astro-reading-copy.ts';
+import { DIGNITIES_MAP } from './astro-engine/core/constants.ts';
 import { YOGA_PLAIN } from './astro-content.ts';
 
 export interface ReadingPart {
@@ -214,13 +215,13 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
       : rankOf(h) <= 3 && occ.length && occ.every((p) => tierOf(p) === 'weak')
         ? ' The ground is good even though the planets in it are not strong, so steady effort here still pays.'
         : '';
-  const areaSection = (o: { kicker: string; title: string; house: number; label: string; lead?: string; tail?: string; extraActions?: string[]; how: string }) => {
+  const areaSection = (o: { kicker: string; title: string; house: number; label: string; lead?: string; tail?: string; extraActions?: string[]; rankSaid?: string; how: string }) => {
     const l = link(o.house, o.label);
     const occ = occupantsOf(o.house, ['Moon']).filter((p) => !mentioned.has(p));
     const placed = occ.map(occupant);
     return {
       group: 'chart' as const, kicker: o.kicker, title: o.title,
-      text: [o.lead, l.text, support(o.house, o.label), ...placed.map((x) => x.text), mismatch(o.house, occ).trim(), o.tail].filter(Boolean).join(' '),
+      text: [o.lead, l.text, o.rankSaid ?? support(o.house, o.label), ...placed.map((x) => x.text), mismatch(o.house, occ).trim(), o.tail].filter(Boolean).join(' '),
       actions: [...placed.map((x) => x.advice).filter(Boolean), sentence(l.lever), ...AREA_PLAYBOOK[o.house].act.slice(0, 2).map(sentence), ...(o.extraActions ?? [])],
       how: o.how,
       lord: l.lord,
@@ -276,11 +277,83 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     tail: `Authority — how readily people accept your lead — is ${sun}; staying power on long projects is ${levelWord(I.strengthPlain(chart, 'Saturn').level)}.`,
     how: `${I.explainArea(chart, 10)} Its ruler: ${I.explainPlanet(chart, chart.houses[9].sign.lord as PlanetName)} Career karakas: Sun (authority) and Saturn (endurance).`,
   }));
-  const venusIn7 = P.Venus.house === 7;
+  const horizon = new Date(now.getTime() + 18 * 30.44 * 86_400_000);
+  const pick = (topic: 'career' | 'money' | 'relationships') => {
+    const w = I.topicReport(chart, topic, now).windows.filter((x) => x.start < horizon);
+    return w.find((x) => x.strength === 'strong') ?? w[0];
+  };
+  const TOPIC = {
+    career: { label: 'work and reputation', move: 'apply, pitch or ask for the bigger role' },
+    money: { label: 'money', move: 'negotiate pay or prices and set up the savings plan' },
+    relationships: { label: 'relationships and agreements', move: 'sign, commit to or renegotiate the agreements that matter' },
+  } as const;
+  const when = (a: Date, b: Date) => (a <= now ? `now until ${dayMonth(b)}` : range(a, b));
+
+  /* ── Love and marriage ── */
+  const venusSign = P.Venus.sign.name;
+  const sign7 = chart.houses[6].sign.name;
+  const lord7 = chart.houses[6].sign.lord as PlanetName;
+  const d9 = (chart.shodashvarga as any)?.D9?.placements as Array<{ planet: string; sign: { name: string } }> | undefined;
+  const d9sign = (p: PlanetName) => d9?.find((x) => x.planet === p)?.sign.name;
+  const d9dig = (p: PlanetName): 'good' | 'fallen' | 'neutral' => {
+    const sg = d9sign(p);
+    const d = DIGNITIES_MAP[p];
+    if (!sg || !d) return 'neutral';
+    return sg === d.exaltation.sign || d.ownSigns.includes(sg as any) ? 'good' : sg === d.debilitation.sign ? 'fallen' : 'neutral';
+  };
+  const marriageChart = [d9dig('Venus'), d9dig(lord7)];
+  const vargottama = d9sign('Venus') === venusSign;
+  const dk = chart.jaimini?.darakaraka?.planet as PlanetName | undefined;
+  const ul = (chart.jaimini?.arudhas as Array<{ houseNumber: number; sign: string; signIndex: number }> | undefined)?.find((a) => a.houseNumber === 12);
+  const nearUl = ul ? (Object.keys(P) as PlanetName[]).filter((p) => [ul.signIndex, (ul.signIndex + 1) % 12].includes(P[p].sign.index)) : [];
+  const strain = nearUl.filter((p) => MARRIAGE_STRAIN[p]);
+  const holds = nearUl.filter((p) => ['Jupiter', 'Venus', 'Mercury', 'Moon'].includes(p));
+  const mg = chart.doshas?.manglik;
+  const loveOcc = occupantsOf(7, ['Moon']).filter((p) => !mentioned.has(p));
+  const loveIn7 = loveOcc.map((p) => {
+    const o = occupant(p);
+    return LOVE_IN_7[p] ? { text: `${LOVE_IN_7[p]} ${o.text.slice(firstSentence(PLANET_IN_HOUSE[p][7]).length).trim()}`.trim(), advice: o.advice } : o;
+  });
+  const r5 = rankOf(5), r7 = rankOf(7);
+  const relWindow = pick('relationships');
+  const marriageLine = marriageChart.includes('fallen')
+    ? 'Your marriage chart has a weak spot: early relationships often disappoint, and later, more deliberate choices work much better.'
+    : marriageChart.every((x) => x === 'good')
+      ? 'Your marriage chart is strong: relationships tend to deepen rather than wear thin over the years.'
+      : marriageChart.includes('good')
+        ? 'Your marriage chart is supportive: a committed relationship tends to get better with time, not worse.'
+        : 'Your marriage chart is neutral: neither a strong push nor a drag, so how a marriage goes depends on your choices more than on luck.';
+  const manglikLine = !mg || mg.severity === 'None'
+    ? 'There is no Manglik pattern in your chart.'
+    : mg.isManglik && (mg.severity === 'High' || mg.severity === 'Medium')
+      ? `Your chart has the classical Manglik pattern${mg.factors.length ? ` (it shows in ${mg.factors.length} of the 3 classical checks)` : ''}. It is not a verdict on marriage: it means heat and friction in close relationships. It works best with a partner of similar intensity, and with an agreed way to cool down after an argument.`
+      : 'There is a mild Manglik pattern, largely cancelled, so it adds a little heat rather than real friction.';
+  parts.push({
+    group: 'chart', kicker: 'Love and marriage', title: 'Romance, partner and marriage',
+    text: [
+      LOVE_STYLE[venusSign], qual('Venus', 'Your capacity for love'),
+      `Romance and dating sit in an area that ranks ${I.ORD(r5)} of 12 for built-in support${r5 <= 3 ? ', so attraction comes easily' : r5 >= 10 ? ', so dating takes more effort than for most' : ''}.`,
+      `In a long-term partner you are drawn to ${PARTNER_TYPE[sign7]}.`,
+      dk && DEEP_PARTNER[dk] ? `The partner who brings out the best in you is ${DEEP_PARTNER[dk]}` : '',
+      ...loveIn7.map((x) => x.text),
+      r7 >= 10 ? (loveOcc.some(isStrong) ? `That is a real strength, but marriage itself ranks only ${I.ORD(r7)} of 12 for built-in support: relationships need deliberate care to last.` : `Marriage ranks ${I.ORD(r7)} of 12 for built-in support, so it needs more deliberate care than other areas.`) : r7 <= 3 ? `Marriage ranks ${I.ORD(r7)} of 12 for built-in support — one of the best-backed parts of your chart.` : '',
+      vargottama ? `${marriageLine} Your way of loving is also very consistent: what a partner sees at the start is what they get.` : marriageLine,
+      strain.length ? `What most often strains a marriage for you: ${strain.map((p) => MARRIAGE_STRAIN[p]).join('; and ')}. Name it early, before it builds up.` : holds.length ? 'Once you commit, your chart helps a marriage hold and grow.' : '',
+      manglikLine,
+    ].filter(Boolean).join(' '),
+    actions: [
+      mg?.isManglik ? 'Agree a cooling-off rule for arguments — for example, stop and come back to it within 24 hours.' : '',
+      relWindow ? `${cap(when(relWindow.start, relWindow.end))}: your clearest window for commitment — moving in, engagement or marriage.` : '',
+      marriageChart.includes('fallen') ? 'Give a new relationship a full year before big commitments like moving in or marrying.' : '',
+      ...loveIn7.map((x) => x.advice).filter((x) => x && !(mg?.isManglik && /\bargu/i.test(x))),
+    ].filter(Boolean),
+    how: `Venus in ${venusSign} (D1 house ${P.Venus.house}), D9 ${d9sign('Venus') ?? '?'}${vargottama ? ' (vargottama)' : ''}. 7th house ${sign7}; its lord ${lord7} in the ${I.ORD(P[lord7].house)} house, D9 ${d9sign(lord7) ?? '?'}. 5th house ranks ${r5}/12 and 7th ${r7}/12 by Sarvashtakavarga. Darakaraka: ${dk ?? '?'}. Upapada in ${ul?.sign ?? '?'}; planets in UL or 2nd from UL: ${nearUl.join(', ') || 'none'}. Manglik: ${mg?.severity ?? 'None'}${mg?.factors?.length ? ` (${mg.factors.join(' ')})` : ''}${mg?.cancellations?.length ? ` Cancelled by: ${mg.cancellations.join(' ')}` : ''}`,
+  });
+
   parts.push(areaSection({
-    kicker: 'Partnership', title: 'Partners, clients and agreements', house: 7, label: 'partnership',
-    tail: venusIn7 ? '' : `Your capacity for warmth and give-and-take in close relationships is ${levelWord(I.strengthPlain(chart, 'Venus').level)}.`,
-    how: `${I.explainArea(chart, 7)} Its ruler: ${I.explainPlanet(chart, chart.houses[6].sign.lord as PlanetName)}${venusIn7 ? '' : ` Venus: ${I.explainPlanet(chart, 'Venus')}`}`,
+    kicker: 'Business partnership', title: 'Business partners, clients and agreements', house: 7, label: 'business partnership',
+    rankSaid: r7 >= 10 ? 'As with marriage, this area has little built-in support, so put structure around it: clear roles, written terms, agreed exit rules.' : r7 <= 3 ? 'As with marriage, this is one of the best-backed areas of your chart.' : undefined,
+    how: `${I.explainArea(chart, 7)} Its ruler: ${I.explainPlanet(chart, lord7)}`,
   }));
 
   // Money: savings (2nd) and gains (11th) together.
@@ -352,17 +425,6 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   });
 
   /* ── The next 18 months ── */
-  const horizon = new Date(now.getTime() + 18 * 30.44 * 86_400_000);
-  const pick = (topic: 'career' | 'money' | 'relationships') => {
-    const w = I.topicReport(chart, topic, now).windows.filter((x) => x.start < horizon);
-    return w.find((x) => x.strength === 'strong') ?? w[0];
-  };
-  const TOPIC = {
-    career: { label: 'work and reputation', move: 'apply, pitch or ask for the bigger role' },
-    money: { label: 'money', move: 'negotiate pay or prices and set up the savings plan' },
-    relationships: { label: 'relationships and agreements', move: 'sign, commit to or renegotiate the agreements that matter' },
-  } as const;
-  const when = (a: Date, b: Date) => (a <= now ? `now until ${dayMonth(b)}` : range(a, b));
   const windows = (['career', 'money', 'relationships'] as const).map((t) => ({ t, w: pick(t) })).filter((x) => x.w);
   const tr = I.slowTransits(chart, now);
   const sat = tr.find((x) => x.planet === 'Saturn')!;

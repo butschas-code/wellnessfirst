@@ -236,3 +236,70 @@ export const BASE_YOGA_PLAIN: Record<string, { title: string; use: string; care?
   'Sarala Yoga': { title: 'Resilience under pressure', use: 'You come through upheaval better than most. Don’t avoid hard situations that lead somewhere.' },
   'Vimala Yoga': { title: 'Good with money and endings', use: 'You handle expenses and endings well and can close chapters cleanly. Keep that discipline with spending.' },
 };
+
+/* ══ Love and marriage ══ */
+
+/** How you love, by the sign your love planet (Venus) is in. No planet names: Simple view. */
+export const LOVE_STYLE: Record<string, string> = {
+  Aries: 'You fall fast and show it. You love the chase and lose interest when things go flat, so keep doing new things together.',
+  Taurus: 'You love steadily and physically — touch, good food, comfort, loyalty. You take time to trust, and once you do, you stay.',
+  Gemini: 'You fall for minds first. Conversation and humour keep you interested; silence and routine make you restless.',
+  Cancer: 'You love by looking after someone, and you need to feel emotionally safe. Hurt goes deep and takes a long time to heal.',
+  Leo: 'You love generously and openly, and you need to be admired back. Being taken for granted is what cools you.',
+  Virgo: 'You show love through practical help and attention to detail rather than big gestures. This is classically a hard placement for romance: you can be critical — of yourself most of all — and find it difficult to relax into being loved.',
+  Libra: 'Partnership comes naturally to you: you want harmony, fairness and a relationship that looks and feels good. The risk is keeping the peace at your own expense.',
+  Scorpio: 'You love intensely and all-or-nothing. Trust and loyalty matter more to you than charm, and betrayal is very hard for you to forgive.',
+  Sagittarius: 'You need freedom and a shared sense of adventure or meaning. A partner who restricts you won’t last; one who travels and grows with you will.',
+  Capricorn: 'You love seriously and show it through reliability rather than words. You may commit late, and your relationships tend to improve with age.',
+  Aquarius: 'You need a friend first and room to stay yourself. Unconventional arrangements suit you better than the traditional script.',
+  Pisces: 'You love selflessly and romantically — classically the best placement there is for love. Watch for idealising a partner or trying to rescue people.',
+};
+
+/** Who you are drawn to as a long-term partner, by the sign on the 7th house. */
+export const PARTNER_TYPE: Record<string, string> = {
+  Aries: 'a direct, energetic partner who takes the initiative',
+  Taurus: 'a steady, sensual and financially sensible partner',
+  Gemini: 'a curious, talkative partner who keeps things light',
+  Cancer: 'a caring, family-minded and emotionally open partner',
+  Leo: 'a confident, warm partner with a strong presence',
+  Virgo: 'a practical, capable partner with an eye for detail',
+  Libra: 'a fair-minded, attractive and sociable partner',
+  Scorpio: 'a deep, private and intense partner',
+  Sagittarius: 'an open-minded, principled partner who loves travel and ideas',
+  Capricorn: 'a mature, responsible and ambitious partner, often older or more established',
+  Aquarius: 'an independent, unconventional partner who is also your friend',
+  Pisces: 'a gentle, imaginative and spiritually minded partner',
+};
+
+/** The partner who suits you most deeply, by the spouse indicator (Darakaraka). */
+export const DEEP_PARTNER: Record<string, string> = {
+  Sun: 'someone with authority and self-respect. It works when you share the lead rather than compete for it.',
+  Moon: 'someone emotionally warm and nurturing. Your moods and theirs will be closely linked, so look after both.',
+  Mars: 'someone energetic and decisive. Expect sparks, and agree early on how you handle arguments.',
+  Mercury: 'someone clever and communicative, often young in spirit. Talking is the glue — when conversation stops, check in.',
+  Jupiter: 'someone wise, principled and generous, often a teacher or adviser type. Respect is the foundation.',
+  Venus: 'someone attractive, artistic and easy to be with. Shared pleasures and beauty hold you together.',
+  Saturn: 'someone serious and reliable, often older or from a different background. It starts slowly and gets stronger with the years.',
+  Rahu: 'someone unusual or from a different culture. Exciting, but check that what you see is real before you commit.',
+};
+
+/** What tends to strain a marriage, by a hard planet near the marriage point (Upapada). */
+export const MARRIAGE_STRAIN: Record<string, string> = {
+  Sun: 'pride and who gets the final word',
+  Mars: 'arguments, impatience and heat',
+  Saturn: 'distance, duty and things left unsaid',
+  Rahu: 'unrealistic expectations or outside temptation',
+  Ketu: 'drifting apart without noticing',
+};
+
+/** A planet in the 7th house, read for love and marriage only (the business reading lives in PLANET_IN_HOUSE). */
+export const LOVE_IN_7: Partial<Record<string, string>> = {
+  Sun: 'You want a partner you can respect and be proud of; respect matters more to you than romance.',
+  Mars: 'There is passion and friction in your relationships: you want a partner with fire, and then have to handle it.',
+  Mercury: 'You bond through conversation: a partner you can’t really talk to won’t hold you, however attractive.',
+  Jupiter: 'You attract decent, generous partners, and marriage is a source of growth for you.',
+  Venus: 'Love and partnership come easily to you.',
+  Saturn: 'Commitment comes slowly and is meant to last: marriage often happens later, or with someone older or more serious.',
+  Rahu: 'You are drawn to unusual partners, often from another culture or background; idealising them is the risk.',
+  Ketu: 'You can feel detached in relationships, or give a partner so much room that the connection thins.',
+};
