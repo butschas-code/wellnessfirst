@@ -52,6 +52,8 @@ import {
 } from '../lib/astro-copy.ts';
 import * as C from '../lib/astro-content.ts';
 import * as I from '../lib/astro-insights.ts';
+import { buildReading } from '../lib/astro-reading.ts';
+import { nakshatraDay, upcomingShifts, weekAhead } from '../lib/astro-today.ts';
 import { chartSvg, type ChartStyle } from './astro-charts.ts';
 import {
   type GeocodedPlace,
@@ -199,8 +201,8 @@ const longDate = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', mo
 
 /* ═══════════ Controller ═══════════ */
 
-type Tab = 'today' | 'you' | 'seasons' | 'people' | 'decide' | 'chart';
-const TABS: Tab[] = ['today', 'you', 'seasons', 'people', 'decide', 'chart'];
+type Tab = 'today' | 'reading' | 'you' | 'seasons' | 'people' | 'decide' | 'chart';
+const TABS: Tab[] = ['today', 'reading', 'you', 'seasons', 'people', 'decide', 'chart'];
 
 class LifeRhythm {
   private profile: UserBirthProfile | null = null;
@@ -314,6 +316,14 @@ class LifeRhythm {
   /* ─── Chrome: tabs, sub-tabs, mode ─── */
 
   private bindChrome() {
+    // Mark the sticky tab bar while it is pinned under the site header.
+    const bar = this.app.querySelector<HTMLElement>('.lr-tabs-wrap');
+    if (bar && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => bar.classList.toggle('is-stuck', e.intersectionRatio < 1 && e.boundingClientRect.top < 120), {
+        rootMargin: '-77px 0px 0px 0px',
+        threshold: [1],
+      }).observe(bar);
+    }
     this.app.querySelectorAll<HTMLButtonElement>('[data-lr-mode]').forEach((b) => b.addEventListener('click', () => this.setMode(b.dataset.lrMode as 'simple' | 'pro')));
     const tabs = Array.from(this.app.querySelectorAll<HTMLButtonElement>('[data-lr-tab]'));
     tabs.forEach((b) => b.addEventListener('click', () => this.setTab(b.dataset.lrTab as Tab, true)));
@@ -337,6 +347,7 @@ class LifeRhythm {
       this.subs[panel.id.replace('lr-panel-', '')] = id;
       panel.querySelectorAll<HTMLButtonElement>('.lr-subnav button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
       panel.querySelectorAll<HTMLElement>('[data-sub-panel]').forEach((p) => (p.hidden = p.dataset.subPanel !== id));
+      this.scrollToContent(btn.closest<HTMLElement>('.lr-subnav') ?? panel);
     });
 
     document.getElementById('lr-edit')?.addEventListener('click', (e) => {
@@ -362,10 +373,17 @@ class LifeRhythm {
       btn.tabIndex = t === tab ? 0 : -1;
       panel.hidden = t !== tab;
     }
-    if (scroll) {
-      const bar = this.app.querySelector('.lr-tabs-wrap') as HTMLElement;
-      if (bar.getBoundingClientRect().top < 0) window.scrollTo({ top: window.scrollY + bar.getBoundingClientRect().top - 88, behavior: 'smooth' });
-    }
+    if (scroll) this.scrollToContent(document.getElementById(`lr-panel-${tab}`)!.parentElement!);
+  }
+
+  /** If the reader is already below `el`, bring its top back to just under the sticky tab bar. */
+  private scrollToContent(el: HTMLElement) {
+    let abs = 0;
+    for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) abs += n.offsetTop;
+    const bar = this.app.querySelector<HTMLElement>('.lr-tabs-wrap');
+    const stickTop = bar ? parseFloat(getComputedStyle(bar).top) || 0 : 0;
+    const target = Math.max(0, abs - stickTop - (bar?.offsetHeight ?? 0) - 8);
+    if (window.scrollY > target) window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
   }
 
   /* ─── Header tools: profiles, language, PDF ─── */
@@ -434,6 +452,7 @@ class LifeRhythm {
     this.partnerChart = this.partner ? this.compute(this.partner) : null;
     this.renderHeader();
     this.renderToday();
+    this.renderReading();
     this.renderYou();
     this.renderSeasons();
     this.renderPeople();
@@ -514,34 +533,32 @@ class LifeRhythm {
 
   /* ═══════════ TODAY ═══════════ */
 
-  /** The whole reading in five lines, shown in the header on every tab. */
-  private renderShort(day: I.DayInsight, slots: ReturnType<typeof calculateTimedChoghadiya>, rahu: { start: Date; end: Date }, isToday: boolean, t: (d: Date) => string) {
-    const el = document.getElementById('lr-short');
-    if (!el) return;
+  private renderReading() {
     const chart = this.chart!;
-    const now = new Date();
-    const { mahadasha: md, antardasha: ad } = chart.dasha.currentDasha;
-    const ads = md.antardashas ?? [];
-    let next: DashaPeriod | undefined = ads[ads.findIndex((x) => x.startDate.getTime() === ad.startDate.getTime()) + 1];
-    if (!next) {
-      const mds = chart.dasha.mahadashas;
-      next = mds[mds.findIndex((m) => m.startDate.getTime() === md.startDate.getTime()) + 1]?.antardashas?.[0];
-    }
-    const cur = I.phaseBrief(chart, ad);
-    const nxt = next ? I.phaseBrief(chart, next) : null;
-    const names = (b: I.PhaseBrief) => b.areas.slice(0, 2).map((a) => a.name.toLowerCase()).join(' and ');
-    const weakest = [...cur.areas].sort((a, b) => a.points - b.points)[0];
-    const slot = slots.find((s) => s.isDay && s.end > now && ['Amrit', 'Shubh', 'Labh'].includes(s.name) && !(s.start < rahu.end && s.end > rahu.start));
-    const dayWord = { good: 'A supportive day for you', steady: 'A steady day for you', light: 'A lighter day for you — keep big decisions for later' }[day.level];
-    const rows: Array<[string, string]> = [
-      ['Now', `${cap(names(cur))} <span class="muted">· until ${esc(longDate(ad.endDate))}</span>`],
-      ['Do', esc(cur.actions[0]) + '.'],
-      ['Avoid', esc(cap(C.AREA_PLAYBOOK[weakest.house].risk)) + '.'],
-      ['Today', `${esc(dayWord)}.${slot ? ` Best window ${esc(t(slot.start))}–${esc(t(slot.end))}${isToday ? '' : ' tomorrow'}.` : ''}`],
-    ];
-    if (nxt && next) rows.push(['Next', `${cap(names(nxt))} <span class="muted">· from ${esc(longDate(next.startDate))}</span>`]);
-    el.innerHTML = `<p class="lr-short-title">Your reading in short</p><dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
-      <p class="lr-pro lr-short-pro">Now/Next: Vimshottari ${esc(md.lord)}–${esc(ad.lord)} antardasha${next ? `, then ${esc(md.lord)}–${esc(next.lord)}` : ''}; areas = houses the sub-period lord occupies and rules. Avoid = the weakest of those houses by Sarvashtakavarga (${weakest.points} points, ${I.ORD(weakest.house)} house). Today = day score ${day.score}/100 from Tarabala, Chandrabala and transits${slot ? `; window = ${esc(slot.name)} choghadiya, outside Rahu Kalam` : ''}.</p>`;
+    const loc = this.place4Today();
+    const r = buildReading(chart, new Date(), { latitude: loc.latitude, longitude: loc.longitude });
+    const name = this.profile?.name?.trim();
+    const section = (p: (typeof r.parts)[number]) => `
+      <section class="lr-reading-part">
+        <p class="lr-label-sm">${esc(p.kicker)}</p>
+        <h3 class="lr-h2 mt-2">${esc(p.title)}</h3>
+        <p class="lr-reading-text">${esc(p.text)}</p>
+        ${p.actions.length ? `<div class="lr-reading-do"><p class="lr-reading-do-title">What to do</p><ul>${p.actions.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+        ${ev(p.how)}
+      </section>`;
+    const chartParts = r.parts.filter((p) => p.group === 'chart');
+    const timing = r.parts.filter((p) => p.group === 'timing');
+    const combos = r.parts.filter((p) => p.group === 'combinations');
+    document.getElementById('lr-panel-reading')!.innerHTML = `
+      ${intro('Your reading', name ? `${esc(name)}, here is what your chart says` : 'What your chart says', 'Your chart read area by area, in plain English: how each part of your life works for you, which planet runs it and where that leads, and what to do about it. Then where you are in time, and the combinations that shape you. Every statement comes from a specific placement — switch to Pro to see it.')}
+      <article class="lr-reading mt-10">
+        ${chartParts.map(section).join('')}
+        <h2 class="lr-reading-group">Your timing</h2>
+        ${timing.map(section).join('')}
+        ${combos.length ? `<h2 class="lr-reading-group">Combinations in your chart</h2><div class="grid gap-5 md:grid-cols-2">${combos.map((c) => `<div class="${c.kicker.startsWith('Supportive') ? 'lr-card' : 'lr-card-quiet'}"><p class="lr-label-sm">${esc(c.kicker)}</p><h4 class="lr-h3 mt-2">${esc(c.title)}</h4><p class="mt-2 text-[0.9375rem] leading-relaxed text-charcoal">${esc(c.text)}</p>${ev(c.how)}</div>`).join('')}</div>` : ''}
+        <section class="lr-reading-part lr-reading-questions"><p class="lr-label-sm">To sit with this week</p><ol>${r.questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol></section>
+      </article>
+      ${consultCta('reading', 'A reading like this is the starting point. In a one-to-one consultation we go through it with you, answer your questions and turn the dates into a concrete plan.')}`;
   }
 
   private renderToday() {
@@ -572,7 +589,6 @@ class LifeRhythm {
     const keyDateLabel = keySolar.sunrise.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: loc.timeZone });
     const keyIsToday = calDay(keySolar.sunrise) === calDay(now);
     const keyWhen = afterSunset ? (keyIsToday ? 'Later today · ' : 'Tomorrow · ') : '';
-    this.renderShort(day, keySlots, keyMu.rahuKalam, keyIsToday, t);
 
     const overview = `
       ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. The Moon is moving through your area of ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()} — so that is a natural focus today.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}
@@ -600,6 +616,8 @@ class LifeRhythm {
         <div class="lr-card"><p class="lr-label-sm">Focus on</p>${labeledList(supportive ? C.TODAY_FOCUS.supportive : C.TODAY_FOCUS.steady)}</div>
         <div class="lr-card-quiet"><p class="lr-label-sm">Keep off your plate</p>${labeledList(C.TODAY_AVOID, true)}</div>
       </div>
+
+      ${this.todayExtrasHtml(day, panchang.nakshatra.name, keySlots, keyMu.rahuKalam, now, t, keyWhen, loc)}
 
       <section class="lr-section">
         ${sectionHead(`Key windows · ${keyIsToday ? 'today, ' : 'tomorrow, '}${keyDateLabel}`, `From the real sunrise (${t(keySolar.sunrise)}) and sunset (${t(keySolar.sunset)}) in ${town}.`)}
@@ -639,6 +657,100 @@ class LifeRhythm {
       sub('travel', a, this.travelHtml(day.level)) +
       sub('reset', a, this.resetHtml(day.level, gochara.saturnSadeSatiActive));
     this.bindTodayPlace(panel);
+  }
+
+  /** The daily-return content: a timed plan, today's star, the Moon's area, the week ahead, shifts and a check-in. */
+  private todayExtrasHtml(
+    day: I.DayInsight,
+    nakName: string,
+    slots: ReturnType<typeof calculateTimedChoghadiya>,
+    rahu: { start: Date; end: Date },
+    now: Date,
+    t: (d: Date) => string,
+    when: string,
+    loc: TodayPlace
+  ) {
+    const chart = this.chart!;
+    const clear = (s: { start: Date; end: Date }) => !(s.start < rahu.end && s.end > rahu.start);
+    const next = (names: string[]) => slots.find((s) => s.isDay && s.end > now && names.includes(s.name) && clear(s));
+    const focus = next(['Amrit', 'Labh']);
+    const people = next(['Shubh', 'Amrit']);
+    const errands = next(['Char']);
+    const plan: Array<[string, string, number]> = [];
+    if (focus) plan.push([`${t(focus.start)} – ${t(focus.end)}`, 'Your most important task: deep work, an important decision, or the thing you have been putting off.', focus.start.getTime()]);
+    if (people && people !== focus) plan.push([`${t(people.start)} – ${t(people.end)}`, 'Calls, meetings and the conversation you need to have — people are more receptive now.', people.start.getTime()]);
+    if (errands) plan.push([`${t(errands.start)} – ${t(errands.end)}`, 'Errands, admin, travel and getting around.', errands.start.getTime()]);
+    if (rahu.end > now) plan.push([`${t(rahu.start)} – ${t(rahu.end)}`, 'Don’t start anything new or sign anything here — use it for routine work.', rahu.start.getTime()]);
+    plan.sort((a, b) => a[2] - b[2]);
+
+    const nd = nakshatraDay(nakName);
+    const mh = day.moonArea.house;
+    const dayIdx = Math.floor(now.getTime() / 86_400_000);
+    const moonAct = C.AREA_PLAYBOOK[mh].act[dayIdx % 3];
+    const week = weekAhead(chart, now, loc);
+    const best = [...week].sort((a, b) => b.score - a.score)[0];
+    const shifts = upcomingShifts(chart, now, 45).slice(0, 6);
+    const wd = (d: Date) => d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: loc.timeZone });
+    const dm = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: loc.timeZone });
+
+    return `
+      <section class="lr-section">
+        ${sectionHead(`${when}Your plan for the day`, 'Built from today’s real sunrise where you are and the quality of each part of the day.')}
+        <ol class="lr-plan" role="list">${plan.map(([time, what]) => `<li><span class="lr-plan-time">${esc(time)}</span><span>${esc(what)}</span></li>`).join('')}</ol>
+      </section>
+
+      <section class="lr-section">
+        <div class="grid gap-5 md:grid-cols-2">
+          <article class="lr-card">
+            <p class="lr-label-sm">Today’s star · ${esc(nakName)}</p>
+            <h4 class="lr-h3 mt-2">${esc(cap(nd.name))}</h4>
+            <p class="mt-3 text-sm font-medium text-ink">Good for</p>
+            <ul class="mt-1.5 list-disc space-y-1 pl-5 text-[0.9375rem] text-charcoal">${nd.good.map((g) => `<li>${esc(g)}</li>`).join('')}</ul>
+            <p class="mt-3 text-sm font-medium text-ink">Better avoided</p>
+            <ul class="mt-1.5 list-disc space-y-1 pl-5 text-[0.9375rem] text-ink-500">${nd.avoid.map((g) => `<li>${esc(g)}</li>`).join('')}</ul>
+            ${ev(`The Moon's nakshatra today is ${nakName}. Muhurta texts group the 27 nakshatras by nature (fixed, moving, quick, soft, mixed, sharp, fierce); each group suits different kinds of action.`)}
+          </article>
+          <article class="lr-card">
+            <p class="lr-label-sm">Where today’s Moon lands for you</p>
+            <h4 class="lr-h3 mt-2">${esc(cap(day.moonArea.name))}</h4>
+            <p class="mt-3 text-[0.9375rem] leading-relaxed text-charcoal">Today the Moon moves through the part of your chart about ${esc(C.AREA_PLAYBOOK[mh].shows)}. That is where your attention naturally goes today — so put it to use.</p>
+            <div class="mt-4 rounded-xl bg-white p-4 text-[0.9375rem]"><span class="font-medium text-ink">One thing to do today:</span> ${esc(moonAct)}.</div>
+            ${ev(`Transiting Moon in ${day.moonSignName}, your ${I.ORD(mh)} house from the Lagna (${day.moonArea.points} Sarvashtakavarga points).`)}
+          </article>
+        </div>
+      </section>
+
+      <section class="lr-section">
+        ${sectionHead('Your week ahead', `Best day this week: ${best.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: loc.timeZone })} — good for ${best.goodFor}.`)}
+        <div class="lr-week">${week
+          .map((d, i) => `<div class="lr-week-day lr-tone-${d.level}${d === best ? ' is-best' : ''}">
+            <p class="lr-week-name">${i === 0 ? 'Today' : esc(wd(d.date))}</p>
+            <p class="lr-week-date">${esc(dm(d.date))}</p>
+            <p class="lr-week-score">${d.score}</p>
+            <p class="lr-week-for">${esc(cap(d.goodFor))}</p>
+          </div>`)
+          .join('')}</div>
+        ${ev(`Daily score = personal Tarabala and Chandrabala from your birth Moon plus the transit picture, calculated for midday each day. "Good for" = the weekday's planetary ruler.`)}
+      </section>
+
+      ${shifts.length ? `<section class="lr-section">
+        ${sectionHead('Shifts in the coming weeks', 'Planets changing sign or direction — and what that means for you.')}
+        <ol class="lr-timeline" role="list">${shifts
+          .map((x) => `<li><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(x.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', timeZone: loc.timeZone }))}</p><p class="mt-1 text-[0.9375rem] leading-relaxed text-charcoal">${esc(x.text)}</p>${x.action ? `<p class="mt-1 text-sm text-ink"><span class="font-medium">Use it:</span> ${esc(x.action)}.</p>` : ''}</div></li>`)
+          .join('')}</ol>
+      </section>` : ''}
+
+      <section class="lr-section">
+        <div class="lr-card-quiet">
+          <p class="lr-label-sm">This evening</p>
+          <h4 class="lr-h3 mt-2">Two-minute check-in</h4>
+          <ol class="mt-3 list-decimal space-y-1.5 pl-5 text-[0.9375rem] text-charcoal">
+            <li>${focus ? `Did you use ${esc(t(focus.start))}–${esc(t(focus.end))} for your most important task? If not, what got in the way?` : 'What was the most important thing you moved forward today?'}</li>
+            <li>What happened today around ${esc(day.moonArea.name.toLowerCase())}? Note one thing — patterns show up within a few weeks.</li>
+            <li>What is the one thing for tomorrow, and when will you do it?</li>
+          </ol>
+        </div>
+      </section>`;
   }
 
   private hoursHtml(slots: TimedSlot[], solar: { sunrise: Date; sunset: Date; nextSunrise: Date; isApproximate: boolean }, loc: TodayPlace, now: Date) {

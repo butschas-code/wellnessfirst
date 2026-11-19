@@ -163,7 +163,6 @@ const steps = [
             </div>
           </div>
           <p id="lr-head-note" class="lr-head-note" hidden></p>
-          <div id="lr-short" class="lr-short" aria-label="Your reading in short"></div>
           <p id="lr-print-stamp" class="lr-print-only"></p>
         </div>
       </header>
@@ -172,6 +171,7 @@ const steps = [
         <div class="container-wfg">
           <div class="lr-tabs" role="tablist" aria-label="Sections">
             <button type="button" role="tab" id="lr-tab-today" aria-controls="lr-panel-today" aria-selected="true" data-lr-tab="today">Today</button>
+            <button type="button" role="tab" id="lr-tab-reading" aria-controls="lr-panel-reading" aria-selected="false" tabindex="-1" data-lr-tab="reading">Your reading</button>
             <button type="button" role="tab" id="lr-tab-you" aria-controls="lr-panel-you" aria-selected="false" tabindex="-1" data-lr-tab="you">You</button>
             <button type="button" role="tab" id="lr-tab-seasons" aria-controls="lr-panel-seasons" aria-selected="false" tabindex="-1" data-lr-tab="seasons">Your seasons</button>
             <button type="button" role="tab" id="lr-tab-people" aria-controls="lr-panel-people" aria-selected="false" tabindex="-1" data-lr-tab="people">People</button>
@@ -195,6 +195,7 @@ const steps = [
           </div>
         </details>
         <div role="tabpanel" id="lr-panel-today" aria-labelledby="lr-tab-today" class="lr-panel" tabindex="0"></div>
+        <div role="tabpanel" id="lr-panel-reading" aria-labelledby="lr-tab-reading" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-you" aria-labelledby="lr-tab-you" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-seasons" aria-labelledby="lr-tab-seasons" class="lr-panel" tabindex="0" hidden></div>
         <div role="tabpanel" id="lr-panel-people" aria-labelledby="lr-tab-people" class="lr-panel" tabindex="0" hidden></div>
@@ -310,17 +311,6 @@ const steps = [
     border: 1px solid rgba(255,255,255,0.14);
   }
 
-  .lr-short { margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.16); padding-top: 1.5rem; }
-  .lr-short:empty { display: none; }
-  .lr-short-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-  .lr-short dl { margin-top: 0.9rem; display: grid; gap: 0.6rem; max-width: 52rem; }
-  .lr-short dl > div { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; align-items: baseline; }
-  .lr-short dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--color-secondary) 70%, #fff); }
-  .lr-short dd { font-size: 1rem; line-height: 1.5; color: #fff; }
-  .lr-short dd .muted { color: rgba(255,255,255,0.65); }
-  .lr-short .lr-short-pro { margin-top: 0.9rem; font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.6); }
-  @media (max-width: 480px) { .lr-short dl > div { grid-template-columns: 1fr; gap: 0.15rem; } }
-
   .lr-mode { display: inline-flex; padding: 0.25rem; border-radius: 9999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); }
   .lr-mode button {
     min-height: 2.5rem; padding: 0 1.1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500;
@@ -329,7 +319,14 @@ const steps = [
   .lr-mode button[aria-checked='true'] { background: #fff; color: var(--color-primary); }
   .lr-mode button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-  .lr-tabs-wrap { border-bottom: 1px solid var(--color-line); background: #fff; }
+  .lr-tabs-wrap {
+    position: sticky; top: 4.75rem; z-index: 30;
+    border-bottom: 1px solid var(--color-line); background: #fff;
+    box-shadow: 0 6px 16px -14px rgba(10, 35, 52, 0.35);
+  }
+  /* While stuck, fill the strip behind the floating site header so content doesn't show through. */
+  .lr-tabs-wrap::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 4.75rem; background: #fff; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  .lr-tabs-wrap.is-stuck::before { opacity: 1; }
   .lr-tabs { display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none; margin: 0 -0.25rem; }
   .lr-tabs::-webkit-scrollbar { display: none; }
   .lr-tabs button {
@@ -513,6 +510,26 @@ const steps = [
 
   /* ─── Evidence line (Pro) ─── */
   .lr-ev { margin-top: 0.75rem; font-size: 0.75rem; line-height: 1.5; color: #3c6b74; font-variant-numeric: tabular-nums; }
+  .lr-plan { display: grid; gap: 0.6rem; }
+  .lr-plan li { display: grid; grid-template-columns: 11.5rem 1fr; gap: 1rem; align-items: baseline; border-radius: 1rem; background: #fff; border: 1px solid var(--color-line); padding: 0.85rem 1.1rem; font-size: 0.9875rem; line-height: 1.5; color: var(--color-charcoal); }
+  .lr-plan-time { font-weight: 600; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+  @media (max-width: 520px) { .lr-plan li { grid-template-columns: 1fr; gap: 0.2rem; } }
+  .lr-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.5rem; }
+  .lr-week-day { border-radius: 1rem; border: 1px solid var(--color-line); background: #fff; padding: 0.75rem 0.6rem; text-align: center; }
+  .lr-week-day.is-best { border-color: var(--color-secondary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-secondary) 35%, transparent); }
+  .lr-week-name { font-size: 0.8125rem; font-weight: 600; color: var(--color-ink); }
+  .lr-week-date { font-size: 0.75rem; color: var(--color-ink-500); }
+  .lr-week-score { margin-top: 0.4rem; font-family: var(--font-display, inherit); font-size: 1.5rem; color: var(--color-ink); }
+  .lr-week-for { margin-top: 0.25rem; font-size: 0.75rem; line-height: 1.35; color: var(--color-charcoal); }
+  @media (max-width: 767px) { .lr-week { grid-template-columns: repeat(7, minmax(6.5rem, 1fr)); overflow-x: auto; padding-bottom: 0.25rem; } }
+  .lr-reading { display: grid; gap: 2.75rem; max-width: 46rem; }
+  .lr-reading-part { border-top: 1px solid var(--color-line); padding-top: 1.75rem; }
+  .lr-reading-text { margin-top: 1rem; font-size: 1.0625rem; line-height: 1.75; color: var(--color-charcoal); }
+  .lr-reading-do { margin-top: 1.25rem; border-radius: 1rem; background: color-mix(in srgb, var(--color-secondary) 9%, #fff); padding: 1rem 1.25rem; }
+  .lr-reading-do-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink); }
+  .lr-reading-do ul { margin-top: 0.6rem; display: grid; gap: 0.45rem; padding-left: 1.1rem; list-style: disc; font-size: 0.9875rem; line-height: 1.55; color: var(--color-charcoal); }
+  .lr-reading-group { margin-top: 1.5rem; font-family: var(--font-display, inherit); font-size: 1.75rem; line-height: 1.2; color: var(--color-ink); }
+  .lr-reading-questions ol { margin-top: 1rem; display: grid; gap: 0.75rem; padding-left: 1.25rem; list-style: decimal; font-size: 1rem; line-height: 1.6; color: var(--color-ink); }
   .lr-ev::before { content: 'How this was worked out · '; font-weight: 600; letter-spacing: 0.04em; }
   .lr-guide { margin-bottom: 2rem; border: 1px solid var(--color-line); border-radius: 1rem; background: color-mix(in srgb, var(--color-accent) 6%, #fff); }
   .lr-guide summary { cursor: pointer; padding: 0.9rem 1.25rem; font-size: 0.875rem; font-weight: 600; color: #3c6b74; }

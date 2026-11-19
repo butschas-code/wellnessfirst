@@ -699,7 +699,7 @@ export function areaWindows(chart: ComprehensiveKundliResult, houses: number[], 
             start: s < from ? from : s,
             end: e,
             strength: score >= 4 ? 'strong' : 'good',
-            why: `${cap1(pname(it.lord))}, which ${role(it.lord)}, is in charge for these weeks${adScore ? `, inside a ${pname(ad.lord)} phase that also ${role(ad.lord)}` : ''}. A short, focused window — schedule the important step here.`,
+            why: `${cap1(pname(it.lord))}, which ${role(it.lord)}, is in charge for these weeks${adScore ? `, within the ${ad.lord} period, which also ${role(ad.lord)}` : ''}. A short, focused window — schedule the important step here.`,
           });
         }
       }
