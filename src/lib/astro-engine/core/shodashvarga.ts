@@ -183,10 +183,9 @@ export function getDivisionalSignIndex(
     }
 
     case 'D60': {
-      // Shashtiamsa: 0.5° divisions
+      // Shashtiamsa (BPHS 6.33–34): 0.5° divisions, counted from the occupied sign itself for every sign.
       const part = Math.min(Math.floor(degreeInSign / 0.5), 59);
-      const startSign = isOddSign ? signIndex : (signIndex + 6) % 12;
-      return (startSign + part) % 12;
+      return (signIndex + part) % 12;
     }
 
     default:

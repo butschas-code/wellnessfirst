@@ -514,6 +514,36 @@ class LifeRhythm {
 
   /* ═══════════ TODAY ═══════════ */
 
+  /** The whole reading in five lines, shown in the header on every tab. */
+  private renderShort(day: I.DayInsight, slots: ReturnType<typeof calculateTimedChoghadiya>, rahu: { start: Date; end: Date }, isToday: boolean, t: (d: Date) => string) {
+    const el = document.getElementById('lr-short');
+    if (!el) return;
+    const chart = this.chart!;
+    const now = new Date();
+    const { mahadasha: md, antardasha: ad } = chart.dasha.currentDasha;
+    const ads = md.antardashas ?? [];
+    let next: DashaPeriod | undefined = ads[ads.findIndex((x) => x.startDate.getTime() === ad.startDate.getTime()) + 1];
+    if (!next) {
+      const mds = chart.dasha.mahadashas;
+      next = mds[mds.findIndex((m) => m.startDate.getTime() === md.startDate.getTime()) + 1]?.antardashas?.[0];
+    }
+    const cur = I.phaseBrief(chart, ad);
+    const nxt = next ? I.phaseBrief(chart, next) : null;
+    const names = (b: I.PhaseBrief) => b.areas.slice(0, 2).map((a) => a.name.toLowerCase()).join(' and ');
+    const weakest = [...cur.areas].sort((a, b) => a.points - b.points)[0];
+    const slot = slots.find((s) => s.isDay && s.end > now && ['Amrit', 'Shubh', 'Labh'].includes(s.name) && !(s.start < rahu.end && s.end > rahu.start));
+    const dayWord = { good: 'A supportive day for you', steady: 'A steady day for you', light: 'A lighter day for you — keep big decisions for later' }[day.level];
+    const rows: Array<[string, string]> = [
+      ['Now', `${cap(names(cur))} <span class="muted">· until ${esc(longDate(ad.endDate))}</span>`],
+      ['Do', esc(cur.actions[0]) + '.'],
+      ['Avoid', esc(cap(C.AREA_PLAYBOOK[weakest.house].risk)) + '.'],
+      ['Today', `${esc(dayWord)}.${slot ? ` Best window ${esc(t(slot.start))}–${esc(t(slot.end))}${isToday ? '' : ' tomorrow'}.` : ''}`],
+    ];
+    if (nxt && next) rows.push(['Next', `${cap(names(nxt))} <span class="muted">· from ${esc(longDate(next.startDate))}</span>`]);
+    el.innerHTML = `<p class="lr-short-title">Your reading in short</p><dl>${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <p class="lr-pro lr-short-pro">Now/Next: Vimshottari ${esc(md.lord)}–${esc(ad.lord)} antardasha${next ? `, then ${esc(md.lord)}–${esc(next.lord)}` : ''}; areas = houses the sub-period lord occupies and rules. Avoid = the weakest of those houses by Sarvashtakavarga (${weakest.points} points, ${I.ORD(weakest.house)} house). Today = day score ${day.score}/100 from Tarabala, Chandrabala and transits${slot ? `; window = ${esc(slot.name)} choghadiya, outside Rahu Kalam` : ''}.</p>`;
+  }
+
   private renderToday() {
     const chart = this.chart!;
     const now = new Date();
@@ -542,6 +572,7 @@ class LifeRhythm {
     const keyDateLabel = keySolar.sunrise.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: loc.timeZone });
     const keyIsToday = calDay(keySolar.sunrise) === calDay(now);
     const keyWhen = afterSunset ? (keyIsToday ? 'Later today · ' : 'Tomorrow · ') : '';
+    this.renderShort(day, keySlots, keyMu.rahuKalam, keyIsToday, t);
 
     const overview = `
       ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. The Moon is moving through your area of ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()} — so that is a natural focus today.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}

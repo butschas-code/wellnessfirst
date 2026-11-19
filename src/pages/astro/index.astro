@@ -163,6 +163,7 @@ const steps = [
             </div>
           </div>
           <p id="lr-head-note" class="lr-head-note" hidden></p>
+          <div id="lr-short" class="lr-short" aria-label="Your reading in short"></div>
           <p id="lr-print-stamp" class="lr-print-only"></p>
         </div>
       </header>
@@ -308,6 +309,17 @@ const steps = [
     font-size: 0.8125rem; line-height: 1.5; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.14);
   }
+
+  .lr-short { margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.16); padding-top: 1.5rem; }
+  .lr-short:empty { display: none; }
+  .lr-short-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .lr-short dl { margin-top: 0.9rem; display: grid; gap: 0.6rem; max-width: 52rem; }
+  .lr-short dl > div { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; align-items: baseline; }
+  .lr-short dt { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: color-mix(in srgb, var(--color-secondary) 70%, #fff); }
+  .lr-short dd { font-size: 1rem; line-height: 1.5; color: #fff; }
+  .lr-short dd .muted { color: rgba(255,255,255,0.65); }
+  .lr-short .lr-short-pro { margin-top: 0.9rem; font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.6); }
+  @media (max-width: 480px) { .lr-short dl > div { grid-template-columns: 1fr; gap: 0.15rem; } }
 
   .lr-mode { display: inline-flex; padding: 0.25rem; border-radius: 9999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); }
   .lr-mode button {
