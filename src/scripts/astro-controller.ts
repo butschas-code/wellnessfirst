@@ -320,7 +320,7 @@ class LifeRhythm {
     const bar = this.app.querySelector<HTMLElement>('.lr-tabs-wrap');
     if (bar && 'IntersectionObserver' in window) {
       new IntersectionObserver(([e]) => bar.classList.toggle('is-stuck', e.intersectionRatio < 1 && e.boundingClientRect.top < 120), {
-        rootMargin: '-65px 0px 0px 0px',
+        rootMargin: '-77px 0px 0px 0px',
         threshold: [1],
       }).observe(bar);
     }
