@@ -591,22 +591,22 @@ class LifeRhythm {
     const keyWhen = afterSunset ? (keyIsToday ? 'Later today · ' : 'Tomorrow · ') : '';
 
     const overview = `
-      ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. The Moon is moving through your area of ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()} — so that is a natural focus today.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}
+      ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. Your natural focus today is ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()}.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}
 
       <div class="mt-10 grid gap-5 lg:grid-cols-[1fr_1.4fr]">
         <div class="lr-card flex items-center gap-6">
-          <div class="lr-score" style="--p:${day.score};--lr-score-color:${day.level === 'light' ? '#d4bf9a' : 'var(--color-secondary)'}"><div><div><p class="font-display text-3xl text-ink">${day.score}</p><p class="text-[0.7rem] text-ink-500">of 100</p></div></div></div>
+          <div class="lr-score" style="--p:${day.score};--lr-score-color:${day.level === 'light' ? '#d4bf9a' : 'var(--color-secondary)'}"><div><div><p class="lr-pro font-display text-3xl text-ink">${day.score}</p><p class="lr-pro text-[0.7rem] text-ink-500">of 100</p><p class="lr-simple-only font-display text-lg leading-tight text-ink">${{ good: 'Strong', steady: 'Steady', light: 'Light' }[day.level]}</p></div></div></div>
           <div>
             <p class="lr-label-sm">Your day rhythm</p>
-            <p class="mt-2 text-[0.9375rem] leading-relaxed text-charcoal">Calculated from your own birth Moon and today’s sky — not a generic daily horoscope.</p>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-charcoal">Calculated from your own birth details and today’s sky — not a generic daily horoscope.</p>
           </div>
         </div>
         <div class="lr-card">
           <p class="lr-label-sm">Why today feels this way</p>
           <ul class="lr-list" role="list">
-            <li><span><strong class="font-medium">Your birth star.</strong> ${esc(cap(day.taraPlain))}.</span></li>
-            <li><span><strong class="font-medium">Your Moon.</strong> ${day.chandraGood ? 'Today’s Moon sits in a supportive position relative to your birth Moon — feelings and energy tend to flow more easily.' : 'Today’s Moon sits in a less supportive position relative to your birth Moon — moods can be a little more sensitive.'}</span></li>
-            <li><span><strong class="font-medium">The wider sky.</strong> ${gochara.generalTransitTone === 'Highly Supportive' ? 'Most planets are in helpful positions for you right now.' : gochara.generalTransitTone === 'Challenging / Preservative' ? 'Several planets are in demanding positions for you right now, so pace yourself.' : 'The bigger planetary picture is mixed — neither pushing nor holding you back.'}</span></li>
+            <li><span><strong class="font-medium">Your personal rhythm.</strong> ${esc(cap(day.taraPlain))}.</span></li>
+            <li><span><strong class="font-medium">Your mood.</strong> ${day.chandraGood ? 'Feelings and energy tend to flow easily today — a good day for people and for things that need a calm head.' : 'Moods can be a little more sensitive today — leave touchy conversations for another day if you can.'}</span></li>
+            <li><span><strong class="font-medium">The bigger picture.</strong> ${gochara.generalTransitTone === 'Highly Supportive' ? 'The bigger picture is on your side right now — a good time to push things forward.' : gochara.generalTransitTone === 'Challenging / Preservative' ? 'The bigger picture is demanding right now, so pace yourself and keep buffers.' : 'The bigger picture is mixed — neither pushing nor holding you back.'}</span></li>
           </ul>
           ${ev(day.evidence)}
         </div>
@@ -702,7 +702,7 @@ class LifeRhythm {
       <section class="lr-section">
         <div class="grid gap-5 md:grid-cols-2">
           <article class="lr-card">
-            <p class="lr-label-sm">Today’s star · ${esc(nakName)}</p>
+            <p class="lr-label-sm">The character of today</p>
             <h4 class="lr-h3 mt-2">${esc(cap(nd.name))}</h4>
             <p class="mt-3 text-sm font-medium text-ink">Good for</p>
             <ul class="mt-1.5 list-disc space-y-1 pl-5 text-[0.9375rem] text-charcoal">${nd.good.map((g) => `<li>${esc(g)}</li>`).join('')}</ul>
@@ -711,9 +711,9 @@ class LifeRhythm {
             ${ev(`The Moon's nakshatra today is ${nakName}. Muhurta texts group the 27 nakshatras by nature (fixed, moving, quick, soft, mixed, sharp, fierce); each group suits different kinds of action.`)}
           </article>
           <article class="lr-card">
-            <p class="lr-label-sm">Where today’s Moon lands for you</p>
+            <p class="lr-label-sm">Where your attention goes today</p>
             <h4 class="lr-h3 mt-2">${esc(cap(day.moonArea.name))}</h4>
-            <p class="mt-3 text-[0.9375rem] leading-relaxed text-charcoal">Today the Moon moves through the part of your chart about ${esc(C.AREA_PLAYBOOK[mh].shows)}. That is where your attention naturally goes today — so put it to use.</p>
+            <p class="mt-3 text-[0.9375rem] leading-relaxed text-charcoal">Today the focus in your chart falls on ${esc(C.AREA_PLAYBOOK[mh].shows)}. That is where your attention naturally goes — so put it to use.</p>
             <div class="mt-4 rounded-xl bg-white p-4 text-[0.9375rem]"><span class="font-medium text-ink">One thing to do today:</span> ${esc(moonAct)}.</div>
             ${ev(`Transiting Moon in ${day.moonSignName}, your ${I.ORD(mh)} house from the Lagna (${day.moonArea.points} Sarvashtakavarga points).`)}
           </article>
@@ -726,7 +726,7 @@ class LifeRhythm {
           .map((d, i) => `<div class="lr-week-day lr-tone-${d.level}${d === best ? ' is-best' : ''}">
             <p class="lr-week-name">${i === 0 ? 'Today' : esc(wd(d.date))}</p>
             <p class="lr-week-date">${esc(dm(d.date))}</p>
-            <p class="lr-week-score">${d.score}</p>
+            <p class="lr-week-score"><span class="lr-pro">${d.score}</span><span class="lr-simple-only">${{ good: 'Strong', steady: 'Steady', light: 'Light' }[d.level]}</span></p>
             <p class="lr-week-for">${esc(cap(d.goodFor))}</p>
           </div>`)
           .join('')}</div>
@@ -734,9 +734,9 @@ class LifeRhythm {
       </section>
 
       ${shifts.length ? `<section class="lr-section">
-        ${sectionHead('Shifts in the coming weeks', 'Planets changing sign or direction — and what that means for you.')}
+        ${sectionHead('What changes in the coming weeks', 'The bigger shifts ahead for you, with dates — and how to use them.')}
         <ol class="lr-timeline" role="list">${shifts
-          .map((x) => `<li><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(x.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', timeZone: loc.timeZone }))}</p><p class="mt-1 text-[0.9375rem] leading-relaxed text-charcoal">${esc(x.text)}</p>${x.action ? `<p class="mt-1 text-sm text-ink"><span class="font-medium">Use it:</span> ${esc(x.action)}.</p>` : ''}</div></li>`)
+          .map((x) => `<li><span class="dot" aria-hidden="true"></span><div><p class="lr-label-sm">${esc(x.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', timeZone: loc.timeZone }))}</p><p class="mt-1 font-medium text-ink">${esc(x.title)}</p><p class="mt-1 text-[0.9375rem] leading-relaxed text-charcoal">${esc(x.text)}</p>${x.action ? `<p class="mt-1 text-sm text-ink"><span class="font-medium">Use it:</span> ${esc(x.action)}.</p>` : ''}${ev(x.pro)}</div></li>`)
           .join('')}</ol>
       </section>` : ''}
 

@@ -66,28 +66,33 @@ export function weekAhead(chart: ComprehensiveKundliResult, from: Date, place: {
   return out;
 }
 
-const RETRO: Partial<Record<PlanetName, string>> = {
-  Mercury: 'double-check messages, contracts and travel plans. Good for revising and finishing, less so for launching.',
-  Venus: 'revisit relationships and spending rather than starting new ones.',
-  Mars: 'energy turns inward — finish projects rather than starting new fights or ventures.',
-  Jupiter: 'review your growth plans and beliefs rather than expanding.',
-  Saturn: 'review commitments and structures; tidy up what isn’t working.',
+/** What a planet entering one of your life areas means in practice — no planet names (those go to Pro). */
+const ENTERS: Partial<Record<PlanetName, { stay: string; title: string; text: (shows: string) => string }>> = {
+  Sun: { stay: 'about a month', title: 'in the spotlight', text: (x) => `For about a month, ${x} move into the spotlight. Good time to take charge here, make decisions and be seen — just don’t make it all about being right.` },
+  Mercury: { stay: 'about three weeks', title: 'time to talk it through', text: (x) => `For about three weeks, this is the best time to plan, write, negotiate and sort out the details around ${x}. Have the conversations and get things on paper.` },
+  Venus: { stay: 'about four weeks', title: 'a smoother, friendlier stretch', text: (x) => `For about four weeks, things go more easily and pleasantly around ${x}. Good for agreements, making up, asking for favours and spending on quality.` },
+  Mars: { stay: 'about six weeks', title: 'more drive — and more friction', text: (x) => `For about six weeks, you get extra energy around ${x}, but also more friction. Push forward on what matters, and watch your temper.` },
+  Jupiter: { stay: 'about a year', title: 'a year of growth', text: (x) => `For about a year, growth and opportunity favour ${x}. Say yes to openings here, learn, and think bigger.` },
+  Saturn: { stay: 'about two and a half years', title: 'a long, serious stretch', text: (x) => `For about two and a half years, ${x} ask for patience, structure and commitment. What you build here slowly will last.` },
 };
-const STAY: Partial<Record<PlanetName, string>> = {
-  Sun: 'about a month',
-  Mercury: 'about three weeks',
-  Venus: 'about four weeks',
-  Mars: 'about six weeks',
-  Jupiter: 'about a year',
-  Saturn: 'about two and a half years',
+const RETRO: Partial<Record<PlanetName, { title: string; text: (shows: string) => string; back: string }>> = {
+  Mercury: { title: 'Double-check everything', text: () => 'For about three weeks, misunderstandings, delays and tech glitches are more likely. Re-read messages and contracts, back up your data, allow extra time for travel — revise and finish rather than launch.', back: 'Communication runs smoothly again — a good moment to send what you held back.' },
+  Venus: { title: 'Revisit rather than start', text: (x) => `For about six weeks, rethink relationships and spending around ${x} rather than starting new ones. Old contacts may come back.`, back: 'Relationships and money decisions get clearer again.' },
+  Mars: { title: 'Finish, don’t start fights', text: (x) => `For about two months, energy around ${x} turns inward. Finish projects and avoid new conflicts or risky starts.`, back: 'Your drive comes back — projects that stalled can move.' },
+  Jupiter: { title: 'Growth slows for a while', text: (x) => `For about four months, growth around ${x} slows down. Review your plans and consolidate rather than expand.`, back: 'Growth picks up again — time to act on what you reviewed.' },
+  Saturn: { title: 'Review your commitments', text: (x) => `For about four months, take stock of commitments and structures around ${x}. Tidy up what isn’t working.`, back: 'Things that stalled can move again — follow through on what you decided.' },
 };
 
 export interface Shift {
   date: Date;
   planet: PlanetName;
   kind: 'sign' | 'retro' | 'direct';
+  /** Plain headline, e.g. "Money & savings: a smoother, friendlier stretch". */
+  title: string;
   text: string;
   action?: string;
+  /** Technical basis for Pro view. */
+  pro: string;
 }
 
 /** Sign changes and retrograde stations of the visible planets over the next `days` days. */
@@ -101,16 +106,22 @@ export function upcomingShifts(chart: ComprehensiveKundliResult, from: Date, day
     const cur = calculatePlanetaryPositions(date, asc);
     for (const p of watch) {
       const a = prev[p], b = cur[p];
-      if (a.sign.index !== b.sign.index) {
-        const h = ((b.sign.index - asc + 12) % 12) + 1;
+      const h = ((b.sign.index - asc + 12) % 12) + 1;
+      const shows = AREA_PLAYBOOK[h].shows;
+      const name = LIFE_AREA[h].name;
+      if (a.sign.index !== b.sign.index && ENTERS[p]) {
+        const e = ENTERS[p]!;
         out.push({
-          date, planet: p, kind: 'sign',
-          text: `${I.pname(p).replace(/^the/, 'The')} moves into your area of ${LIFE_AREA[h].name.toLowerCase()} for ${STAY[p]}, bringing ${I.PLANET_NATURE[p].brings} to ${AREA_PLAYBOOK[h].shows}.`,
-          action: AREA_PLAYBOOK[h].act[0],
+          date, planet: p, kind: 'sign', title: `${name}: ${e.title}`, text: e.text(shows), action: AREA_PLAYBOOK[h].act[0],
+          pro: `${p} enters ${b.sign.name} (your ${I.ORD(h)} house from the Lagna) for ${e.stay}.`,
         });
       }
-      if (!a.isRetrograde && b.isRetrograde && RETRO[p]) out.push({ date, planet: p, kind: 'retro', text: `${p} turns retrograde (it appears to move backwards for a while): ${RETRO[p]}` });
-      if (a.isRetrograde && !b.isRetrograde && RETRO[p]) out.push({ date, planet: p, kind: 'direct', text: `${p} moves forward again — what stalled in its area can move now.` });
+      if (!a.isRetrograde && b.isRetrograde && RETRO[p]) {
+        out.push({ date, planet: p, kind: 'retro', title: RETRO[p]!.title, text: RETRO[p]!.text(shows), pro: `${p} stations retrograde in ${b.sign.name} (your ${I.ORD(h)} house).` });
+      }
+      if (a.isRetrograde && !b.isRetrograde && RETRO[p]) {
+        out.push({ date, planet: p, kind: 'direct', title: `${name}: moving again`, text: RETRO[p]!.back, pro: `${p} stations direct in ${b.sign.name} (your ${I.ORD(h)} house).` });
+      }
     }
     prev = cur;
   }

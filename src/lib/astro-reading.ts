@@ -14,7 +14,7 @@ import type { ComprehensiveKundliResult, PlanetName, DashaPeriod } from './astro
 import { calculateVarshaphal } from './astro-engine/annual/varshaphal.ts';
 import * as I from './astro-insights.ts';
 import { AREA_PLAYBOOK, LEAK, LIFE_AREA, MOON_RESET, RISING, stageOf } from './astro-content.ts';
-import { STRENGTHS } from './astro-copy.ts';
+import { CHAPTERS, STRENGTHS } from './astro-copy.ts';
 import { BASE_YOGA_PLAIN, COMES_THROUGH, LEVER, NAKSHATRA_PLAIN, PLANET_IN_HOUSE } from './astro-reading-copy.ts';
 import { YOGA_PLAIN } from './astro-content.ts';
 
@@ -54,9 +54,21 @@ const LAGNA_LORD_IN: Record<number, string> = {
 };
 
 const lc = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+/** What each planet stands for in everyday terms — used so Simple view never needs planet names. */
+const PLANET_PLAIN: Record<string, string> = {
+  Sun: 'your confidence', Moon: 'your emotional side', Mars: 'your drive', Mercury: 'your thinking and communication',
+  Jupiter: 'your judgement and growth', Venus: 'your relationships and taste', Saturn: 'your discipline', Rahu: 'your ambition', Ketu: 'your detachment',
+};
+/** Safety net: replace any planet name left in Simple text with what it stands for. */
+const plainify = (t: string) =>
+  t
+    .replace(/\s*\((?:(?:Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu)(?:,\s*| and )?)+\)/g, '')
+    .replace(/\b(?:the )?(Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu)\b/gi, (m, p: string) => PLANET_PLAIN[p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()] ?? m)
+    .replace(/(^|[.!?]\s+)([a-z])/g, (_m, a: string, b: string) => a + b.toUpperCase());
 const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const stripDot = (t: string) => t.replace(/[.\s]+$/, '');
 const area = (h: number) => LIFE_AREA[h].name.toLowerCase();
+const levelWord = (l: string) => ({ strong: 'strong', good: 'good', average: 'moderate', low: 'something to build up' } as Record<string, string>)[l] ?? 'moderate';
 const monthYear = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 const dayMonth = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 const range = (a: Date, b: Date) =>
@@ -104,9 +116,9 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const yoga = yogas.find((y) => y.strength === 'strong') ?? yogas.find((y) => y.strength === 'moderate');
   const p2 =
     `Your chart puts the most built-in support behind ${area(b1.house)} and ${area(b2.house)}. Effort there goes further than anywhere else, so give both a fixed share of every week — for example: ${lc(stripDot(AREA_PLAYBOOK[b1.house].act[0]))}, and ${lc(stripDot(AREA_PLAYBOOK[b2.house].act[0]))}. ` +
-    (yoga ? `You also carry a classical combination (${yoga.name}) that gives you ${lc(stripDot(yoga.plainTitle))}. ${yoga.plainUse} ` : '') +
+    (yoga ? `Your chart also gives you ${lc(stripDot(yoga.plainTitle))}. ${yoga.plainUse} ` : '') +
     `The opposite end is ${area(worst.house)}, which gets the least support in your chart. In everyday life that tends to look like this: ${lc(stripDot(LEAK[worst.house].risk))}. The fix is structure, not willpower: ${lc(LEAK[worst.house].fix)} ` +
-    `Finally, ${I.pname(low)} is the least powerful planet in your chart, so the quality it stands for (${lc(STRENGTHS[low]?.title ?? low)}) needs deliberate practice: ${lc(STRENGTHS[low]?.effort ?? '')}`;
+    `Finally, the quality that needs the most deliberate practice in your chart is ${lc(STRENGTHS[low]?.title ?? 'balance')}: ${lc(STRENGTHS[low]?.effort ?? '')}`;
   const how2 = `${I.explainArea(chart, b1.house)} ${I.explainArea(chart, b2.house)} ${I.explainArea(chart, worst.house)}${yoga ? ` Strongest supportive yoga: ${yoga.name} (${yoga.strength}; planets ${yoga.planets.join(', ')}).` : ''} Weakest planet by Shadbala: ${I.explainPlanet(chart, low)}`;
 
 
@@ -121,21 +133,21 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     const power = !s
       ? ''
       : s.strengthRatio >= 1.3
-        ? 'This planet is strong in your chart, so this comes through clearly and reliably.'
+        ? 'This comes through clearly and reliably for you.'
         : s.strengthRatio >= 1
-          ? 'This planet has enough strength to deliver, without much in reserve.'
-          : 'This planet is under-powered, so these themes show up unevenly — strongly at times, faintly at others.';
+          ? 'This works for you, without much in reserve.'
+          : 'This shows up unevenly — strongly at times, faintly at others.';
     const place =
       d === 'Exalted'
-        ? ' It is in its best sign — a genuine asset.'
+        ? ' It is one of the real assets in your chart.'
         : d === 'OwnSign' || d === 'Moolatrikona'
-          ? ' It is in its own territory, which makes it dependable.'
+          ? ' It is dependable.'
           : d === 'Debilitated'
             ? cancelled(p)
-              ? ' It is in its weakest sign, but a classical cancellation applies: this tends to start hard and become a strength with time and effort.'
-              : ' It is in its weakest sign, so results come later and through effort.'
+              ? ' It tends to start out hard, but it is the kind of weakness that becomes a strength with time and effort.'
+              : ' Results here come later and through effort.'
             : d === 'Enemy'
-              ? ' It sits in an uncomfortable sign, so expect some friction.'
+              ? ' Expect some friction along the way.'
               : '';
     return (power + place).trim();
   };
@@ -144,7 +156,7 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const nm = (p: PlanetName) => cap(p === 'Rahu' ? 'Rahu (the north node)' : p === 'Ketu' ? 'Ketu (the south node)' : I.pname(p));
   const placementText = (p: PlanetName, named = false) => {
     mentioned.add(p);
-    return `${nm(p)} sits ${named ? `in your area of ${area(P[p].house)}` : 'here'}: ${lc(PLANET_IN_HOUSE[p][P[p].house])} ${qual(p)}`.trim();
+    return `${named ? `In your area of ${area(P[p].house)}: ${lc(PLANET_IN_HOUSE[p][P[p].house])}` : PLANET_IN_HOUSE[p][P[p].house]} ${qual(p)}`.trim();
   };
   /** How an area reaches you, through the house its ruling planet sits in. */
   const link = (h: number, label: string) => {
@@ -153,9 +165,9 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     const dist = ((y - h + 12) % 12) + 1;
     const text =
       y === h
-        ? `${cap(label)} is ruled by ${I.pname(lord)}, which sits right in this area — you are directly in charge here, and it responds to your own effort more than to luck or other people.`
-        : `${cap(label)} is ruled by ${I.pname(lord)}, which sits in your area of ${area(y)}. So ${label} is closely tied to ${COMES_THROUGH[y]}.` +
-          ([6, 8, 12].includes(dist) ? ' That link sits in a difficult position relative to this area, so it tends to cost you something before it gives — expect detours, and don’t mistake them for dead ends.' : '');
+        ? `You are directly in charge of ${label}: it responds to your own effort more than to luck or other people.`
+        : `${cap(label)} is closely tied to ${COMES_THROUGH[y]}.` +
+          ([6, 8, 12].includes(dist) ? ' That connection is a demanding one, so it tends to cost you something before it gives — expect detours, and don’t mistake them for dead ends.' : '');
     return { lord, y, text: y === h ? text : `${text} ${qual(lord)}`.trim(), lever: `To move ${label} forward, ${LEVER[y]}.` };
   };
   const supportWords = (h: number) => {
@@ -168,9 +180,9 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const l1 = link(1, 'your life direction');
   const lagNak = chart.ascendant.nakshatra?.name;
   parts.push({
-    group: 'chart', kicker: 'You', title: `${ascSign} rising`,
+    group: 'chart', kicker: 'You', title: 'How you come across and what drives you',
     text:
-      `${RISING[ascSign]} That is the side people meet first.${lagNak && NAKSHATRA_PLAIN[lagNak] ? ` Your rising degree falls in ${lagNak}: ${NAKSHATRA_PLAIN[lagNak]}` : ''} ` +
+      `${RISING[ascSign]} That is the side people meet first.${lagNak && NAKSHATRA_PLAIN[lagNak] ? ` On top of that, ${NAKSHATRA_PLAIN[lagNak]}` : ''} ` +
       `${l1.text} In practice: ${LAGNA_LORD_IN[l1.y]} ` +
       occupantsOf(1).map((p) => placementText(p)).join(' '),
     actions: [cap(l1.lever.replace('To move your life direction forward, ', '')), cap(stripDot(AREA_PLAYBOOK[l1.y].act[0])) + '.'],
@@ -181,13 +193,13 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const moonNak = P.Moon.nakshatra.name;
   mentioned.add('Moon');
   parts.push({
-    group: 'chart', kicker: 'Your mind', title: `${moonSign} Moon in ${moonNak}`,
+    group: 'chart', kicker: 'Your mind', title: 'How you feel, cope and recover',
     text:
-      `The Moon shows how you feel, what settles you and how you handle stress. Yours is in ${moonSign}: ${lc(MOON_RESET[moonSign].style)} ` +
-      `Your birth star is ${moonNak}: ${NAKSHATRA_PLAIN[moonNak] ?? ''} ` +
-      `It sits in your area of ${area(P.Moon.house)}: ${lc(PLANET_IN_HOUSE.Moon[P.Moon.house])} ${qual('Moon')}`,
+      `Emotionally, ${lc(MOON_RESET[moonSign].style)} ` +
+      `At a deeper level, ${NAKSHATRA_PLAIN[moonNak] ?? ''} ` +
+      `${PLANET_IN_HOUSE.Moon[P.Moon.house]} ${qual('Moon')}`,
     actions: [`When you are stressed: ${lc(stripDot(MOON_RESET[moonSign].reset))}.`, cap(stripDot(AREA_PLAYBOOK[P.Moon.house].act[0])) + '.'],
-    how: I.explainPlanet(chart, 'Moon'),
+    how: `Moon in ${moonSign}, ${moonNak} nakshatra. ${I.explainPlanet(chart, 'Moon')}`,
   });
 
   // Work
@@ -198,9 +210,9 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     text:
       `${l10.text} Your career area is ${supportWords(10)}. ` +
       (occ10.length ? occ10.map((p) => placementText(p)).join(' ') + ' ' : '') +
-      `Two planets naturally stand for career: the Sun for authority and Saturn for staying power. ${I.strengthPlain(chart, 'Sun', false).text} ${I.strengthPlain(chart, 'Saturn', false).text}`,
+      `Your natural authority is ${levelWord(I.strengthPlain(chart, 'Sun').level)}, and your staying power is ${levelWord(I.strengthPlain(chart, 'Saturn').level)}.`,
     actions: [l10.lever, cap(stripDot(AREA_PLAYBOOK[10].act[0])) + '.', cap(stripDot(AREA_PLAYBOOK[10].act[1])) + '.'],
-    how: `${I.explainArea(chart, 10)} Its ruler: ${I.explainPlanet(chart, l10.lord)}`,
+    how: `${I.explainArea(chart, 10)} Its ruler: ${I.explainPlanet(chart, l10.lord)} Career karakas: Sun (authority) and Saturn (endurance).`,
   });
 
   // Partnership
@@ -211,7 +223,7 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     text:
       `${l7.text} This area is ${supportWords(7)}. ` +
       (occ7.length ? occ7.map((p) => placementText(p)).join(' ') + ' ' : '') +
-      (occ7.includes('Venus') ? '' : `Venus, the natural indicator of love and partnership, sits in your area of ${area(P.Venus.house)}. ${qual('Venus')}`),
+      (occ7.includes('Venus') ? '' : `Your capacity for warmth and harmony in love is ${levelWord(I.strengthPlain(chart, 'Venus').level)}.`),
     actions: [l7.lever, cap(stripDot(AREA_PLAYBOOK[7].act[0])) + '.', cap(stripDot(AREA_PLAYBOOK[7].act[1])) + '.'],
     how: `${I.explainArea(chart, 7)} Its ruler: ${I.explainPlanet(chart, l7.lord)}${occ7.includes('Venus') ? '' : ` Venus: ${I.explainPlanet(chart, 'Venus')}`}`,
   });
@@ -235,7 +247,7 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   parts.push({
     group: 'chart', kicker: 'Body and energy', title: 'Health, routines and stamina',
     text:
-      `Your basic vitality depends on the ruler of your chart and on the Sun. ${l1.lord === 'Sun' ? '' : `${I.strengthPlain(chart, l1.lord).text} `}${I.strengthPlain(chart, 'Sun').text} ` +
+      `Your basic vitality is ${levelWord(I.strengthPlain(chart, 'Sun').level)}, and your overall resilience is ${levelWord(I.strengthPlain(chart, l1.lord).level)}. ` +
       `${l6.text} ` +
       (occ6.length ? occ6.map((p) => placementText(p)).join(' ') : ''),
     actions: [cap(stripDot(AREA_PLAYBOOK[6].act[0])) + '.', cap(stripDot(AREA_PLAYBOOK[6].act[1])) + '.', 'This is about pacing and habits, not medical advice — for health concerns, see a qualified professional.'],
@@ -277,10 +289,10 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const next = nextAntardasha(chart, md, ad);
   const where = pct < 25 ? 'near the start' : pct < 50 ? 'in the first half' : pct < 75 ? 'past the middle' : 'in the final stretch';
   const p3 =
-    `Since ${monthYear(md.startDate)}${md.startDate > birth ? ` (age ${age(md.startDate)})` : ' (your birth)'} you have been in a ${md.lord} chapter that runs until ${monthYear(md.endDate)} (age ${age(md.endDate)}). ` +
-    `${cap(I.pname(md.lord))} sits in your area of ${area(mdB.areas[0].house)}${mdRules.length ? ` and also rules ${joinAnd(mdRules)}` : ''}, so these years keep returning to ${AREA_PLAYBOOK[mdB.areas[0].house].shows}. ` +
-    `${I.strengthPlain(chart, md.lord).text} You are ${where} of this chapter: ${lc(stage.text)} ` +
-    `Right now, until ${dayMonth(ad.endDate)}, the ${ad.lord} sub-period puts ${joinAnd(adB.areas.slice(0, 2).map((a) => area(a.house)))} in front. ${blend.text} ` +
+    `Since ${monthYear(md.startDate)}${md.startDate > birth ? ` (age ${age(md.startDate)})` : ' (your birth)'} you have been in a chapter of ${CHAPTERS[md.lord].short.toLowerCase()} that runs until ${monthYear(md.endDate)} (age ${age(md.endDate)}). ` +
+    `It plays out mainly in your area of ${area(mdB.areas[0].house)}${mdRules.length ? `, and it also involves ${joinAnd(mdRules)}` : ''}, so these years keep returning to ${AREA_PLAYBOOK[mdB.areas[0].house].shows}. ` +
+    `Your chart gives this chapter ${{ strong: 'strong', good: 'good', average: 'moderate', low: 'limited' }[I.strengthPlain(chart, md.lord).level]} backing. You are ${where} of it: ${lc(stage.text)} ` +
+    `Right now, until ${dayMonth(ad.endDate)}, the current sub-phase puts ${joinAnd(adB.areas.slice(0, 2).map((a) => area(a.house)))} in front. ${blend.text} ` +
     `The two most useful moves for this stretch: ${lc(stripDot(adB.actions[0]))}, and ${lc(stripDot(adB.actions[1] ?? adB.actions[0]))}. Before ${dayMonth(ad.endDate)}, ${lc(stripDot(adB.close[0]))}${next ? ` — from then on the focus moves to ${joinAnd(I.phaseBrief(chart, next).areas.slice(0, 2).map((a) => area(a.house)))}` : ''}.`;
   const how3 = `Vimshottari ${md.lord} mahadasha ${md.startDate.toISOString().slice(0, 10)} to ${md.endDate.toISOString().slice(0, 10)} (${pct}% elapsed); ${ad.lord} antardasha to ${ad.endDate.toISOString().slice(0, 10)}${next ? `, then ${next.lord}` : ''}. ${mdB.evidence} ${blend.evidence}`;
 
@@ -294,7 +306,7 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   const lines: string[] = [];
   for (const t of ['career', 'money', 'relationships'] as const) {
     const w = pick(t);
-    if (w) lines.push(`for ${labels[t]}, ${range(w.start, w.end)} (${stripDot(w.why.split('.')[0]).replace(/^The /, 'the ')})`);
+    if (w) lines.push(`for ${labels[t]}, ${range(w.start, w.end)}${w.strength === 'strong' ? ' (a strong window)' : ''}`);
   }
   const tr = I.slowTransits(chart, now);
   const sat = tr.find((x) => x.planet === 'Saturn')!;
@@ -313,8 +325,8 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     (lines.length
       ? `Your clearest openings in the next 18 months: ${joinAnd(lines)}. Put the important steps for each into those dates rather than spreading them evenly. `
       : 'The next 18 months bring no sharply marked openings for work, money or relationships, so steady, even effort works better than waiting for a big moment. ') +
-    `In the background, Jupiter ${jup.favourable ? 'supports' : 'quietly helps'} your area of ${area(jup.houseFromAsc)}${jup.until ? ` until about ${monthYear(jup.until)}` : ''} — ${jup.favourable ? 'a good time to say yes to growth there' : 'growth there comes through steady effort rather than luck'}. ` +
-    `Saturn ${sat.favourable ? 'rewards patient work' : 'asks for patience and structure'} in your area of ${area(sat.houseFromAsc)}${sat.until ? ` until about ${monthYear(sat.until)}` : ''} — ${sat.favourable ? 'slow, disciplined effort there builds something lasting' : `expect that part of life to feel like hard work; don’t force it, build systems around it`}.` +
+    `In the background, the slow cycle of growth ${jup.favourable ? 'supports' : 'quietly helps'} your area of ${area(jup.houseFromAsc)}${jup.until ? ` until about ${monthYear(jup.until)}` : ''} — ${jup.favourable ? 'a good time to say yes to growth there' : 'growth there comes through steady effort rather than luck'}. ` +
+    `The slow cycle of discipline ${sat.favourable ? 'rewards patient work' : 'asks for patience and structure'} in your area of ${area(sat.houseFromAsc)}${sat.until ? ` until about ${monthYear(sat.until)}` : ''} — ${sat.favourable ? 'slow, disciplined effort there builds something lasting' : `expect that part of life to feel like hard work; don’t force it, build systems around it`}.` +
     yearLine;
   const how4 = `Windows: Vimshottari antardashas and pratyantardashas whose lords occupy or rule the 10th/2nd/7th houses, plus Jupiter transits through them (next 18 months). ${jup.evidence} ${sat.evidence}${howYear}`;
 
@@ -325,7 +337,7 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
   ];
 
   parts.unshift({ group: 'chart', kicker: 'Overview', title: 'Where your effort pays — and where it leaks', text: p2, actions: [cap(stripDot(AREA_PLAYBOOK[b1.house].act[0])) + '.', cap(stripDot(LEAK[worst.house].fix)) + '.'], how: how2 });
-  parts.push({ group: 'timing', kicker: 'Where you are now', title: `The ${md.lord} chapter`, text: p3, actions: [cap(stripDot(adB.actions[0])) + '.', cap(stripDot(adB.actions[1] ?? adB.actions[0])) + '.', `Before ${dayMonth(ad.endDate)}: ${lc(stripDot(adB.close[0]))}.`], how: how3 });
+  parts.push({ group: 'timing', kicker: 'Where you are now', title: `A chapter of ${CHAPTERS[md.lord].short.toLowerCase()}`, text: p3, actions: [cap(stripDot(adB.actions[0])) + '.', cap(stripDot(adB.actions[1] ?? adB.actions[0])) + '.', `Before ${dayMonth(ad.endDate)}: ${lc(stripDot(adB.close[0]))}.`], how: how3 });
   parts.push({ group: 'timing', kicker: 'Coming up', title: 'The next 18 months', text: p4, actions: lines.length ? ['Put your most important steps for work, money and relationships into the dates above.', 'Mark the dates in your calendar now, with one concrete goal for each.'] : ['Keep an even weekly rhythm rather than waiting for a big moment.'], how: how4 });
 
   // Combinations (yogas), each tied to the placements that form it.
@@ -346,19 +358,24 @@ export function buildReading(chart: ComprehensiveKundliResult, now: Date = new D
     const mild = y.strength === 'weak' && y.nature === 'supportive' ? ' The planets forming it are not very strong, so expect a milder version that needs effort to activate.' : '';
     parts.push({
       group: 'combinations', kicker: y.nature === 'supportive' ? 'Supportive combination' : 'Combination that asks for care', title: y.plainTitle,
-      text: `${where.length ? `In your chart this is formed by ${joinAnd([...new Set(where)])}. ` : ''}${y.plainUse}${mild}`,
+      text: `${y.plainUse}${mild.replace('The planets forming it are', 'In your chart it is')}`,
       actions: [],
-      how: `${y.name} (${y.strength}): ${y.description}`,
+      how: `${y.name} (${y.strength}): ${y.description}${where.length ? ` Formed by ${joinAnd([...new Set(where)])}.` : ''}`,
     });
   }
   if (chart.doshas?.kaalSarp?.isKaalSarp) {
     parts.push({
       group: 'combinations', kicker: 'Combination that asks for care', title: 'Life on one track',
-      text: `All seven classical planets sit on one side of the Rahu–Ketu axis (Rahu in your area of ${area(P.Rahu.house)}, Ketu in ${area(P.Ketu.house)}). Life can feel channelled along one strong track, with little sideways room. Use the focus it gives you, and deliberately build a second interest or support system so you aren’t carried along by one theme only.`,
+      text: `Your chart is unusually focused: everything pulls between ${area(P.Rahu.house)} on one side and ${area(P.Ketu.house)} on the other. Life can feel channelled along one strong track, with little sideways room. Use the focus it gives you, and deliberately build a second interest or support system so you aren’t carried along by one theme only.`,
       actions: [],
-      how: 'Kaal Sarp (modern classification, not in BPHS): all seven planets hemmed between Rahu and Ketu.',
+      how: `Kaal Sarp (modern classification, not in BPHS): all seven planets hemmed between Rahu (${I.ORD(P.Rahu.house)} house) and Ketu (${I.ORD(P.Ketu.house)} house).`,
     });
   }
 
+  for (const p of parts) {
+    p.text = plainify(p.text);
+    p.title = plainify(p.title);
+    p.actions = p.actions.map(plainify);
+  }
   return { parts, questions };
 }
