@@ -21,6 +21,10 @@ const configuredSite = siteFromEnv || 'https://www.wellnessfirstglobal.com';
 export default defineConfig({
   site: configuredSite,
   output: 'static',
+  /** Life Rhythm moved from /astro — keep old links and bookmarks working. */
+  redirects: {
+    '/astro': '/liferhythm',
+  },
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
@@ -42,7 +46,7 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) => {
-        if (page.includes('/styleguide') || page.includes('/app')) return false;
+        if (page.includes('/styleguide') || page.includes('/app') || /\/astro\/?$/.test(page)) return false;
         try {
           const p = new URL(page).pathname.replace(/\/$/, '') || '/';
           if (p === '/community/dashboard' || p.startsWith('/community/')) return false;
