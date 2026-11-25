@@ -590,6 +590,17 @@ class LifeRhythm {
     const keyIsToday = calDay(keySolar.sunrise) === calDay(now);
     const keyWhen = afterSunset ? (keyIsToday ? 'Later today · ' : 'Tomorrow · ') : '';
 
+    const keyWindows = `
+      <section class="lr-section">
+        ${sectionHead(`Key windows · ${keyIsToday ? 'today, ' : 'tomorrow, '}${keyDateLabel}`, `From the real sunrise (${t(keySolar.sunrise)}) and sunset (${t(keySolar.sunset)}) in ${town}.`)}
+        <div class="grid gap-5 md:grid-cols-3">
+          ${card(`${t(keyMu.abhijitMuhurat.start)} – ${t(keyMu.abhijitMuhurat.end)}`, 'Around local noon — a strong window for important decisions and starting things.', 'Abhijit muhurta (8th of 15 daytime muhurtas)', { kicker: `${keyWhen}Best for decisions` })}
+          ${firstPeople ? card(`${t(firstPeople.start)} – ${t(firstPeople.end)}`, `${HOURS[firstPeople.name].label}: ${HOURS[firstPeople.name].tip.toLowerCase()}.`, `${firstPeople.name} choghadiya`, { kicker: `${keyWhen}Good for people` }) : card('Later', 'The best daytime windows for meetings have passed.', undefined, { kicker: 'Good for people' })}
+          ${card(`${t(keyMu.rahuKalam.start)} – ${t(keyMu.rahuKalam.end)}`, 'Traditionally avoided for starting new things. Fine for routine work.', `Rahu Kalam (octant ${['8', '2', '7', '5', '6', '4', '3'][keySolar.weekday]} of daytime)`, { kicker: `${keyWhen}Avoid new starts`, quiet: true })}
+        </div>
+      </section>
+`;
+
     const overview = `
       ${intro(dateStr, cap(headline), `Today is ${day.taraPlain} for you. Your natural focus today is ${day.moonArea.name.toLowerCase()} — ${day.moonArea.about.toLowerCase()}.`, `<span class="lr-pill lr-tone-${day.level}">${levelLabel}</span>`)}
 
@@ -617,16 +628,9 @@ class LifeRhythm {
         <div class="lr-card-quiet"><p class="lr-label-sm">Keep off your plate</p>${labeledList(C.TODAY_AVOID, true)}</div>
       </div>
 
-      ${this.todayExtrasHtml(day, panchang.nakshatra.name, keySlots, keyMu.rahuKalam, now, t, keyWhen, loc)}
+      ${this.todayExtrasHtml(day, panchang.nakshatra.name, keySlots, keyMu.rahuKalam, now, t, { day: `${keyIsToday ? 'today' : 'tomorrow'}, ${keyDateLabel}`, afterSunset }, loc, keyWindows)}
 
-      <section class="lr-section">
-        ${sectionHead(`Key windows · ${keyIsToday ? 'today, ' : 'tomorrow, '}${keyDateLabel}`, `From the real sunrise (${t(keySolar.sunrise)}) and sunset (${t(keySolar.sunset)}) in ${town}.`)}
-        <div class="grid gap-5 md:grid-cols-3">
-          ${card(`${t(keyMu.abhijitMuhurat.start)} – ${t(keyMu.abhijitMuhurat.end)}`, 'Around local noon — a strong window for important decisions and starting things.', 'Abhijit muhurta (8th of 15 daytime muhurtas)', { kicker: `${keyWhen}Best for decisions` })}
-          ${firstPeople ? card(`${t(firstPeople.start)} – ${t(firstPeople.end)}`, `${HOURS[firstPeople.name].label}: ${HOURS[firstPeople.name].tip.toLowerCase()}.`, `${firstPeople.name} choghadiya`, { kicker: `${keyWhen}Good for people` }) : card('Later', 'The best daytime windows for meetings have passed.', undefined, { kicker: 'Good for people' })}
-          ${card(`${t(keyMu.rahuKalam.start)} – ${t(keyMu.rahuKalam.end)}`, 'Traditionally avoided for starting new things. Fine for routine work.', `Rahu Kalam (octant ${['8', '2', '7', '5', '6', '4', '3'][keySolar.weekday]} of daytime)`, { kicker: `${keyWhen}Avoid new starts`, quiet: true })}
-        </div>
-      </section>
+      ${afterSunset ? '' : keyWindows}
 
       ${proBlock(
         kv([
@@ -667,8 +671,9 @@ class LifeRhythm {
     rahu: { start: Date; end: Date },
     now: Date,
     t: (d: Date) => string,
-    when: string,
-    loc: TodayPlace
+    planFor: { day: string; afterSunset: boolean },
+    loc: TodayPlace,
+    tomorrowExtra = ''
   ) {
     const chart = this.chart!;
     const clear = (s: { start: Date; end: Date }) => !(s.start < rahu.end && s.end > rahu.start);
@@ -693,11 +698,15 @@ class LifeRhythm {
     const wd = (d: Date) => d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: loc.timeZone });
     const dm = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: loc.timeZone });
 
-    return `
+    const planSec = `
       <section class="lr-section">
-        ${sectionHead(`${when}Your plan for the day`, 'Built from today’s real sunrise where you are and the quality of each part of the day.')}
+        ${sectionHead(`Your plan for ${planFor.day}`, planFor.afterSunset ? `The sun has set, so today’s daytime windows are over — this plan is for the coming day, built from its real sunrise where you are.` : 'Built from today’s real sunrise where you are and the quality of each part of the day.')}
         <ol class="lr-plan" role="list">${plan.map(([time, what]) => `<li><span class="lr-plan-time">${esc(time)}</span><span>${esc(what)}</span></li>`).join('')}</ol>
       </section>
+`;
+
+    return `
+      ${planFor.afterSunset ? '' : planSec}
 
       <section class="lr-section">
         <div class="grid gap-5 md:grid-cols-2">
@@ -719,6 +728,8 @@ class LifeRhythm {
           </article>
         </div>
       </section>
+
+      ${planFor.afterSunset ? planSec + tomorrowExtra : ''}
 
       <section class="lr-section">
         ${sectionHead('Your week ahead', `Best day this week: ${best.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: loc.timeZone })} — good for ${best.goodFor}.`)}
