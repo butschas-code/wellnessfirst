@@ -219,10 +219,14 @@ const articleLd = articleJsonLd({
 </BaseLayout>
 
 <script>
+  import { onPage } from '@/lib/page-lifecycle';
   import { initArticleFavorites } from '@/scripts/article-favorites';
   import { initArticleReflectionPanel } from '@/scripts/article-reflection-panel';
   import { initArticleMemberAccess } from '@/scripts/article-member-access';
-  initArticleFavorites();
-  initArticleReflectionPanel();
-  initArticleMemberAccess();
+
+  onPage((signal) => {
+    initArticleFavorites(signal);
+    initArticleReflectionPanel();
+    initArticleMemberAccess();
+  }, { when: () => /^\/articles\/[^/]+\/?$/.test(window.location.pathname) });
 </script>

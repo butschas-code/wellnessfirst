@@ -128,6 +128,10 @@ import {
 </AppLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initConsultationRequestPage } from '@/scripts/consultation-request';
-  void initConsultationRequestPage();
+
+  onPage((signal) => {
+    void initConsultationRequestPage();
+  }, { when: atPath('/my-wellness-space/consultation') });
 </script>

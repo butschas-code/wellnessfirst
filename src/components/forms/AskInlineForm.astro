@@ -122,26 +122,30 @@ const formId = id ?? 'wfg-ask-inline';
 </form>
 
 <script>
-  // Combine the selected area + question into the `message` field the API expects.
-  document.querySelectorAll<HTMLFormElement>('form[data-ask-inline]').forEach((form) => {
-    form.addEventListener('submit', () => {
-      const area = (form.querySelector<HTMLInputElement>('input[name="ask_area"]:checked')?.value ?? 'general')
-        .trim();
-      const question = (form.querySelector<HTMLTextAreaElement>('textarea[name="question"]')?.value ?? '').trim();
-      const messageInput = form.querySelector<HTMLInputElement>('input[name="message"]');
-      if (messageInput) {
-        const label =
-          area === 'astrology'
-            ? 'Astrology question'
-            : area === 'vastu'
-              ? 'Vastu question'
-              : area === 'home'
-                ? 'Home-harmony question'
-                : area === 'frequency'
-                  ? 'Frequency question'
-                  : 'Question';
-        messageInput.value = `[${label}]\n\n${question}`;
-      }
-    }, true); // capture so it runs before wfg-forms' bindContact submit handler reads the FormData
-  });
+  import { onPage, has } from '@/lib/page-lifecycle';
+
+  onPage((signal) => {
+    // Combine the selected area + question into the `message` field the API expects.
+    document.querySelectorAll<HTMLFormElement>('form[data-ask-inline]').forEach((form) => {
+      form.addEventListener('submit', () => {
+        const area = (form.querySelector<HTMLInputElement>('input[name="ask_area"]:checked')?.value ?? 'general')
+          .trim();
+        const question = (form.querySelector<HTMLTextAreaElement>('textarea[name="question"]')?.value ?? '').trim();
+        const messageInput = form.querySelector<HTMLInputElement>('input[name="message"]');
+        if (messageInput) {
+          const label =
+            area === 'astrology'
+              ? 'Astrology question'
+              : area === 'vastu'
+                ? 'Vastu question'
+                : area === 'home'
+                  ? 'Home-harmony question'
+                  : area === 'frequency'
+                    ? 'Frequency question'
+                    : 'Question';
+          messageInput.value = `[${label}]\n\n${question}`;
+        }
+      }, true); // capture so it runs before wfg-forms' bindContact submit handler reads the FormData
+    });
+  }, { when: has('form[data-ask-inline]') });
 </script>

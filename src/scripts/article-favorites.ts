@@ -190,9 +190,12 @@ async function onFavoriteClick(btn: HTMLElement): Promise<void> {
   }
 }
 
-function bindDelegation(): void {
+function bindDelegation(signal?: AbortSignal): void {
   if (delegationBound) return;
   delegationBound = true;
+  signal?.addEventListener('abort', () => {
+    delegationBound = false;
+  });
 
   document.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement | null;
@@ -201,17 +204,18 @@ function bindDelegation(): void {
     ev.preventDefault();
     ev.stopPropagation();
     void onFavoriteClick(btn);
-  });
+  }, { signal });
 
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowser();
-  supabase.auth.onAuthStateChange(() => void hydrate());
+  const { data } = supabase.auth.onAuthStateChange(() => void hydrate());
+  signal?.addEventListener('abort', () => data.subscription.unsubscribe());
 }
 
 /** Wire favorite buttons present in the DOM; safe to call on every page load. */
-export function initArticleFavorites(): void {
+export function initArticleFavorites(signal?: AbortSignal): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  bindDelegation();
+  bindDelegation(signal);
   void hydrate();
 }

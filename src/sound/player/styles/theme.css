@@ -1,0 +1,72 @@
+/*
+ * Wellness Waves — Wellness First theme layer (loads after waves.css).
+ * Brand: deep navy scene, cream type and sheets, sage light; Newsreader for
+ * display type, Inter for UI. Values follow src/styles/tokens.css.
+ */
+
+.ww {
+  --ink: #071a27;
+  --ink-raised: #0a2334;
+  --ink-high: #12354c;
+  --paper: #f4efe6;
+  --paper-dim: #cfd3cc;
+  --paper-faint: #95a3a8;
+  --glow: #a9c193;
+  --glow-soft: rgba(137, 163, 117, 0.2);
+  --danger: #e8a39a;
+  --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+/* Each space keeps its own light, in muted tones that sit with navy and sage. */
+.ww[data-depth='focus'] { --glow: #a2c0c5; --glow-soft: rgba(162, 192, 197, 0.2); }
+.ww[data-depth='relax'] { --glow: #a9c193; --glow-soft: rgba(169, 193, 147, 0.2); }
+.ww[data-depth='sleep'] { --glow: #93a6cc; --glow-soft: rgba(147, 166, 204, 0.2); }
+.ww[data-depth='meditate'] { --glow: #b9b6d8; --glow-soft: rgba(185, 182, 216, 0.2); }
+.ww[data-depth='energy'] { --glow: #cbd68f; --glow-soft: rgba(203, 214, 143, 0.2); }
+.ww[data-depth='balance'] { --glow: #e2c5b6; --glow-soft: rgba(226, 197, 182, 0.2); }
+.ww[data-depth='recover'] { --glow: #9fc9c1; --glow-soft: rgba(159, 201, 193, 0.2); }
+
+/* The island root lives at the end of every page: no size, no background of its own. */
+.ww.ww-shell { min-height: 0; background: none; font-weight: 400; }
+
+/*
+ * /sound: a full-screen room under the floating site nav. The room is not a
+ * stacking context, so its sheets (z 71) can rise above the site nav (z 40);
+ * the water canvas (z -1) shows because the page backgrounds step aside.
+ */
+html:has(body.ww-sound-page) { background: #071a27 !important; overflow: hidden; }
+body.ww-sound-page { background: transparent !important; }
+.ww.ww-room { position: relative; min-height: 0; height: 100svh; overflow: hidden; background: transparent; font-weight: 400; }
+.ww-room .home { height: 100svh; }
+
+/* Display type: Newsreader, a little tighter than body text. */
+.ww .sheet h2, .ww .home__space-name, .ww .h1, .ww .h2, .ww .h3, .ww .display, .ww .descriptor { letter-spacing: -0.01em; }
+
+/* Light sheets: cream paper with navy ink, like the rest of the site's cards. */
+.ww .sheet {
+  --paper: #0a2334;
+  --paper-dim: #2f3a42;
+  --paper-faint: #4a5c68;
+  --glass: rgba(10, 35, 52, 0.05);
+  --glass-strong: rgba(10, 35, 52, 0.09);
+  --glass-line: rgba(10, 35, 52, 0.16);
+  --hair: rgba(10, 35, 52, 0.1);
+  --hair-strong: rgba(10, 35, 52, 0.2);
+  --glow: #5f7d4c;
+  --glow-soft: rgba(95, 125, 76, 0.16);
+  background: #f4efe6;
+  color: var(--paper);
+  box-shadow: 0 24px 60px -20px rgba(4, 16, 25, 0.55);
+}
+.ww .sheet .btn--primary { background: #0a2334; color: #f4efe6; }
+
+/* Mini player: navy glass bar, clear of the site's own floating controls. */
+.ww .mini { background: rgba(10, 35, 52, 0.92); border: 1px solid rgba(244, 239, 230, 0.14); color: var(--paper); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+
+/* "Playing in another tab" note. */
+.ww .ww-notice {
+  position: fixed; z-index: 36; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  max-width: min(92vw, 520px); padding: 10px 16px; border-radius: 999px;
+  background: rgba(10, 35, 52, 0.92); color: var(--paper); font-size: 0.85rem; text-align: center;
+}

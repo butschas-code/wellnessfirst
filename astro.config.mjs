@@ -7,6 +7,7 @@ import cloudflare from '@astrojs/cloudflare';
 import vercel from '@astrojs/vercel';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import react from '@astrojs/react';
 
 /** Vercel sets `VERCEL=1` during `npm run build` — the Cloudflare adapter is incompatible with that platform. */
 const useVercel = Boolean(process.env.VERCEL);
@@ -44,6 +45,8 @@ export default defineConfig({
   adapter: useVercel ? vercel() : cloudflare(),
   integrations: [
     mdx(),
+    /** Wellness Waves player (src/sound/player) is a React island. */
+    react({ include: ['**/src/sound/**'] }),
     sitemap({
       filter: (page) => {
         if (page.includes('/styleguide') || page.includes('/app') || /\/astro\/?$/.test(page)) return false;

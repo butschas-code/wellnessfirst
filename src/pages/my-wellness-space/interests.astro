@@ -54,142 +54,145 @@ import { TOPIC_KEYS, TOPIC_LABELS } from '@/lib/member/topic-labels';
 </AppLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { guardSessionOrRedirect } from '@/lib/app/guardSession';
   import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
 
-  function selectedKeys(form: HTMLFormElement): string[] {
-    return Array.from(form.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]:checked')).map((b) => b.value);
-  }
-
-  function updateCount(form: HTMLFormElement, el: HTMLElement | null) {
-    if (!el) return;
-    const n = selectedKeys(form).length;
-    el.textContent =
-      n === 0 ? 'No areas selected yet — choose whenever it feels right.' : `${n} ${n === 1 ? 'area' : 'areas'} selected.`;
-  }
-
-  (async () => {
-    const state = document.getElementById('w-int-state');
-    const panel = document.getElementById('w-int-panel');
-    const form = document.getElementById('w-int-form') as HTMLFormElement | null;
-    const err = document.getElementById('w-int-error');
-    const ok = document.getElementById('w-int-ok');
-    const countEl = document.getElementById('w-int-count');
-    const submitBtn = document.getElementById('w-int-submit') as HTMLButtonElement | null;
-
-    if (!isSupabaseConfigured() || !form) {
-      state!.textContent = 'Supabase is not configured.';
-      return;
+  onPage((signal) => {
+    function selectedKeys(form: HTMLFormElement): string[] {
+      return Array.from(form.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]:checked')).map((b) => b.value);
     }
 
-    const session = await guardSessionOrRedirect();
-    if (!session) return;
+    function updateCount(form: HTMLFormElement, el: HTMLElement | null) {
+      if (!el) return;
+      const n = selectedKeys(form).length;
+      el.textContent =
+        n === 0 ? 'No areas selected yet — choose whenever it feels right.' : `${n} ${n === 1 ? 'area' : 'areas'} selected.`;
+    }
 
-    const userId = session.user.id;
-    const formEl = form;
+    (async () => {
+      const state = document.getElementById('w-int-state');
+      const panel = document.getElementById('w-int-panel');
+      const form = document.getElementById('w-int-form') as HTMLFormElement | null;
+      const err = document.getElementById('w-int-error');
+      const ok = document.getElementById('w-int-ok');
+      const countEl = document.getElementById('w-int-count');
+      const submitBtn = document.getElementById('w-int-submit') as HTMLButtonElement | null;
 
-    const supabase = getSupabaseBrowser();
-    let existingKeys = new Set<string>();
-
-    async function loadPrefs() {
-      const { data: prefs, error } = await supabase.from('topic_preferences').select('topic_key').eq('user_id', userId);
-      if (error) {
-        state!.textContent = error.message;
-        return false;
+      if (!isSupabaseConfigured() || !form) {
+        state!.textContent = 'Supabase is not configured.';
+        return;
       }
-      existingKeys = new Set((prefs ?? []).map((p) => p.topic_key));
+
+      const session = await guardSessionOrRedirect();
+      if (!session) return;
+
+      const userId = session.user.id;
+      const formEl = form;
+
+      const supabase = getSupabaseBrowser();
+      let existingKeys = new Set<string>();
+
+      async function loadPrefs() {
+        const { data: prefs, error } = await supabase.from('topic_preferences').select('topic_key').eq('user_id', userId);
+        if (error) {
+          state!.textContent = error.message;
+          return false;
+        }
+        existingKeys = new Set((prefs ?? []).map((p) => p.topic_key));
+        formEl.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]').forEach((cb) => {
+          cb.checked = existingKeys.has(cb.value);
+        });
+        updateCount(formEl, countEl);
+        return true;
+      }
+
+      const loaded = await loadPrefs();
+      if (!loaded) return;
+
+      state?.classList.add('hidden');
+      panel?.classList.remove('hidden');
+
       formEl.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]').forEach((cb) => {
-        cb.checked = existingKeys.has(cb.value);
+        cb.addEventListener('change', () => updateCount(formEl, countEl));
       });
-      updateCount(formEl, countEl);
-      return true;
-    }
 
-    const loaded = await loadPrefs();
-    if (!loaded) return;
+      formEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        err?.classList.add('hidden');
+        ok?.classList.add('hidden');
 
-    state?.classList.add('hidden');
-    panel?.classList.remove('hidden');
+        const keys = selectedKeys(formEl);
+        const selectedSet = new Set(keys);
 
-    formEl.querySelectorAll<HTMLInputElement>('[data-topic-checkbox]').forEach((cb) => {
-      cb.addEventListener('change', () => updateCount(formEl, countEl));
-    });
+        const toRemove = [...existingKeys].filter((k) => !selectedSet.has(k));
+        const toAdd = [...selectedSet].filter((k) => !existingKeys.has(k));
 
-    formEl.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      err?.classList.add('hidden');
-      ok?.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving…';
+        }
 
-      const keys = selectedKeys(formEl);
-      const selectedSet = new Set(keys);
+        if (toRemove.length > 0) {
+          const { error: delErr } = await supabase.from('topic_preferences').delete().eq('user_id', userId).in('topic_key', toRemove);
+          if (delErr) {
+            if (err) {
+              err.textContent = delErr.message;
+              err.classList.remove('hidden');
+            }
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Save choices';
+            }
+            return;
+          }
+        }
 
-      const toRemove = [...existingKeys].filter((k) => !selectedSet.has(k));
-      const toAdd = [...selectedSet].filter((k) => !existingKeys.has(k));
+        if (toAdd.length > 0) {
+          const { error: insErr } = await supabase
+            .from('topic_preferences')
+            .insert(toAdd.map((topic_key) => ({ user_id: userId, topic_key })));
+          if (insErr) {
+            if (err) {
+              err.textContent = insErr.message;
+              err.classList.remove('hidden');
+            }
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Save choices';
+            }
+            return;
+          }
+        }
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Saving…';
-      }
+        const { error: profileErr } = await supabase
+          .from('profiles')
+          .update({ onboarding_completed: keys.length >= 1 })
+          .eq('id', userId);
 
-      if (toRemove.length > 0) {
-        const { error: delErr } = await supabase.from('topic_preferences').delete().eq('user_id', userId).in('topic_key', toRemove);
-        if (delErr) {
+        if (profileErr) {
           if (err) {
-            err.textContent = delErr.message;
+            err.textContent = `Topics saved, but profile could not be updated: ${profileErr.message}`;
             err.classList.remove('hidden');
           }
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Save choices';
-          }
-          return;
         }
-      }
 
-      if (toAdd.length > 0) {
-        const { error: insErr } = await supabase
-          .from('topic_preferences')
-          .insert(toAdd.map((topic_key) => ({ user_id: userId, topic_key })));
-        if (insErr) {
-          if (err) {
-            err.textContent = insErr.message;
-            err.classList.remove('hidden');
-          }
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Save choices';
-          }
-          return;
+        existingKeys = selectedSet;
+
+        if (ok) {
+          ok.textContent =
+            keys.length === 0
+              ? 'Saved. Your overview will offer general suggestions until you choose areas again.'
+              : 'Saved. Your overview will quietly favour readings and resources that honour these themes.';
+          ok.classList.remove('hidden');
         }
-      }
 
-      const { error: profileErr } = await supabase
-        .from('profiles')
-        .update({ onboarding_completed: keys.length >= 1 })
-        .eq('id', userId);
-
-      if (profileErr) {
-        if (err) {
-          err.textContent = `Topics saved, but profile could not be updated: ${profileErr.message}`;
-          err.classList.remove('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save choices';
         }
-      }
-
-      existingKeys = selectedSet;
-
-      if (ok) {
-        ok.textContent =
-          keys.length === 0
-            ? 'Saved. Your overview will offer general suggestions until you choose areas again.'
-            : 'Saved. Your overview will quietly favour readings and resources that honour these themes.';
-        ok.classList.remove('hidden');
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Save choices';
-      }
-      updateCount(formEl, countEl);
-    });
-  })();
+        updateCount(formEl, countEl);
+      });
+    })();
+  }, { when: atPath('/my-wellness-space/interests') });
 </script>

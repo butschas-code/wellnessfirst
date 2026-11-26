@@ -213,97 +213,105 @@ const topicFilterValues = ['all', ...activePillars] as const;
 </BaseLayout>
 
 <script>
-  const topicRoot = document.querySelector('[data-article-filters]');
-  const kwRoot = document.querySelector('[data-article-keyword-filters]');
-  const noMatch = document.querySelector('[data-article-no-match]') as HTMLElement | null;
-  const sections = () => document.querySelectorAll<HTMLElement>('[data-article-section]');
+  import { onPage, atPath } from '@/lib/page-lifecycle';
 
-  const getSelectedTopic = () =>
-    (topicRoot?.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute(
-      'data-article-filter',
-    ) || 'all';
+  onPage((signal) => {
+    const topicRoot = document.querySelector('[data-article-filters]');
+    const kwRoot = document.querySelector('[data-article-keyword-filters]');
+    const noMatch = document.querySelector('[data-article-no-match]') as HTMLElement | null;
+    const sections = () => document.querySelectorAll<HTMLElement>('[data-article-section]');
 
-  const getSelectedKeyword = () => {
-    if (!kwRoot) return 'all';
-    return (
-      (kwRoot.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute('data-article-keyword') || 'all'
-    );
-  };
+    const getSelectedTopic = () =>
+      (topicRoot?.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute(
+        'data-article-filter',
+      ) || 'all';
 
-  const setShowAll = () => {
-    if (!topicRoot) return;
-    const firstT = topicRoot.querySelector('button[data-article-filter="all"]') as HTMLButtonElement | null;
-    firstT?.click();
+    const getSelectedKeyword = () => {
+      if (!kwRoot) return 'all';
+      return (
+        (kwRoot.querySelector('button[aria-pressed="true"]') as HTMLButtonElement | null)?.getAttribute('data-article-keyword') || 'all'
+      );
+    };
+
+    const setShowAll = () => {
+      if (!topicRoot) return;
+      const firstT = topicRoot.querySelector('button[data-article-filter="all"]') as HTMLButtonElement | null;
+      firstT?.click();
+      if (kwRoot) {
+        const firstK = kwRoot.querySelector('button[data-article-keyword="all"]') as HTMLButtonElement | null;
+        firstK?.click();
+      }
+    };
+
+    const applyFilters = () => {
+      const topic = getSelectedTopic();
+      const kw = getSelectedKeyword();
+      let totalVisible = 0;
+
+      sections().forEach((sec) => {
+        const secTopic = sec.getAttribute('data-topic') || '';
+        const includeSection = topic === 'all' || secTopic === topic;
+        if (!includeSection) {
+          sec.classList.add('hidden');
+          return;
+        }
+        const rows = sec.querySelectorAll<HTMLElement>('[data-article-row]');
+        let count = 0;
+        rows.forEach((row) => {
+          const raw = row.getAttribute('data-article-tags') || '';
+          const tags = raw ? raw.split('|||') : [];
+          const kwMatch = kw === 'all' || tags.includes(kw);
+          row.classList.toggle('hidden', !kwMatch);
+          if (kwMatch) count += 1;
+        });
+        if (count === 0) {
+          sec.classList.add('hidden');
+        } else {
+          sec.classList.remove('hidden');
+          totalVisible += count;
+        }
+      });
+
+      if (noMatch) {
+        const hide = totalVisible > 0 || sections().length === 0;
+        noMatch.classList.toggle('hidden', hide);
+        noMatch.setAttribute('aria-hidden', hide ? 'true' : 'false');
+      }
+    };
+
+    document.querySelector('[data-article-show-all]')?.addEventListener('click', () => setShowAll());
+
+    if (topicRoot) {
+      topicRoot.querySelectorAll('button[data-article-filter]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const me = btn as HTMLButtonElement;
+          topicRoot.querySelectorAll('button[data-article-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          me.setAttribute('aria-pressed', 'true');
+          applyFilters();
+        });
+      });
+    }
+
     if (kwRoot) {
-      const firstK = kwRoot.querySelector('button[data-article-keyword="all"]') as HTMLButtonElement | null;
-      firstK?.click();
+      kwRoot.querySelectorAll('button[data-article-keyword]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const me = btn as HTMLButtonElement;
+          kwRoot.querySelectorAll('button[data-article-keyword]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          me.setAttribute('aria-pressed', 'true');
+          applyFilters();
+        });
+      });
     }
-  };
 
-  const applyFilters = () => {
-    const topic = getSelectedTopic();
-    const kw = getSelectedKeyword();
-    let totalVisible = 0;
-
-    sections().forEach((sec) => {
-      const secTopic = sec.getAttribute('data-topic') || '';
-      const includeSection = topic === 'all' || secTopic === topic;
-      if (!includeSection) {
-        sec.classList.add('hidden');
-        return;
-      }
-      const rows = sec.querySelectorAll<HTMLElement>('[data-article-row]');
-      let count = 0;
-      rows.forEach((row) => {
-        const raw = row.getAttribute('data-article-tags') || '';
-        const tags = raw ? raw.split('|||') : [];
-        const kwMatch = kw === 'all' || tags.includes(kw);
-        row.classList.toggle('hidden', !kwMatch);
-        if (kwMatch) count += 1;
-      });
-      if (count === 0) {
-        sec.classList.add('hidden');
-      } else {
-        sec.classList.remove('hidden');
-        totalVisible += count;
-      }
-    });
-
-    if (noMatch) {
-      const hide = totalVisible > 0 || sections().length === 0;
-      noMatch.classList.toggle('hidden', hide);
-      noMatch.setAttribute('aria-hidden', hide ? 'true' : 'false');
-    }
-  };
-
-  document.querySelector('[data-article-show-all]')?.addEventListener('click', () => setShowAll());
-
-  if (topicRoot) {
-    topicRoot.querySelectorAll('button[data-article-filter]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const me = btn as HTMLButtonElement;
-        topicRoot.querySelectorAll('button[data-article-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        me.setAttribute('aria-pressed', 'true');
-        applyFilters();
-      });
-    });
-  }
-
-  if (kwRoot) {
-    kwRoot.querySelectorAll('button[data-article-keyword]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const me = btn as HTMLButtonElement;
-        kwRoot.querySelectorAll('button[data-article-keyword]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        me.setAttribute('aria-pressed', 'true');
-        applyFilters();
-      });
-    });
-  }
-
-  applyFilters();
+    applyFilters();
+  }, { when: atPath('/articles') });
 </script>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initArticleFavorites } from '@/scripts/article-favorites';
-  initArticleFavorites();
+
+  onPage((signal) => {
+    initArticleFavorites(signal);
+  }, { when: atPath('/articles') });
 </script>

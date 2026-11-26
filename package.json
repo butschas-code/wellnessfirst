@@ -13,11 +13,13 @@
     "check:functions": "tsc -p functions/tsconfig.json",
     "astro": "astro",
     "generate-types": "wrangler types",
-    "db:push": "supabase db push"
+    "db:push": "supabase db push",
+    "test:sound": "vitest run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.2.1",
     "@astrojs/mdx": "^5.0.4",
+    "@astrojs/react": "^6.0.6",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/vercel": "^10.0.5",
     "@supabase/supabase-js": "^2.104.1",
@@ -26,8 +28,12 @@
     "astro": "^6.1.9",
     "astronomy-engine": "^2.1.19",
     "gsap": "^3.15.0",
+    "lucide-react": "^1.81.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "^4.2.4",
-    "wrangler": "^4.84.1"
+    "wrangler": "^4.84.1",
+    "zod": "^3.25.76"
   },
   "overrides": {
     "vite": "^7"
@@ -36,6 +42,10 @@
     "@astrojs/check": "^0.9.8",
     "@cloudflare/workers-types": "^4.20260424.1",
     "@types/node": "^25.6.0",
-    "typescript": "^5.9.3"
+    "@types/react": "^18.3.32",
+    "@types/react-dom": "^18.3.7",
+    "node-web-audio-api": "^2.3.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
   }
 }

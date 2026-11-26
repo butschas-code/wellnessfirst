@@ -34,6 +34,10 @@ const { entries, eyebrow = 'Related reading', title = 'More articles' } = Astro.
 }
 
 <script>
+  import { onPage } from '@/lib/page-lifecycle';
   import { initArticleFavorites } from '@/scripts/article-favorites';
-  initArticleFavorites();
+
+  onPage((signal) => {
+    initArticleFavorites(signal);
+  });
 </script>

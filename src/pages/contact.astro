@@ -114,54 +114,58 @@ import CommunitySpine from '@/components/community/CommunitySpine.astro';
 </BaseLayout>
 
 <script>
-  type TopicPreset = {
-    kicker: string;
-    heading: string;
-    body: string;
-    subject: string;
-    messageSeed: string;
-  };
-  const presets: Record<string, TopicPreset> = {
-    astrology: {
-      kicker: 'Living pattern',
-      heading: 'Re: astrological questions',
-      body: 'Share a chart or a short sketch of what is up — season, timing, a decision. Your time zone helps. Reply within a few business days when we can.',
-      subject: 'Astrology — ',
-      messageSeed:
-        "Hello — I have a question about astrology / timing. Briefly:\n\n(What is up right now, and the time zone you are in.)",
-    },
-    vastu: {
-      kicker: 'Home & environment',
-      heading: 'Re: vastu &amp; home harmony',
-      body: 'Tell us the room, the orientation if you know it, and what does not sit right (sleep, mood, focus). A photo or rough sketch is welcome as a follow-up.',
-      subject: 'Vastu / home harmony — ',
-      messageSeed:
-        "Hello — I have a vastu / home-harmony question. Briefly:\n\n(Room and orientation, what feels off, and what you have tried.)",
-    },
-  };
+  import { onPage, atPath } from '@/lib/page-lifecycle';
 
-  const params = new URLSearchParams(window.location.search);
-  const rawTopic = (params.get('topic') || '').toLowerCase();
-  const preset = presets[rawTopic];
-  if (preset) {
-    const banner = document.getElementById('contact-topic-banner');
-    if (banner) {
-      banner.classList.remove('hidden');
-      const k = banner.querySelector('[data-contact-topic-kicker]');
-      const h = banner.querySelector('[data-contact-topic-heading]');
-      const b = banner.querySelector('[data-contact-topic-body]');
-      if (k) k.textContent = preset.kicker;
-      if (h) h.innerHTML = preset.heading;
-      if (b) b.textContent = preset.body;
+  onPage((signal) => {
+    type TopicPreset = {
+      kicker: string;
+      heading: string;
+      body: string;
+      subject: string;
+      messageSeed: string;
+    };
+    const presets: Record<string, TopicPreset> = {
+      astrology: {
+        kicker: 'Living pattern',
+        heading: 'Re: astrological questions',
+        body: 'Share a chart or a short sketch of what is up — season, timing, a decision. Your time zone helps. Reply within a few business days when we can.',
+        subject: 'Astrology — ',
+        messageSeed:
+          "Hello — I have a question about astrology / timing. Briefly:\n\n(What is up right now, and the time zone you are in.)",
+      },
+      vastu: {
+        kicker: 'Home & environment',
+        heading: 'Re: vastu &amp; home harmony',
+        body: 'Tell us the room, the orientation if you know it, and what does not sit right (sleep, mood, focus). A photo or rough sketch is welcome as a follow-up.',
+        subject: 'Vastu / home harmony — ',
+        messageSeed:
+          "Hello — I have a vastu / home-harmony question. Briefly:\n\n(Room and orientation, what feels off, and what you have tried.)",
+      },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const rawTopic = (params.get('topic') || '').toLowerCase();
+    const preset = presets[rawTopic];
+    if (preset) {
+      const banner = document.getElementById('contact-topic-banner');
+      if (banner) {
+        banner.classList.remove('hidden');
+        const k = banner.querySelector('[data-contact-topic-kicker]');
+        const h = banner.querySelector('[data-contact-topic-heading]');
+        const b = banner.querySelector('[data-contact-topic-body]');
+        if (k) k.textContent = preset.kicker;
+        if (h) h.innerHTML = preset.heading;
+        if (b) b.textContent = preset.body;
+      }
+      const select = document.querySelector<HTMLSelectElement>('select[name="topic"]');
+      if (select) {
+        const opt = Array.from(select.options).find((o) => o.value === 'consultation');
+        if (opt) select.value = 'consultation';
+      }
+      const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+      if (message && message.value.trim().length === 0) {
+        message.value = preset.messageSeed;
+      }
     }
-    const select = document.querySelector<HTMLSelectElement>('select[name="topic"]');
-    if (select) {
-      const opt = Array.from(select.options).find((o) => o.value === 'consultation');
-      if (opt) select.value = 'consultation';
-    }
-    const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
-    if (message && message.value.trim().length === 0) {
-      message.value = preset.messageSeed;
-    }
-  }
+  }, { when: atPath('/contact') });
 </script>

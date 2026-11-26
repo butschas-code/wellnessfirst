@@ -2,7 +2,7 @@
  * Subtle Y translation on [data-wfg-parallax] for depth (home only).
  * Respects reduced motion. Paired with --wfg-p-y in CSS.
  */
-export function initHomeParallax(): void {
+export function initHomeParallax(signal?: AbortSignal): void {
   if (typeof window === 'undefined') return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -34,6 +34,6 @@ export function initHomeParallax(): void {
   };
 
   update();
-  window.addEventListener('scroll', onFrame, { passive: true });
-  window.addEventListener('resize', onFrame, { passive: true });
+  window.addEventListener('scroll', onFrame, { passive: true, signal });
+  window.addEventListener('resize', onFrame, { passive: true, signal });
 }

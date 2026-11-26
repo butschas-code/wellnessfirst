@@ -4,6 +4,8 @@ import '@/styles/global.css';
 import { site } from '@/lib/site';
 import MemberShellNav from '@/components/member/MemberShellNav.astro';
 import type { MemberNavKey } from '@/lib/member/nav';
+import { ClientRouter } from 'astro:transitions';
+import WavesPlayer from '@/components/sound/WavesPlayer.astro';
 
 interface Props {
   title: string;
@@ -43,6 +45,8 @@ const pageTitle = `${title} · ${site.name}`;
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
+    <!-- Soft navigation keeps the Wellness Waves player playing between pages. -->
+    <ClientRouter />
     <Analytics />
   </head>
   <body class="flex min-h-screen flex-col bg-paper font-sans text-charcoal antialiased">
@@ -92,5 +96,6 @@ const pageTitle = `${title} · ${site.name}`;
         <a class="link-wfg-ghost text-sm" href="/contact">Help</a>
       </div>
     </footer>
+    <WavesPlayer />
   </body>
 </html>

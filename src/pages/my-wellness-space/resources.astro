@@ -28,6 +28,10 @@ import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
 </AppLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initResourceMemberHub } from '@/scripts/resource-member-hub';
-  void initResourceMemberHub();
+
+  onPage((signal) => {
+    void initResourceMemberHub();
+  }, { when: atPath('/my-wellness-space/resources') });
 </script>

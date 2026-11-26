@@ -51,6 +51,7 @@ import {
   type HourTone,
 } from '../lib/astro-copy.ts';
 import * as C from '../lib/astro-content.ts';
+import { onPage } from '../lib/page-lifecycle.ts';
 import * as I from '../lib/astro-insights.ts';
 import { buildReading } from '../lib/astro-reading.ts';
 import { nakshatraDay, upcomingShifts, weekAhead } from '../lib/astro-today.ts';
@@ -203,6 +204,9 @@ const longDate = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', mo
 
 type Tab = 'today' | 'reading' | 'you' | 'seasons' | 'people' | 'decide' | 'chart';
 const TABS: Tab[] = ['today', 'reading', 'you', 'seasons', 'people', 'decide', 'chart'];
+
+/** Aborts when the Life Rhythm page is swapped out (soft navigation). */
+let pageSignal: AbortSignal | undefined;
 
 class LifeRhythm {
   private profile: UserBirthProfile | null = null;
@@ -429,7 +433,7 @@ class LifeRhythm {
       }
     });
     document.getElementById('lr-print')?.addEventListener('click', () => this.printReport());
-    window.addEventListener('afterprint', () => this.app.classList.remove('lr-printing'));
+    window.addEventListener('afterprint', () => this.app.classList.remove('lr-printing'), { signal: pageSignal });
     this.renderProfileSwitch();
   }
 
@@ -1721,8 +1725,10 @@ class LifeRhythm {
 
 }
 
-if (typeof document !== 'undefined') {
-  const start = () => new LifeRhythm().init();
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
-}
+onPage(
+  (signal) => {
+    pageSignal = signal;
+    new LifeRhythm().init();
+  },
+  { when: () => document.getElementById('lr-app') !== null },
+);

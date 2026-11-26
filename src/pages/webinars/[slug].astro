@@ -146,16 +146,19 @@ const schedulePreview = formatWebinarScheduleStart(row);
 
   <div id="w-webinar-bootstrap" class="hidden" data-json={JSON.stringify(webinarDetailPayload)} aria-hidden="true"></div>
   <script>
+    import { onPage, has } from '@/lib/page-lifecycle';
     import { initWebinarDetailBooking } from '@/scripts/webinar-detail-booking';
     import type { WebinarDetailPayload } from '@/scripts/webinar-detail-booking';
 
-    const el = document.getElementById('w-webinar-bootstrap');
-    const raw = el?.dataset.json;
-    if (raw) {
-      try {
-        initWebinarDetailBooking(JSON.parse(raw) as WebinarDetailPayload);
-      } catch {
-        console.warn('[webinar-detail] invalid bootstrap payload');
+    onPage((signal) => {
+      const el = document.getElementById('w-webinar-bootstrap');
+      const raw = el?.dataset.json;
+      if (raw) {
+        try {
+          initWebinarDetailBooking(JSON.parse(raw) as WebinarDetailPayload, signal);
+        } catch {
+          console.warn('[webinar-detail] invalid bootstrap payload');
+        }
       }
-    }
+    }, { when: has('#w-webinar-bootstrap') });
   </script>

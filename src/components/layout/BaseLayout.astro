@@ -6,6 +6,8 @@ import SiteHeader from '@/components/site/SiteHeader.astro';
 import SiteFooter from '@/components/site/SiteFooter.astro';
 import { resolveOgImage, siteGraphJsonLd } from '@/lib/seo';
 import { WFG_HOME_SCROLL_FIRST_BG } from '@/lib/home-scroll-colors';
+import { ClientRouter } from 'astro:transitions';
+import WavesPlayer from '@/components/sound/WavesPlayer.astro';
 
 interface Props {
   title: string;
@@ -15,6 +17,8 @@ interface Props {
   ogImageAlt?: string;
   canonicalPath?: string;
   mainClass?: string;
+  /** Hide the site footer (full-screen pages such as the /sound player room). */
+  hideFooter?: boolean;
   /** e.g. homepage scroll tint: `wfg-home-body` */
   bodyClass?: string;
   noIndex?: boolean;
@@ -36,6 +40,7 @@ const {
   ogImageAlt,
   canonicalPath,
   mainClass,
+  hideFooter = false,
   bodyClass,
   noIndex,
   ogType = 'website',
@@ -114,6 +119,8 @@ const homeFirstPaintStyle = `background-color: ${WFG_HOME_SCROLL_FIRST_BG}; back
     )}
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <slot name="head" />
+    <!-- Soft navigation keeps the Wellness Waves player playing between pages. -->
+    <ClientRouter />
     <Analytics />
   </head>
   <body
@@ -136,23 +143,24 @@ const homeFirstPaintStyle = `background-color: ${WFG_HOME_SCROLL_FIRST_BG}; back
       <slot />
     </main>
     <slot name="prefooter" />
-    <slot name="footer">
-      <SiteFooter />
-    </slot>
+    {!hideFooter && (
+      <slot name="footer">
+        <SiteFooter />
+      </slot>
+    )}
+    <WavesPlayer />
     <script>
+      import { onPage } from '@/lib/page-lifecycle';
       import { initWfgForms } from '@/scripts/wfg-forms';
       import { initWfgMotion } from '@/scripts/wfg-motion';
-      import { scrollColorTransition } from '@/scripts/scroll-color-transition';
-      const boot = () => {
+      import { scrollColorTransition, resetScrollColors } from '@/scripts/scroll-color-transition';
+      // Runs on every page view, including soft navigations.
+      onPage((signal) => {
         initWfgForms();
         initWfgMotion();
         scrollColorTransition();
-      };
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', boot);
-      } else {
-        boot();
-      }
+        signal.addEventListener('abort', resetScrollColors);
+      });
     </script>
   </body>
 </html>

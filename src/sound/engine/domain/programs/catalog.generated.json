@@ -1,0 +1,7238 @@
+{
+  "schema": "infinity-sound/canonical-program-catalog",
+  "importVersion": "1.0.0",
+  "source": {
+    "file": "PEMF_105_Wellness_Catalog_v2.xlsx",
+    "sha256": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+    "sheets": [
+      "Programs",
+      "Categories"
+    ],
+    "note": "Ordered frequency values only. The workbook specifies no step durations, waveforms or modulation depths."
+  },
+  "categories": [
+    {
+      "name": "Relaxation & Stress Balance",
+      "declaredProgramCount": 14,
+      "sourceRow": 2
+    },
+    {
+      "name": "Sleep & Night Recovery",
+      "declaredProgramCount": 12,
+      "sourceRow": 3
+    },
+    {
+      "name": "Energy & Vitality",
+      "declaredProgramCount": 11,
+      "sourceRow": 4
+    },
+    {
+      "name": "Mental Focus & Clarity",
+      "declaredProgramCount": 11,
+      "sourceRow": 5
+    },
+    {
+      "name": "Emotional Balance",
+      "declaredProgramCount": 10,
+      "sourceRow": 6
+    },
+    {
+      "name": "Physical Ease & Recovery",
+      "declaredProgramCount": 11,
+      "sourceRow": 7
+    },
+    {
+      "name": "Movement & Activity Support",
+      "declaredProgramCount": 9,
+      "sourceRow": 8
+    },
+    {
+      "name": "Digestive & Metabolic Balance",
+      "declaredProgramCount": 9,
+      "sourceRow": 9
+    },
+    {
+      "name": "Mindfulness & Inner Awareness",
+      "declaredProgramCount": 9,
+      "sourceRow": 10
+    },
+    {
+      "name": "Daily Balance & Preventive Care",
+      "declaredProgramCount": 9,
+      "sourceRow": 11
+    }
+  ],
+  "programs": [
+    {
+      "id": "rela_001",
+      "category": "Relaxation & Stress Balance",
+      "name": "Deep Calm & Nervous Ease",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.2,
+          "raw": "0.2"
+        },
+        {
+          "index": 1,
+          "hz": 0.25,
+          "raw": "0.25"
+        },
+        {
+          "index": 2,
+          "hz": 0.78,
+          "raw": "0.78"
+        },
+        {
+          "index": 3,
+          "hz": 2.65,
+          "raw": "2.65"
+        },
+        {
+          "index": 4,
+          "hz": 4.17,
+          "raw": "4.17"
+        },
+        {
+          "index": 5,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 6,
+          "hz": 15.0,
+          "raw": "15"
+        },
+        {
+          "index": 7,
+          "hz": 21.0,
+          "raw": "21"
+        },
+        {
+          "index": 8,
+          "hz": 55.0,
+          "raw": "55"
+        }
+      ],
+      "sourceRow": 2
+    },
+    {
+      "id": "rela_002",
+      "category": "Relaxation & Stress Balance",
+      "name": "Stress Reset & Unwind",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 1,
+          "hz": 2.68,
+          "raw": "2.68"
+        },
+        {
+          "index": 2,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 3,
+          "hz": 7.35,
+          "raw": "7.35"
+        },
+        {
+          "index": 4,
+          "hz": 7.7,
+          "raw": "7.7"
+        },
+        {
+          "index": 5,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 6,
+          "hz": 10.5,
+          "raw": "10.5"
+        },
+        {
+          "index": 7,
+          "hz": 15.73,
+          "raw": "15.73"
+        },
+        {
+          "index": 8,
+          "hz": 19.0,
+          "raw": "19"
+        },
+        {
+          "index": 9,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 10,
+          "hz": 45.44,
+          "raw": "45.44"
+        }
+      ],
+      "sourceRow": 3
+    },
+    {
+      "id": "rela_003",
+      "category": "Relaxation & Stress Balance",
+      "name": "Grounding & Centering",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.78,
+          "raw": "0.78"
+        },
+        {
+          "index": 1,
+          "hz": 0.83,
+          "raw": "0.83"
+        },
+        {
+          "index": 2,
+          "hz": 1.39,
+          "raw": "1.39"
+        },
+        {
+          "index": 3,
+          "hz": 5.5,
+          "raw": "5.5"
+        },
+        {
+          "index": 4,
+          "hz": 5.79,
+          "raw": "5.79"
+        },
+        {
+          "index": 5,
+          "hz": 6.79,
+          "raw": "6.79"
+        },
+        {
+          "index": 6,
+          "hz": 9.4,
+          "raw": "9.4"
+        },
+        {
+          "index": 7,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 8,
+          "hz": 10.55,
+          "raw": "10.55"
+        },
+        {
+          "index": 9,
+          "hz": 20.0,
+          "raw": "20"
+        },
+        {
+          "index": 10,
+          "hz": 31.0,
+          "raw": "31"
+        },
+        {
+          "index": 11,
+          "hz": 38.83,
+          "raw": "38.83"
+        },
+        {
+          "index": 12,
+          "hz": 92.0,
+          "raw": "92"
+        },
+        {
+          "index": 13,
+          "hz": 103.0,
+          "raw": "103"
+        }
+      ],
+      "sourceRow": 4
+    },
+    {
+      "id": "rela_004",
+      "category": "Relaxation & Stress Balance",
+      "name": "Breath-Like Relaxation",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 1,
+          "hz": 0.68,
+          "raw": "0.68"
+        },
+        {
+          "index": 2,
+          "hz": 0.85,
+          "raw": "0.85"
+        },
+        {
+          "index": 3,
+          "hz": 2.4,
+          "raw": "2.4"
+        },
+        {
+          "index": 4,
+          "hz": 2.65,
+          "raw": "2.65"
+        },
+        {
+          "index": 5,
+          "hz": 2.75,
+          "raw": "2.75"
+        },
+        {
+          "index": 6,
+          "hz": 4.7,
+          "raw": "4.7"
+        },
+        {
+          "index": 7,
+          "hz": 4.9,
+          "raw": "4.9"
+        },
+        {
+          "index": 8,
+          "hz": 6.79,
+          "raw": "6.79"
+        },
+        {
+          "index": 9,
+          "hz": 6.8,
+          "raw": "6.8"
+        },
+        {
+          "index": 10,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 11,
+          "hz": 12.4,
+          "raw": "12.4"
+        },
+        {
+          "index": 12,
+          "hz": 16.0,
+          "raw": "16"
+        }
+      ],
+      "sourceRow": 5
+    },
+    {
+      "id": "rela_005",
+      "category": "Relaxation & Stress Balance",
+      "name": "Quiet Mind Support",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.62,
+          "raw": "0.62"
+        },
+        {
+          "index": 1,
+          "hz": 2.5,
+          "raw": "2.5"
+        },
+        {
+          "index": 2,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 3,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 4,
+          "hz": 5.43,
+          "raw": "5.43"
+        },
+        {
+          "index": 5,
+          "hz": 7.82,
+          "raw": "7.82"
+        },
+        {
+          "index": 6,
+          "hz": 9.3,
+          "raw": "9.3"
+        },
+        {
+          "index": 7,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 8,
+          "hz": 15.05,
+          "raw": "15.05"
+        },
+        {
+          "index": 9,
+          "hz": 15.42,
+          "raw": "15.42"
+        },
+        {
+          "index": 10,
+          "hz": 15.73,
+          "raw": "15.73"
+        },
+        {
+          "index": 11,
+          "hz": 73.0,
+          "raw": "73"
+        }
+      ],
+      "sourceRow": 6
+    },
+    {
+      "id": "rela_006",
+      "category": "Relaxation & Stress Balance",
+      "name": "End-of-Day Release",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.24,
+          "raw": "0.24"
+        },
+        {
+          "index": 1,
+          "hz": 2.4,
+          "raw": "2.4"
+        },
+        {
+          "index": 2,
+          "hz": 2.65,
+          "raw": "2.65"
+        },
+        {
+          "index": 3,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 4,
+          "hz": 5.14,
+          "raw": "5.14"
+        },
+        {
+          "index": 5,
+          "hz": 5.43,
+          "raw": "5.43"
+        },
+        {
+          "index": 6,
+          "hz": 46.98,
+          "raw": "46.98"
+        },
+        {
+          "index": 7,
+          "hz": 83.0,
+          "raw": "83"
+        }
+      ],
+      "sourceRow": 7
+    },
+    {
+      "id": "rela_007",
+      "category": "Relaxation & Stress Balance",
+      "name": "Soft Relaxation Break",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 1,
+          "hz": 0.73,
+          "raw": "0.73"
+        },
+        {
+          "index": 2,
+          "hz": 2.4,
+          "raw": "2.4"
+        },
+        {
+          "index": 3,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 4,
+          "hz": 3.89,
+          "raw": "3.89"
+        },
+        {
+          "index": 5,
+          "hz": 3.9,
+          "raw": "3.9"
+        },
+        {
+          "index": 6,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 7,
+          "hz": 7.25,
+          "raw": "7.25"
+        },
+        {
+          "index": 8,
+          "hz": 7.82,
+          "raw": "7.82"
+        },
+        {
+          "index": 9,
+          "hz": 9.2,
+          "raw": "9.2"
+        },
+        {
+          "index": 10,
+          "hz": 9.9,
+          "raw": "9.9"
+        },
+        {
+          "index": 11,
+          "hz": 10.36,
+          "raw": "10.36"
+        },
+        {
+          "index": 12,
+          "hz": 59.0,
+          "raw": "59"
+        },
+        {
+          "index": 13,
+          "hz": 65.0,
+          "raw": "65"
+        },
+        {
+          "index": 14,
+          "hz": 119.0,
+          "raw": "119"
+        }
+      ],
+      "sourceRow": 8
+    },
+    {
+      "id": "rela_008",
+      "category": "Relaxation & Stress Balance",
+      "name": "Steady Calm for Busy Days",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 1,
+          "hz": 1.44,
+          "raw": "1.44"
+        },
+        {
+          "index": 2,
+          "hz": 3.6,
+          "raw": "3.6"
+        },
+        {
+          "index": 3,
+          "hz": 6.8,
+          "raw": "6.8"
+        },
+        {
+          "index": 4,
+          "hz": 8.0,
+          "raw": "8"
+        },
+        {
+          "index": 5,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 6,
+          "hz": 10.36,
+          "raw": "10.36"
+        },
+        {
+          "index": 7,
+          "hz": 10.5,
+          "raw": "10.5"
+        },
+        {
+          "index": 8,
+          "hz": 15.19,
+          "raw": "15.19"
+        }
+      ],
+      "sourceRow": 9
+    },
+    {
+      "id": "rela_009",
+      "category": "Relaxation & Stress Balance",
+      "name": "Shoulders & Jaw Unclench",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.93,
+          "raw": "0.93"
+        },
+        {
+          "index": 1,
+          "hz": 1.39,
+          "raw": "1.39"
+        },
+        {
+          "index": 2,
+          "hz": 4.7,
+          "raw": "4.7"
+        },
+        {
+          "index": 3,
+          "hz": 5.5,
+          "raw": "5.5"
+        },
+        {
+          "index": 4,
+          "hz": 15.0,
+          "raw": "15"
+        },
+        {
+          "index": 5,
+          "hz": 22.5,
+          "raw": "22.5"
+        },
+        {
+          "index": 6,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 7,
+          "hz": 49.0,
+          "raw": "49"
+        }
+      ],
+      "sourceRow": 10
+    },
+    {
+      "id": "rela_010",
+      "category": "Relaxation & Stress Balance",
+      "name": "Calm Focused Presence",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.5,
+          "raw": "1.5"
+        },
+        {
+          "index": 1,
+          "hz": 3.89,
+          "raw": "3.89"
+        },
+        {
+          "index": 2,
+          "hz": 5.0,
+          "raw": "5"
+        },
+        {
+          "index": 3,
+          "hz": 9.0,
+          "raw": "9"
+        },
+        {
+          "index": 4,
+          "hz": 41.2,
+          "raw": "41.2"
+        },
+        {
+          "index": 5,
+          "hz": 45.44,
+          "raw": "45.44"
+        },
+        {
+          "index": 6,
+          "hz": 64.0,
+          "raw": "64"
+        },
+        {
+          "index": 7,
+          "hz": 90.0,
+          "raw": "90"
+        }
+      ],
+      "sourceRow": 11
+    },
+    {
+      "id": "rela_011",
+      "category": "Relaxation & Stress Balance",
+      "name": "Overwhelm Ease",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.05,
+          "raw": "0.05"
+        },
+        {
+          "index": 1,
+          "hz": 0.2,
+          "raw": "0.2"
+        },
+        {
+          "index": 2,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 3,
+          "hz": 5.35,
+          "raw": "5.35"
+        },
+        {
+          "index": 4,
+          "hz": 9.3,
+          "raw": "9.3"
+        },
+        {
+          "index": 5,
+          "hz": 9.4,
+          "raw": "9.4"
+        },
+        {
+          "index": 6,
+          "hz": 24.0,
+          "raw": "24"
+        },
+        {
+          "index": 7,
+          "hz": 27.0,
+          "raw": "27"
+        },
+        {
+          "index": 8,
+          "hz": 35.0,
+          "raw": "35"
+        },
+        {
+          "index": 9,
+          "hz": 47.29,
+          "raw": "47.29"
+        },
+        {
+          "index": 10,
+          "hz": 74.25,
+          "raw": "74.25"
+        }
+      ],
+      "sourceRow": 12
+    },
+    {
+      "id": "rela_012",
+      "category": "Relaxation & Stress Balance",
+      "name": "Social Recharge & Boundaries",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Use when you want to feel more grounded, steady, and at ease.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.65,
+          "raw": "0.65"
+        },
+        {
+          "index": 1,
+          "hz": 1.05,
+          "raw": "1.05"
+        },
+        {
+          "index": 2,
+          "hz": 1.45,
+          "raw": "1.45"
+        },
+        {
+          "index": 3,
+          "hz": 2.75,
+          "raw": "2.75"
+        },
+        {
+          "index": 4,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 5,
+          "hz": 9.39,
+          "raw": "9.39"
+        },
+        {
+          "index": 6,
+          "hz": 9.9,
+          "raw": "9.9"
+        },
+        {
+          "index": 7,
+          "hz": 14.19,
+          "raw": "14.19"
+        },
+        {
+          "index": 8,
+          "hz": 20.5,
+          "raw": "20.5"
+        },
+        {
+          "index": 9,
+          "hz": 33.13,
+          "raw": "33.13"
+        },
+        {
+          "index": 10,
+          "hz": 87.0,
+          "raw": "87"
+        },
+        {
+          "index": 11,
+          "hz": 105.25,
+          "raw": "105.25"
+        }
+      ],
+      "sourceRow": 13
+    },
+    {
+      "id": "rela_013",
+      "category": "Relaxation & Stress Balance",
+      "name": "Travel & Transition Calm",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Helpful during travel and transitions to support an easier adjustment.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.17,
+          "raw": "0.17"
+        },
+        {
+          "index": 1,
+          "hz": 0.57,
+          "raw": "0.57"
+        },
+        {
+          "index": 2,
+          "hz": 2.75,
+          "raw": "2.75"
+        },
+        {
+          "index": 3,
+          "hz": 6.15,
+          "raw": "6.15"
+        },
+        {
+          "index": 4,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 5,
+          "hz": 7.7,
+          "raw": "7.7"
+        },
+        {
+          "index": 6,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 7,
+          "hz": 14.19,
+          "raw": "14.19"
+        },
+        {
+          "index": 8,
+          "hz": 15.19,
+          "raw": "15.19"
+        },
+        {
+          "index": 9,
+          "hz": 17.0,
+          "raw": "17"
+        },
+        {
+          "index": 10,
+          "hz": 22.5,
+          "raw": "22.5"
+        },
+        {
+          "index": 11,
+          "hz": 58.0,
+          "raw": "58"
+        },
+        {
+          "index": 12,
+          "hz": 72.79,
+          "raw": "72.79"
+        },
+        {
+          "index": 13,
+          "hz": 95.48,
+          "raw": "95.48"
+        }
+      ],
+      "sourceRow": 14
+    },
+    {
+      "id": "rela_014",
+      "category": "Relaxation & Stress Balance",
+      "name": "Evening Wind-Down Balance",
+      "description": "Supports a calm internal state and helps ease everyday tension. Designed for unwinding during breaks, after stimulation, or whenever you want to settle. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.11,
+          "raw": "0.11"
+        },
+        {
+          "index": 1,
+          "hz": 0.25,
+          "raw": "0.25"
+        },
+        {
+          "index": 2,
+          "hz": 0.57,
+          "raw": "0.57"
+        },
+        {
+          "index": 3,
+          "hz": 0.65,
+          "raw": "0.65"
+        },
+        {
+          "index": 4,
+          "hz": 4.4,
+          "raw": "4.4"
+        },
+        {
+          "index": 5,
+          "hz": 5.79,
+          "raw": "5.79"
+        },
+        {
+          "index": 6,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 7,
+          "hz": 9.2,
+          "raw": "9.2"
+        },
+        {
+          "index": 8,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 9,
+          "hz": 17.0,
+          "raw": "17"
+        },
+        {
+          "index": 10,
+          "hz": 20.5,
+          "raw": "20.5"
+        }
+      ],
+      "sourceRow": 15
+    },
+    {
+      "id": "slee_015",
+      "category": "Sleep & Night Recovery",
+      "name": "Nighttime Mental Unwinding",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.5,
+          "raw": "0.5"
+        },
+        {
+          "index": 1,
+          "hz": 0.57,
+          "raw": "0.57"
+        },
+        {
+          "index": 2,
+          "hz": 0.78,
+          "raw": "0.78"
+        },
+        {
+          "index": 3,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 4,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 5,
+          "hz": 5.9,
+          "raw": "5.9"
+        },
+        {
+          "index": 6,
+          "hz": 7.25,
+          "raw": "7.25"
+        },
+        {
+          "index": 7,
+          "hz": 7.5,
+          "raw": "7.5"
+        },
+        {
+          "index": 8,
+          "hz": 8.01,
+          "raw": "8.01"
+        },
+        {
+          "index": 9,
+          "hz": 13.3,
+          "raw": "13.3"
+        },
+        {
+          "index": 10,
+          "hz": 14.19,
+          "raw": "14.19"
+        },
+        {
+          "index": 11,
+          "hz": 14.3,
+          "raw": "14.3"
+        },
+        {
+          "index": 12,
+          "hz": 21.0,
+          "raw": "21"
+        },
+        {
+          "index": 13,
+          "hz": 31.0,
+          "raw": "31"
+        },
+        {
+          "index": 14,
+          "hz": 41.2,
+          "raw": "41.2"
+        }
+      ],
+      "sourceRow": 16
+    },
+    {
+      "id": "slee_016",
+      "category": "Sleep & Night Recovery",
+      "name": "Pre-Sleep Body Soothing",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.49,
+          "raw": "0.49"
+        },
+        {
+          "index": 1,
+          "hz": 2.0,
+          "raw": "2"
+        },
+        {
+          "index": 2,
+          "hz": 3.5,
+          "raw": "3.5"
+        },
+        {
+          "index": 3,
+          "hz": 4.17,
+          "raw": "4.17"
+        },
+        {
+          "index": 4,
+          "hz": 7.53,
+          "raw": "7.53"
+        },
+        {
+          "index": 5,
+          "hz": 7.8,
+          "raw": "7.8"
+        },
+        {
+          "index": 6,
+          "hz": 7.82,
+          "raw": "7.82"
+        },
+        {
+          "index": 7,
+          "hz": 9.69,
+          "raw": "9.69"
+        },
+        {
+          "index": 8,
+          "hz": 40.6,
+          "raw": "40.6"
+        },
+        {
+          "index": 9,
+          "hz": 72.0,
+          "raw": "72"
+        },
+        {
+          "index": 10,
+          "hz": 120.0,
+          "raw": "120"
+        }
+      ],
+      "sourceRow": 17
+    },
+    {
+      "id": "slee_017",
+      "category": "Sleep & Night Recovery",
+      "name": "Quiet Thoughts & Let-Go",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Use for gentle night recovery support and a more settled end of day.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.52,
+          "raw": "0.52"
+        },
+        {
+          "index": 1,
+          "hz": 1.44,
+          "raw": "1.44"
+        },
+        {
+          "index": 2,
+          "hz": 2.5,
+          "raw": "2.5"
+        },
+        {
+          "index": 3,
+          "hz": 7.0,
+          "raw": "7"
+        },
+        {
+          "index": 4,
+          "hz": 8.25,
+          "raw": "8.25"
+        },
+        {
+          "index": 5,
+          "hz": 38.0,
+          "raw": "38"
+        },
+        {
+          "index": 6,
+          "hz": 72.0,
+          "raw": "72"
+        },
+        {
+          "index": 7,
+          "hz": 98.0,
+          "raw": "98"
+        }
+      ],
+      "sourceRow": 18
+    },
+    {
+      "id": "slee_018",
+      "category": "Sleep & Night Recovery",
+      "name": "Sleep Rhythm Support",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.05,
+          "raw": "0.05"
+        },
+        {
+          "index": 1,
+          "hz": 0.52,
+          "raw": "0.52"
+        },
+        {
+          "index": 2,
+          "hz": 1.89,
+          "raw": "1.89"
+        },
+        {
+          "index": 3,
+          "hz": 2.5,
+          "raw": "2.5"
+        },
+        {
+          "index": 4,
+          "hz": 4.4,
+          "raw": "4.4"
+        },
+        {
+          "index": 5,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 6,
+          "hz": 8.25,
+          "raw": "8.25"
+        },
+        {
+          "index": 7,
+          "hz": 14.0,
+          "raw": "14"
+        },
+        {
+          "index": 8,
+          "hz": 15.43,
+          "raw": "15.43"
+        },
+        {
+          "index": 9,
+          "hz": 20.0,
+          "raw": "20"
+        },
+        {
+          "index": 10,
+          "hz": 21.0,
+          "raw": "21"
+        },
+        {
+          "index": 11,
+          "hz": 27.0,
+          "raw": "27"
+        },
+        {
+          "index": 12,
+          "hz": 27.44,
+          "raw": "27.44"
+        },
+        {
+          "index": 13,
+          "hz": 72.79,
+          "raw": "72.79"
+        }
+      ],
+      "sourceRow": 19
+    },
+    {
+      "id": "slee_019",
+      "category": "Sleep & Night Recovery",
+      "name": "Late-Night Overthinking Ease",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.52,
+          "raw": "0.52"
+        },
+        {
+          "index": 1,
+          "hz": 0.68,
+          "raw": "0.68"
+        },
+        {
+          "index": 2,
+          "hz": 1.39,
+          "raw": "1.39"
+        },
+        {
+          "index": 3,
+          "hz": 9.0,
+          "raw": "9"
+        },
+        {
+          "index": 4,
+          "hz": 10.1,
+          "raw": "10.1"
+        },
+        {
+          "index": 5,
+          "hz": 22.0,
+          "raw": "22"
+        },
+        {
+          "index": 6,
+          "hz": 40.0,
+          "raw": "40"
+        },
+        {
+          "index": 7,
+          "hz": 95.0,
+          "raw": "95"
+        }
+      ],
+      "sourceRow": 20
+    },
+    {
+      "id": "slee_020",
+      "category": "Sleep & Night Recovery",
+      "name": "Restful Night Routine",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.37,
+          "raw": "0.37"
+        },
+        {
+          "index": 1,
+          "hz": 0.59,
+          "raw": "0.59"
+        },
+        {
+          "index": 2,
+          "hz": 0.62,
+          "raw": "0.62"
+        },
+        {
+          "index": 3,
+          "hz": 0.8,
+          "raw": "0.8"
+        },
+        {
+          "index": 4,
+          "hz": 7.25,
+          "raw": "7.25"
+        },
+        {
+          "index": 5,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 6,
+          "hz": 10.3,
+          "raw": "10.3"
+        },
+        {
+          "index": 7,
+          "hz": 14.3,
+          "raw": "14.3"
+        },
+        {
+          "index": 8,
+          "hz": 40.5,
+          "raw": "40.5"
+        },
+        {
+          "index": 9,
+          "hz": 80.9,
+          "raw": "80.9"
+        }
+      ],
+      "sourceRow": 21
+    },
+    {
+      "id": "slee_021",
+      "category": "Sleep & Night Recovery",
+      "name": "Deep Rest & Stillness",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Use for gentle night recovery support and a more settled end of day.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.59,
+          "raw": "0.59"
+        },
+        {
+          "index": 1,
+          "hz": 2.3,
+          "raw": "2.3"
+        },
+        {
+          "index": 2,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 3,
+          "hz": 5.0,
+          "raw": "5"
+        },
+        {
+          "index": 4,
+          "hz": 5.35,
+          "raw": "5.35"
+        },
+        {
+          "index": 5,
+          "hz": 7.0,
+          "raw": "7"
+        },
+        {
+          "index": 6,
+          "hz": 8.0,
+          "raw": "8"
+        },
+        {
+          "index": 7,
+          "hz": 14.8,
+          "raw": "14.8"
+        },
+        {
+          "index": 8,
+          "hz": 18.0,
+          "raw": "18"
+        },
+        {
+          "index": 9,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 10,
+          "hz": 76.0,
+          "raw": "76"
+        },
+        {
+          "index": 11,
+          "hz": 117.5,
+          "raw": "117.5"
+        },
+        {
+          "index": 12,
+          "hz": 119.98,
+          "raw": "119.98"
+        }
+      ],
+      "sourceRow": 22
+    },
+    {
+      "id": "slee_022",
+      "category": "Sleep & Night Recovery",
+      "name": "Falling Asleep Support",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.59,
+          "raw": "0.59"
+        },
+        {
+          "index": 1,
+          "hz": 1.05,
+          "raw": "1.05"
+        },
+        {
+          "index": 2,
+          "hz": 3.5,
+          "raw": "3.5"
+        },
+        {
+          "index": 3,
+          "hz": 4.7,
+          "raw": "4.7"
+        },
+        {
+          "index": 4,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 5,
+          "hz": 7.7,
+          "raw": "7.7"
+        },
+        {
+          "index": 6,
+          "hz": 9.1,
+          "raw": "9.1"
+        },
+        {
+          "index": 7,
+          "hz": 9.39,
+          "raw": "9.39"
+        },
+        {
+          "index": 8,
+          "hz": 9.69,
+          "raw": "9.69"
+        }
+      ],
+      "sourceRow": 23
+    },
+    {
+      "id": "slee_023",
+      "category": "Sleep & Night Recovery",
+      "name": "Night Recovery Balance",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.11,
+          "raw": "0.11"
+        },
+        {
+          "index": 1,
+          "hz": 0.9,
+          "raw": "0.9"
+        },
+        {
+          "index": 2,
+          "hz": 0.93,
+          "raw": "0.93"
+        },
+        {
+          "index": 3,
+          "hz": 1.1,
+          "raw": "1.1"
+        },
+        {
+          "index": 4,
+          "hz": 4.9,
+          "raw": "4.9"
+        },
+        {
+          "index": 5,
+          "hz": 9.59,
+          "raw": "9.59"
+        },
+        {
+          "index": 6,
+          "hz": 10.55,
+          "raw": "10.55"
+        },
+        {
+          "index": 7,
+          "hz": 13.3,
+          "raw": "13.3"
+        },
+        {
+          "index": 8,
+          "hz": 14.3,
+          "raw": "14.3"
+        },
+        {
+          "index": 9,
+          "hz": 33.0,
+          "raw": "33"
+        },
+        {
+          "index": 10,
+          "hz": 79.0,
+          "raw": "79"
+        },
+        {
+          "index": 11,
+          "hz": 112.0,
+          "raw": "112"
+        }
+      ],
+      "sourceRow": 24
+    },
+    {
+      "id": "slee_024",
+      "category": "Sleep & Night Recovery",
+      "name": "Dreamy Calm & Comfort",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Use for gentle night recovery support and a more settled end of day.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 1,
+          "hz": 0.49,
+          "raw": "0.49"
+        },
+        {
+          "index": 2,
+          "hz": 2.4,
+          "raw": "2.4"
+        },
+        {
+          "index": 3,
+          "hz": 3.5,
+          "raw": "3.5"
+        },
+        {
+          "index": 4,
+          "hz": 4.17,
+          "raw": "4.17"
+        },
+        {
+          "index": 5,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 6,
+          "hz": 9.18,
+          "raw": "9.18"
+        },
+        {
+          "index": 7,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 8,
+          "hz": 15.33,
+          "raw": "15.33"
+        },
+        {
+          "index": 9,
+          "hz": 34.1,
+          "raw": "34.1"
+        },
+        {
+          "index": 10,
+          "hz": 40.0,
+          "raw": "40"
+        },
+        {
+          "index": 11,
+          "hz": 62.66,
+          "raw": "62.66"
+        }
+      ],
+      "sourceRow": 25
+    },
+    {
+      "id": "slee_025",
+      "category": "Sleep & Night Recovery",
+      "name": "Jetlag Night Support",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.14,
+          "raw": "0.14"
+        },
+        {
+          "index": 1,
+          "hz": 0.65,
+          "raw": "0.65"
+        },
+        {
+          "index": 2,
+          "hz": 3.89,
+          "raw": "3.89"
+        },
+        {
+          "index": 3,
+          "hz": 7.53,
+          "raw": "7.53"
+        },
+        {
+          "index": 4,
+          "hz": 9.5,
+          "raw": "9.5"
+        },
+        {
+          "index": 5,
+          "hz": 9.59,
+          "raw": "9.59"
+        },
+        {
+          "index": 6,
+          "hz": 10.3,
+          "raw": "10.3"
+        },
+        {
+          "index": 7,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 8,
+          "hz": 21.0,
+          "raw": "21"
+        },
+        {
+          "index": 9,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 10,
+          "hz": 36.0,
+          "raw": "36"
+        },
+        {
+          "index": 11,
+          "hz": 50.5,
+          "raw": "50.5"
+        },
+        {
+          "index": 12,
+          "hz": 62.5,
+          "raw": "62.5"
+        }
+      ],
+      "sourceRow": 26
+    },
+    {
+      "id": "slee_026",
+      "category": "Sleep & Night Recovery",
+      "name": "Morning After Rest",
+      "description": "Supports a smoother transition into rest and helps quiet mental activity at night. Designed for evening routines, winding down, and creating a calmer bedtime atmosphere. Great as a morning routine to start clear and balanced.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.37,
+          "raw": "0.37"
+        },
+        {
+          "index": 1,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 2,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 3,
+          "hz": 6.0,
+          "raw": "6"
+        },
+        {
+          "index": 4,
+          "hz": 6.15,
+          "raw": "6.15"
+        },
+        {
+          "index": 5,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 6,
+          "hz": 14.4,
+          "raw": "14.4"
+        },
+        {
+          "index": 7,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 8,
+          "hz": 76.0,
+          "raw": "76"
+        },
+        {
+          "index": 9,
+          "hz": 101.0,
+          "raw": "101"
+        }
+      ],
+      "sourceRow": 27
+    },
+    {
+      "id": "ener_027",
+      "category": "Energy & Vitality",
+      "name": "Gentle Energy Reset",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 20.27,
+          "raw": "20.27"
+        },
+        {
+          "index": 1,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 2,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 3,
+          "hz": 38.83,
+          "raw": "38.83"
+        },
+        {
+          "index": 4,
+          "hz": 87.0,
+          "raw": "87"
+        },
+        {
+          "index": 5,
+          "hz": 88.0,
+          "raw": "88"
+        },
+        {
+          "index": 6,
+          "hz": 249.0,
+          "raw": "249"
+        },
+        {
+          "index": 7,
+          "hz": 304.6,
+          "raw": "304.6"
+        },
+        {
+          "index": 8,
+          "hz": 317.5,
+          "raw": "317.5"
+        },
+        {
+          "index": 9,
+          "hz": 337.69,
+          "raw": "337.69"
+        },
+        {
+          "index": 10,
+          "hz": 354.0,
+          "raw": "354"
+        },
+        {
+          "index": 11,
+          "hz": 451.74,
+          "raw": "451.74"
+        },
+        {
+          "index": 12,
+          "hz": 451.77,
+          "raw": "451.77"
+        },
+        {
+          "index": 13,
+          "hz": 482.0,
+          "raw": "482"
+        }
+      ],
+      "sourceRow": 28
+    },
+    {
+      "id": "ener_028",
+      "category": "Energy & Vitality",
+      "name": "Morning Vitality Lift",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Great as a morning routine to start clear and balanced.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 13.0,
+          "raw": "13"
+        },
+        {
+          "index": 1,
+          "hz": 34.0,
+          "raw": "34"
+        },
+        {
+          "index": 2,
+          "hz": 35.0,
+          "raw": "35"
+        },
+        {
+          "index": 3,
+          "hz": 44.0,
+          "raw": "44"
+        },
+        {
+          "index": 4,
+          "hz": 55.0,
+          "raw": "55"
+        },
+        {
+          "index": 5,
+          "hz": 102.0,
+          "raw": "102"
+        },
+        {
+          "index": 6,
+          "hz": 342.06,
+          "raw": "342.06"
+        },
+        {
+          "index": 7,
+          "hz": 349.54,
+          "raw": "349.54"
+        },
+        {
+          "index": 8,
+          "hz": 368.0,
+          "raw": "368"
+        },
+        {
+          "index": 9,
+          "hz": 405.0,
+          "raw": "405"
+        },
+        {
+          "index": 10,
+          "hz": 416.0,
+          "raw": "416"
+        }
+      ],
+      "sourceRow": 29
+    },
+    {
+      "id": "ener_029",
+      "category": "Energy & Vitality",
+      "name": "Midday Recharge",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 8.01,
+          "raw": "8.01"
+        },
+        {
+          "index": 1,
+          "hz": 46.98,
+          "raw": "46.98"
+        },
+        {
+          "index": 2,
+          "hz": 67.51,
+          "raw": "67.51"
+        },
+        {
+          "index": 3,
+          "hz": 80.0,
+          "raw": "80"
+        },
+        {
+          "index": 4,
+          "hz": 120.0,
+          "raw": "120"
+        },
+        {
+          "index": 5,
+          "hz": 241.68,
+          "raw": "241.68"
+        },
+        {
+          "index": 6,
+          "hz": 259.0,
+          "raw": "259"
+        },
+        {
+          "index": 7,
+          "hz": 333.0,
+          "raw": "333"
+        }
+      ],
+      "sourceRow": 30
+    },
+    {
+      "id": "ener_030",
+      "category": "Energy & Vitality",
+      "name": "Motivation & Drive Support",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 13.0,
+          "raw": "13"
+        },
+        {
+          "index": 1,
+          "hz": 14.1,
+          "raw": "14.1"
+        },
+        {
+          "index": 2,
+          "hz": 24.0,
+          "raw": "24"
+        },
+        {
+          "index": 3,
+          "hz": 45.0,
+          "raw": "45"
+        },
+        {
+          "index": 4,
+          "hz": 58.0,
+          "raw": "58"
+        },
+        {
+          "index": 5,
+          "hz": 77.0,
+          "raw": "77"
+        },
+        {
+          "index": 6,
+          "hz": 94.0,
+          "raw": "94"
+        },
+        {
+          "index": 7,
+          "hz": 120.0,
+          "raw": "120"
+        },
+        {
+          "index": 8,
+          "hz": 200.0,
+          "raw": "200"
+        },
+        {
+          "index": 9,
+          "hz": 302.0,
+          "raw": "302"
+        },
+        {
+          "index": 10,
+          "hz": 462.0,
+          "raw": "462"
+        },
+        {
+          "index": 11,
+          "hz": 475.0,
+          "raw": "475"
+        },
+        {
+          "index": 12,
+          "hz": 479.48,
+          "raw": "479.48"
+        }
+      ],
+      "sourceRow": 31
+    },
+    {
+      "id": "ener_031",
+      "category": "Energy & Vitality",
+      "name": "Fresh Start Activation",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.05,
+          "raw": "1.05"
+        },
+        {
+          "index": 1,
+          "hz": 8.1,
+          "raw": "8.1"
+        },
+        {
+          "index": 2,
+          "hz": 40.79,
+          "raw": "40.79"
+        },
+        {
+          "index": 3,
+          "hz": 70.47,
+          "raw": "70.47"
+        },
+        {
+          "index": 4,
+          "hz": 136.25,
+          "raw": "136.25"
+        },
+        {
+          "index": 5,
+          "hz": 243.0,
+          "raw": "243"
+        },
+        {
+          "index": 6,
+          "hz": 248.0,
+          "raw": "248"
+        },
+        {
+          "index": 7,
+          "hz": 278.0,
+          "raw": "278"
+        },
+        {
+          "index": 8,
+          "hz": 291.69,
+          "raw": "291.69"
+        },
+        {
+          "index": 9,
+          "hz": 310.31,
+          "raw": "310.31"
+        },
+        {
+          "index": 10,
+          "hz": 452.0,
+          "raw": "452"
+        }
+      ],
+      "sourceRow": 32
+    },
+    {
+      "id": "ener_032",
+      "category": "Energy & Vitality",
+      "name": "Vital Flow & Warmth",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 14.8,
+          "raw": "14.8"
+        },
+        {
+          "index": 1,
+          "hz": 26.0,
+          "raw": "26"
+        },
+        {
+          "index": 2,
+          "hz": 60.0,
+          "raw": "60"
+        },
+        {
+          "index": 3,
+          "hz": 74.14,
+          "raw": "74.14"
+        },
+        {
+          "index": 4,
+          "hz": 118.0,
+          "raw": "118"
+        },
+        {
+          "index": 5,
+          "hz": 147.0,
+          "raw": "147"
+        },
+        {
+          "index": 6,
+          "hz": 213.0,
+          "raw": "213"
+        },
+        {
+          "index": 7,
+          "hz": 243.0,
+          "raw": "243"
+        },
+        {
+          "index": 8,
+          "hz": 246.0,
+          "raw": "246"
+        },
+        {
+          "index": 9,
+          "hz": 247.09,
+          "raw": "247.09"
+        },
+        {
+          "index": 10,
+          "hz": 270.54,
+          "raw": "270.54"
+        },
+        {
+          "index": 11,
+          "hz": 320.0,
+          "raw": "320"
+        },
+        {
+          "index": 12,
+          "hz": 434.0,
+          "raw": "434"
+        }
+      ],
+      "sourceRow": 33
+    },
+    {
+      "id": "ener_033",
+      "category": "Energy & Vitality",
+      "name": "Low-Energy Day Support",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 1,
+          "hz": 47.5,
+          "raw": "47.5"
+        },
+        {
+          "index": 2,
+          "hz": 52.0,
+          "raw": "52"
+        },
+        {
+          "index": 3,
+          "hz": 92.84,
+          "raw": "92.84"
+        },
+        {
+          "index": 4,
+          "hz": 95.48,
+          "raw": "95.48"
+        },
+        {
+          "index": 5,
+          "hz": 104.0,
+          "raw": "104"
+        },
+        {
+          "index": 6,
+          "hz": 142.0,
+          "raw": "142"
+        },
+        {
+          "index": 7,
+          "hz": 171.0,
+          "raw": "171"
+        },
+        {
+          "index": 8,
+          "hz": 205.53,
+          "raw": "205.53"
+        },
+        {
+          "index": 9,
+          "hz": 240.57,
+          "raw": "240.57"
+        }
+      ],
+      "sourceRow": 34
+    },
+    {
+      "id": "ener_034",
+      "category": "Energy & Vitality",
+      "name": "Wake-Up Clarity & Energy",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Great as a morning routine to start clear and balanced.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 10.35,
+          "raw": "10.35"
+        },
+        {
+          "index": 1,
+          "hz": 37.0,
+          "raw": "37"
+        },
+        {
+          "index": 2,
+          "hz": 47.0,
+          "raw": "47"
+        },
+        {
+          "index": 3,
+          "hz": 119.98,
+          "raw": "119.98"
+        },
+        {
+          "index": 4,
+          "hz": 207.0,
+          "raw": "207"
+        },
+        {
+          "index": 5,
+          "hz": 240.0,
+          "raw": "240"
+        },
+        {
+          "index": 6,
+          "hz": 243.0,
+          "raw": "243"
+        },
+        {
+          "index": 7,
+          "hz": 305.0,
+          "raw": "305"
+        },
+        {
+          "index": 8,
+          "hz": 349.54,
+          "raw": "349.54"
+        },
+        {
+          "index": 9,
+          "hz": 468.0,
+          "raw": "468"
+        },
+        {
+          "index": 10,
+          "hz": 473.0,
+          "raw": "473"
+        }
+      ],
+      "sourceRow": 35
+    },
+    {
+      "id": "ener_035",
+      "category": "Energy & Vitality",
+      "name": "Steady Stamina Support",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 1,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 2,
+          "hz": 27.0,
+          "raw": "27"
+        },
+        {
+          "index": 3,
+          "hz": 27.5,
+          "raw": "27.5"
+        },
+        {
+          "index": 4,
+          "hz": 34.1,
+          "raw": "34.1"
+        },
+        {
+          "index": 5,
+          "hz": 40.6,
+          "raw": "40.6"
+        },
+        {
+          "index": 6,
+          "hz": 88.1,
+          "raw": "88.1"
+        },
+        {
+          "index": 7,
+          "hz": 107.0,
+          "raw": "107"
+        },
+        {
+          "index": 8,
+          "hz": 117.0,
+          "raw": "117"
+        },
+        {
+          "index": 9,
+          "hz": 222.18,
+          "raw": "222.18"
+        },
+        {
+          "index": 10,
+          "hz": 272.0,
+          "raw": "272"
+        },
+        {
+          "index": 11,
+          "hz": 397.0,
+          "raw": "397"
+        }
+      ],
+      "sourceRow": 36
+    },
+    {
+      "id": "ener_036",
+      "category": "Energy & Vitality",
+      "name": "Bright Mood & Energy",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Use to encourage steady vitality and a brighter sense of momentum.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 17.6,
+          "raw": "17.6"
+        },
+        {
+          "index": 1,
+          "hz": 33.13,
+          "raw": "33.13"
+        },
+        {
+          "index": 2,
+          "hz": 102.0,
+          "raw": "102"
+        },
+        {
+          "index": 3,
+          "hz": 147.85,
+          "raw": "147.85"
+        },
+        {
+          "index": 4,
+          "hz": 263.0,
+          "raw": "263"
+        },
+        {
+          "index": 5,
+          "hz": 265.0,
+          "raw": "265"
+        },
+        {
+          "index": 6,
+          "hz": 335.5,
+          "raw": "335.5"
+        },
+        {
+          "index": 7,
+          "hz": 357.3,
+          "raw": "357.3"
+        },
+        {
+          "index": 8,
+          "hz": 407.0,
+          "raw": "407"
+        },
+        {
+          "index": 9,
+          "hz": 425.0,
+          "raw": "425"
+        },
+        {
+          "index": 10,
+          "hz": 430.2,
+          "raw": "430.2"
+        }
+      ],
+      "sourceRow": 37
+    },
+    {
+      "id": "ener_037",
+      "category": "Energy & Vitality",
+      "name": "After-Work Reboot",
+      "description": "Supports a refreshed, more energized state without pushing intensity. Designed for mornings, midday slumps, or when you want a clean reset into activity. Ideal before focused tasks when you want a steady, clear headspace.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 99.03,
+          "raw": "99.03"
+        },
+        {
+          "index": 1,
+          "hz": 181.0,
+          "raw": "181"
+        },
+        {
+          "index": 2,
+          "hz": 201.0,
+          "raw": "201"
+        },
+        {
+          "index": 3,
+          "hz": 247.09,
+          "raw": "247.09"
+        },
+        {
+          "index": 4,
+          "hz": 287.0,
+          "raw": "287"
+        },
+        {
+          "index": 5,
+          "hz": 357.0,
+          "raw": "357"
+        },
+        {
+          "index": 6,
+          "hz": 428.3,
+          "raw": "428.3"
+        },
+        {
+          "index": 7,
+          "hz": 466.0,
+          "raw": "466"
+        },
+        {
+          "index": 8,
+          "hz": 492.23,
+          "raw": "492.23"
+        }
+      ],
+      "sourceRow": 38
+    },
+    {
+      "id": "focu_038",
+      "category": "Mental Focus & Clarity",
+      "name": "Clear Focus Session",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 9.18,
+          "raw": "9.18"
+        },
+        {
+          "index": 1,
+          "hz": 40.39,
+          "raw": "40.39"
+        },
+        {
+          "index": 2,
+          "hz": 41.0,
+          "raw": "41"
+        },
+        {
+          "index": 3,
+          "hz": 46.5,
+          "raw": "46.5"
+        },
+        {
+          "index": 4,
+          "hz": 48.0,
+          "raw": "48"
+        },
+        {
+          "index": 5,
+          "hz": 105.25,
+          "raw": "105.25"
+        },
+        {
+          "index": 6,
+          "hz": 124.0,
+          "raw": "124"
+        },
+        {
+          "index": 7,
+          "hz": 141.59,
+          "raw": "141.59"
+        },
+        {
+          "index": 8,
+          "hz": 218.0,
+          "raw": "218"
+        },
+        {
+          "index": 9,
+          "hz": 224.0,
+          "raw": "224"
+        },
+        {
+          "index": 10,
+          "hz": 310.31,
+          "raw": "310.31"
+        },
+        {
+          "index": 11,
+          "hz": 328.0,
+          "raw": "328"
+        },
+        {
+          "index": 12,
+          "hz": 379.0,
+          "raw": "379"
+        },
+        {
+          "index": 13,
+          "hz": 432.0,
+          "raw": "432"
+        }
+      ],
+      "sourceRow": 39
+    },
+    {
+      "id": "focu_039",
+      "category": "Mental Focus & Clarity",
+      "name": "Study & Learning Support",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Ideal before focused tasks when you want a steady, clear headspace.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 1,
+          "hz": 9.3,
+          "raw": "9.3"
+        },
+        {
+          "index": 2,
+          "hz": 18.0,
+          "raw": "18"
+        },
+        {
+          "index": 3,
+          "hz": 19.5,
+          "raw": "19.5"
+        },
+        {
+          "index": 4,
+          "hz": 33.0,
+          "raw": "33"
+        },
+        {
+          "index": 5,
+          "hz": 62.5,
+          "raw": "62.5"
+        },
+        {
+          "index": 6,
+          "hz": 62.64,
+          "raw": "62.64"
+        },
+        {
+          "index": 7,
+          "hz": 76.0,
+          "raw": "76"
+        },
+        {
+          "index": 8,
+          "hz": 89.0,
+          "raw": "89"
+        },
+        {
+          "index": 9,
+          "hz": 106.0,
+          "raw": "106"
+        },
+        {
+          "index": 10,
+          "hz": 381.19,
+          "raw": "381.19"
+        },
+        {
+          "index": 11,
+          "hz": 430.2,
+          "raw": "430.2"
+        }
+      ],
+      "sourceRow": 40
+    },
+    {
+      "id": "focu_040",
+      "category": "Mental Focus & Clarity",
+      "name": "Deep Work Mode",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Ideal before focused tasks when you want a steady, clear headspace.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 1,
+          "hz": 66.0,
+          "raw": "66"
+        },
+        {
+          "index": 2,
+          "hz": 74.14,
+          "raw": "74.14"
+        },
+        {
+          "index": 3,
+          "hz": 88.1,
+          "raw": "88.1"
+        },
+        {
+          "index": 4,
+          "hz": 141.0,
+          "raw": "141"
+        },
+        {
+          "index": 5,
+          "hz": 171.0,
+          "raw": "171"
+        },
+        {
+          "index": 6,
+          "hz": 265.67,
+          "raw": "265.67"
+        },
+        {
+          "index": 7,
+          "hz": 314.0,
+          "raw": "314"
+        },
+        {
+          "index": 8,
+          "hz": 321.0,
+          "raw": "321"
+        },
+        {
+          "index": 9,
+          "hz": 326.16,
+          "raw": "326.16"
+        },
+        {
+          "index": 10,
+          "hz": 399.56,
+          "raw": "399.56"
+        },
+        {
+          "index": 11,
+          "hz": 400.6,
+          "raw": "400.6"
+        },
+        {
+          "index": 12,
+          "hz": 436.0,
+          "raw": "436"
+        },
+        {
+          "index": 13,
+          "hz": 470.0,
+          "raw": "470"
+        }
+      ],
+      "sourceRow": 41
+    },
+    {
+      "id": "focu_041",
+      "category": "Mental Focus & Clarity",
+      "name": "Mental Clutter Clean-Up",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 46.0,
+          "raw": "46"
+        },
+        {
+          "index": 1,
+          "hz": 77.0,
+          "raw": "77"
+        },
+        {
+          "index": 2,
+          "hz": 110.0,
+          "raw": "110"
+        },
+        {
+          "index": 3,
+          "hz": 111.0,
+          "raw": "111"
+        },
+        {
+          "index": 4,
+          "hz": 133.12,
+          "raw": "133.12"
+        },
+        {
+          "index": 5,
+          "hz": 250.0,
+          "raw": "250"
+        },
+        {
+          "index": 6,
+          "hz": 300.0,
+          "raw": "300"
+        },
+        {
+          "index": 7,
+          "hz": 356.0,
+          "raw": "356"
+        },
+        {
+          "index": 8,
+          "hz": 386.0,
+          "raw": "386"
+        },
+        {
+          "index": 9,
+          "hz": 448.0,
+          "raw": "448"
+        },
+        {
+          "index": 10,
+          "hz": 488.0,
+          "raw": "488"
+        }
+      ],
+      "sourceRow": 42
+    },
+    {
+      "id": "focu_042",
+      "category": "Mental Focus & Clarity",
+      "name": "Sharp Attention Boost",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 9.59,
+          "raw": "9.59"
+        },
+        {
+          "index": 1,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 2,
+          "hz": 42.0,
+          "raw": "42"
+        },
+        {
+          "index": 3,
+          "hz": 46.99,
+          "raw": "46.99"
+        },
+        {
+          "index": 4,
+          "hz": 61.0,
+          "raw": "61"
+        },
+        {
+          "index": 5,
+          "hz": 62.66,
+          "raw": "62.66"
+        },
+        {
+          "index": 6,
+          "hz": 90.0,
+          "raw": "90"
+        },
+        {
+          "index": 7,
+          "hz": 91.0,
+          "raw": "91"
+        },
+        {
+          "index": 8,
+          "hz": 100.0,
+          "raw": "100"
+        },
+        {
+          "index": 9,
+          "hz": 179.0,
+          "raw": "179"
+        },
+        {
+          "index": 10,
+          "hz": 243.0,
+          "raw": "243"
+        },
+        {
+          "index": 11,
+          "hz": 411.0,
+          "raw": "411"
+        },
+        {
+          "index": 12,
+          "hz": 423.0,
+          "raw": "423"
+        },
+        {
+          "index": 13,
+          "hz": 468.0,
+          "raw": "468"
+        }
+      ],
+      "sourceRow": 43
+    },
+    {
+      "id": "focu_043",
+      "category": "Mental Focus & Clarity",
+      "name": "Creative Thinking Flow",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 4.17,
+          "raw": "4.17"
+        },
+        {
+          "index": 1,
+          "hz": 5.35,
+          "raw": "5.35"
+        },
+        {
+          "index": 2,
+          "hz": 6.79,
+          "raw": "6.79"
+        },
+        {
+          "index": 3,
+          "hz": 8.01,
+          "raw": "8.01"
+        },
+        {
+          "index": 4,
+          "hz": 34.1,
+          "raw": "34.1"
+        },
+        {
+          "index": 5,
+          "hz": 105.0,
+          "raw": "105"
+        },
+        {
+          "index": 6,
+          "hz": 318.0,
+          "raw": "318"
+        },
+        {
+          "index": 7,
+          "hz": 468.0,
+          "raw": "468"
+        },
+        {
+          "index": 8,
+          "hz": 471.0,
+          "raw": "471"
+        }
+      ],
+      "sourceRow": 44
+    },
+    {
+      "id": "focu_044",
+      "category": "Mental Focus & Clarity",
+      "name": "Decision Clarity Support",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 2.64,
+          "raw": "2.64"
+        },
+        {
+          "index": 1,
+          "hz": 15.0,
+          "raw": "15"
+        },
+        {
+          "index": 2,
+          "hz": 19.0,
+          "raw": "19"
+        },
+        {
+          "index": 3,
+          "hz": 22.0,
+          "raw": "22"
+        },
+        {
+          "index": 4,
+          "hz": 27.69,
+          "raw": "27.69"
+        },
+        {
+          "index": 5,
+          "hz": 34.0,
+          "raw": "34"
+        },
+        {
+          "index": 6,
+          "hz": 155.0,
+          "raw": "155"
+        },
+        {
+          "index": 7,
+          "hz": 201.0,
+          "raw": "201"
+        },
+        {
+          "index": 8,
+          "hz": 253.0,
+          "raw": "253"
+        },
+        {
+          "index": 9,
+          "hz": 274.0,
+          "raw": "274"
+        },
+        {
+          "index": 10,
+          "hz": 331.0,
+          "raw": "331"
+        }
+      ],
+      "sourceRow": 45
+    },
+    {
+      "id": "focu_045",
+      "category": "Mental Focus & Clarity",
+      "name": "Screen-Time Reset",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 20.5,
+          "raw": "20.5"
+        },
+        {
+          "index": 1,
+          "hz": 56.0,
+          "raw": "56"
+        },
+        {
+          "index": 2,
+          "hz": 73.95,
+          "raw": "73.95"
+        },
+        {
+          "index": 3,
+          "hz": 164.0,
+          "raw": "164"
+        },
+        {
+          "index": 4,
+          "hz": 166.0,
+          "raw": "166"
+        },
+        {
+          "index": 5,
+          "hz": 336.0,
+          "raw": "336"
+        },
+        {
+          "index": 6,
+          "hz": 438.0,
+          "raw": "438"
+        },
+        {
+          "index": 7,
+          "hz": 455.0,
+          "raw": "455"
+        },
+        {
+          "index": 8,
+          "hz": 463.06,
+          "raw": "463.06"
+        }
+      ],
+      "sourceRow": 46
+    },
+    {
+      "id": "focu_046",
+      "category": "Mental Focus & Clarity",
+      "name": "Meeting Readiness",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Ideal before focused tasks when you want a steady, clear headspace.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 9.18,
+          "raw": "9.18"
+        },
+        {
+          "index": 1,
+          "hz": 12.09,
+          "raw": "12.09"
+        },
+        {
+          "index": 2,
+          "hz": 14.8,
+          "raw": "14.8"
+        },
+        {
+          "index": 3,
+          "hz": 65.0,
+          "raw": "65"
+        },
+        {
+          "index": 4,
+          "hz": 186.0,
+          "raw": "186"
+        },
+        {
+          "index": 5,
+          "hz": 219.0,
+          "raw": "219"
+        },
+        {
+          "index": 6,
+          "hz": 263.11,
+          "raw": "263.11"
+        },
+        {
+          "index": 7,
+          "hz": 333.0,
+          "raw": "333"
+        },
+        {
+          "index": 8,
+          "hz": 339.0,
+          "raw": "339"
+        },
+        {
+          "index": 9,
+          "hz": 397.0,
+          "raw": "397"
+        },
+        {
+          "index": 10,
+          "hz": 489.22,
+          "raw": "489.22"
+        }
+      ],
+      "sourceRow": 47
+    },
+    {
+      "id": "focu_047",
+      "category": "Mental Focus & Clarity",
+      "name": "Calm Concentration",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.89,
+          "raw": "1.89"
+        },
+        {
+          "index": 1,
+          "hz": 8.0,
+          "raw": "8"
+        },
+        {
+          "index": 2,
+          "hz": 19.0,
+          "raw": "19"
+        },
+        {
+          "index": 3,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 4,
+          "hz": 70.4,
+          "raw": "70.4"
+        },
+        {
+          "index": 5,
+          "hz": 88.57,
+          "raw": "88.57"
+        },
+        {
+          "index": 6,
+          "hz": 92.84,
+          "raw": "92.84"
+        },
+        {
+          "index": 7,
+          "hz": 102.0,
+          "raw": "102"
+        },
+        {
+          "index": 8,
+          "hz": 113.0,
+          "raw": "113"
+        },
+        {
+          "index": 9,
+          "hz": 129.36,
+          "raw": "129.36"
+        },
+        {
+          "index": 10,
+          "hz": 232.0,
+          "raw": "232"
+        },
+        {
+          "index": 11,
+          "hz": 238.0,
+          "raw": "238"
+        },
+        {
+          "index": 12,
+          "hz": 242.0,
+          "raw": "242"
+        },
+        {
+          "index": 13,
+          "hz": 430.2,
+          "raw": "430.2"
+        }
+      ],
+      "sourceRow": 48
+    },
+    {
+      "id": "focu_048",
+      "category": "Mental Focus & Clarity",
+      "name": "Task Switching Ease",
+      "description": "Supports mental clarity and a steadier attention span in demanding moments. Designed for deep work, study, creative sessions, or meeting readiness. Use when you want calm concentration without feeling overstimulated.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 40.0,
+          "raw": "40"
+        },
+        {
+          "index": 1,
+          "hz": 46.99,
+          "raw": "46.99"
+        },
+        {
+          "index": 2,
+          "hz": 59.0,
+          "raw": "59"
+        },
+        {
+          "index": 3,
+          "hz": 60.0,
+          "raw": "60"
+        },
+        {
+          "index": 4,
+          "hz": 62.64,
+          "raw": "62.64"
+        },
+        {
+          "index": 5,
+          "hz": 97.5,
+          "raw": "97.5"
+        },
+        {
+          "index": 6,
+          "hz": 103.0,
+          "raw": "103"
+        },
+        {
+          "index": 7,
+          "hz": 113.0,
+          "raw": "113"
+        },
+        {
+          "index": 8,
+          "hz": 116.0,
+          "raw": "116"
+        },
+        {
+          "index": 9,
+          "hz": 159.0,
+          "raw": "159"
+        },
+        {
+          "index": 10,
+          "hz": 179.0,
+          "raw": "179"
+        },
+        {
+          "index": 11,
+          "hz": 249.0,
+          "raw": "249"
+        },
+        {
+          "index": 12,
+          "hz": 320.0,
+          "raw": "320"
+        },
+        {
+          "index": 13,
+          "hz": 376.0,
+          "raw": "376"
+        },
+        {
+          "index": 14,
+          "hz": 458.0,
+          "raw": "458"
+        }
+      ],
+      "sourceRow": 49
+    },
+    {
+      "id": "emot_049",
+      "category": "Emotional Balance",
+      "name": "Emotional Grounding",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.14,
+          "raw": "0.14"
+        },
+        {
+          "index": 1,
+          "hz": 0.73,
+          "raw": "0.73"
+        },
+        {
+          "index": 2,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 3,
+          "hz": 5.5,
+          "raw": "5.5"
+        },
+        {
+          "index": 4,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 5,
+          "hz": 12.09,
+          "raw": "12.09"
+        },
+        {
+          "index": 6,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 7,
+          "hz": 15.43,
+          "raw": "15.43"
+        },
+        {
+          "index": 8,
+          "hz": 19.5,
+          "raw": "19.5"
+        },
+        {
+          "index": 9,
+          "hz": 24.0,
+          "raw": "24"
+        },
+        {
+          "index": 10,
+          "hz": 28.0,
+          "raw": "28"
+        },
+        {
+          "index": 11,
+          "hz": 47.0,
+          "raw": "47"
+        },
+        {
+          "index": 12,
+          "hz": 88.0,
+          "raw": "88"
+        }
+      ],
+      "sourceRow": 50
+    },
+    {
+      "id": "emot_050",
+      "category": "Emotional Balance",
+      "name": "Heart-Settling Comfort",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.16,
+          "raw": "0.16"
+        },
+        {
+          "index": 1,
+          "hz": 2.5,
+          "raw": "2.5"
+        },
+        {
+          "index": 2,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 3,
+          "hz": 4.9,
+          "raw": "4.9"
+        },
+        {
+          "index": 4,
+          "hz": 5.0,
+          "raw": "5"
+        },
+        {
+          "index": 5,
+          "hz": 5.79,
+          "raw": "5.79"
+        },
+        {
+          "index": 6,
+          "hz": 5.9,
+          "raw": "5.9"
+        },
+        {
+          "index": 7,
+          "hz": 6.29,
+          "raw": "6.29"
+        },
+        {
+          "index": 8,
+          "hz": 7.25,
+          "raw": "7.25"
+        },
+        {
+          "index": 9,
+          "hz": 7.7,
+          "raw": "7.7"
+        },
+        {
+          "index": 10,
+          "hz": 8.0,
+          "raw": "8"
+        },
+        {
+          "index": 11,
+          "hz": 9.69,
+          "raw": "9.69"
+        },
+        {
+          "index": 12,
+          "hz": 9.9,
+          "raw": "9.9"
+        },
+        {
+          "index": 13,
+          "hz": 14.4,
+          "raw": "14.4"
+        },
+        {
+          "index": 14,
+          "hz": 119.0,
+          "raw": "119"
+        }
+      ],
+      "sourceRow": 51
+    },
+    {
+      "id": "emot_051",
+      "category": "Emotional Balance",
+      "name": "Release & Reset (Emotions)",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.89,
+          "raw": "1.89"
+        },
+        {
+          "index": 1,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 2,
+          "hz": 5.12,
+          "raw": "5.12"
+        },
+        {
+          "index": 3,
+          "hz": 10.3,
+          "raw": "10.3"
+        },
+        {
+          "index": 4,
+          "hz": 10.36,
+          "raw": "10.36"
+        },
+        {
+          "index": 5,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 6,
+          "hz": 20.5,
+          "raw": "20.5"
+        },
+        {
+          "index": 7,
+          "hz": 21.34,
+          "raw": "21.34"
+        },
+        {
+          "index": 8,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 9,
+          "hz": 88.57,
+          "raw": "88.57"
+        },
+        {
+          "index": 10,
+          "hz": 106.75,
+          "raw": "106.75"
+        }
+      ],
+      "sourceRow": 52
+    },
+    {
+      "id": "emot_052",
+      "category": "Emotional Balance",
+      "name": "Uplift & Lightness",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 1,
+          "hz": 0.52,
+          "raw": "0.52"
+        },
+        {
+          "index": 2,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 3,
+          "hz": 4.9,
+          "raw": "4.9"
+        },
+        {
+          "index": 4,
+          "hz": 5.0,
+          "raw": "5"
+        },
+        {
+          "index": 5,
+          "hz": 5.01,
+          "raw": "5.01"
+        },
+        {
+          "index": 6,
+          "hz": 6.15,
+          "raw": "6.15"
+        },
+        {
+          "index": 7,
+          "hz": 12.4,
+          "raw": "12.4"
+        },
+        {
+          "index": 8,
+          "hz": 17.6,
+          "raw": "17.6"
+        },
+        {
+          "index": 9,
+          "hz": 24.0,
+          "raw": "24"
+        },
+        {
+          "index": 10,
+          "hz": 85.0,
+          "raw": "85"
+        }
+      ],
+      "sourceRow": 53
+    },
+    {
+      "id": "emot_053",
+      "category": "Emotional Balance",
+      "name": "Steady Mood Balance",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.49,
+          "raw": "0.49"
+        },
+        {
+          "index": 1,
+          "hz": 1.8,
+          "raw": "1.8"
+        },
+        {
+          "index": 2,
+          "hz": 7.63,
+          "raw": "7.63"
+        },
+        {
+          "index": 3,
+          "hz": 7.83,
+          "raw": "7.83"
+        },
+        {
+          "index": 4,
+          "hz": 8.1,
+          "raw": "8.1"
+        },
+        {
+          "index": 5,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 6,
+          "hz": 33.3,
+          "raw": "33.3"
+        },
+        {
+          "index": 7,
+          "hz": 44.0,
+          "raw": "44"
+        },
+        {
+          "index": 8,
+          "hz": 80.9,
+          "raw": "80.9"
+        }
+      ],
+      "sourceRow": 54
+    },
+    {
+      "id": "emot_054",
+      "category": "Emotional Balance",
+      "name": "Inner Safety & Ease",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.68,
+          "raw": "0.68"
+        },
+        {
+          "index": 1,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 2,
+          "hz": 3.5,
+          "raw": "3.5"
+        },
+        {
+          "index": 3,
+          "hz": 6.29,
+          "raw": "6.29"
+        },
+        {
+          "index": 4,
+          "hz": 7.35,
+          "raw": "7.35"
+        },
+        {
+          "index": 5,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 6,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 7,
+          "hz": 10.1,
+          "raw": "10.1"
+        },
+        {
+          "index": 8,
+          "hz": 10.5,
+          "raw": "10.5"
+        },
+        {
+          "index": 9,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 10,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 11,
+          "hz": 27.0,
+          "raw": "27"
+        },
+        {
+          "index": 12,
+          "hz": 32.0,
+          "raw": "32"
+        },
+        {
+          "index": 13,
+          "hz": 88.1,
+          "raw": "88.1"
+        }
+      ],
+      "sourceRow": 55
+    },
+    {
+      "id": "emot_055",
+      "category": "Emotional Balance",
+      "name": "Self-Compassion Support",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.52,
+          "raw": "0.52"
+        },
+        {
+          "index": 1,
+          "hz": 0.68,
+          "raw": "0.68"
+        },
+        {
+          "index": 2,
+          "hz": 0.83,
+          "raw": "0.83"
+        },
+        {
+          "index": 3,
+          "hz": 1.44,
+          "raw": "1.44"
+        },
+        {
+          "index": 4,
+          "hz": 2.75,
+          "raw": "2.75"
+        },
+        {
+          "index": 5,
+          "hz": 3.89,
+          "raw": "3.89"
+        },
+        {
+          "index": 6,
+          "hz": 4.9,
+          "raw": "4.9"
+        },
+        {
+          "index": 7,
+          "hz": 7.5,
+          "raw": "7.5"
+        },
+        {
+          "index": 8,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 9,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 10,
+          "hz": 9.9,
+          "raw": "9.9"
+        },
+        {
+          "index": 11,
+          "hz": 10.35,
+          "raw": "10.35"
+        },
+        {
+          "index": 12,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 13,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 14,
+          "hz": 94.0,
+          "raw": "94"
+        }
+      ],
+      "sourceRow": 56
+    },
+    {
+      "id": "emot_056",
+      "category": "Emotional Balance",
+      "name": "Confidence & Center",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 2.68,
+          "raw": "2.68"
+        },
+        {
+          "index": 1,
+          "hz": 4.7,
+          "raw": "4.7"
+        },
+        {
+          "index": 2,
+          "hz": 7.5,
+          "raw": "7.5"
+        },
+        {
+          "index": 3,
+          "hz": 7.82,
+          "raw": "7.82"
+        },
+        {
+          "index": 4,
+          "hz": 9.4,
+          "raw": "9.4"
+        },
+        {
+          "index": 5,
+          "hz": 11.8,
+          "raw": "11.8"
+        },
+        {
+          "index": 6,
+          "hz": 12.4,
+          "raw": "12.4"
+        },
+        {
+          "index": 7,
+          "hz": 14.0,
+          "raw": "14"
+        },
+        {
+          "index": 8,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 9,
+          "hz": 15.73,
+          "raw": "15.73"
+        },
+        {
+          "index": 10,
+          "hz": 17.0,
+          "raw": "17"
+        },
+        {
+          "index": 11,
+          "hz": 27.69,
+          "raw": "27.69"
+        },
+        {
+          "index": 12,
+          "hz": 62.66,
+          "raw": "62.66"
+        },
+        {
+          "index": 13,
+          "hz": 72.7,
+          "raw": "72.7"
+        },
+        {
+          "index": 14,
+          "hz": 78.0,
+          "raw": "78"
+        }
+      ],
+      "sourceRow": 57
+    },
+    {
+      "id": "emot_057",
+      "category": "Emotional Balance",
+      "name": "Resilience & Rebound",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.62,
+          "raw": "0.62"
+        },
+        {
+          "index": 1,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 2,
+          "hz": 1.45,
+          "raw": "1.45"
+        },
+        {
+          "index": 3,
+          "hz": 4.7,
+          "raw": "4.7"
+        },
+        {
+          "index": 4,
+          "hz": 5.12,
+          "raw": "5.12"
+        },
+        {
+          "index": 5,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 6,
+          "hz": 15.42,
+          "raw": "15.42"
+        },
+        {
+          "index": 7,
+          "hz": 16.0,
+          "raw": "16"
+        },
+        {
+          "index": 8,
+          "hz": 22.5,
+          "raw": "22.5"
+        },
+        {
+          "index": 9,
+          "hz": 83.0,
+          "raw": "83"
+        }
+      ],
+      "sourceRow": 58
+    },
+    {
+      "id": "emot_058",
+      "category": "Emotional Balance",
+      "name": "Emotional Space & Breath",
+      "description": "Supports emotional steadiness and a more grounded inner tone. Designed for moments of sensitivity, overwhelm, or when you want to reset your mood gently. Use to encourage resilience, self-compassion, and a calmer emotional baseline.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.17,
+          "raw": "0.17"
+        },
+        {
+          "index": 1,
+          "hz": 0.2,
+          "raw": "0.2"
+        },
+        {
+          "index": 2,
+          "hz": 2.65,
+          "raw": "2.65"
+        },
+        {
+          "index": 3,
+          "hz": 7.63,
+          "raw": "7.63"
+        },
+        {
+          "index": 4,
+          "hz": 9.69,
+          "raw": "9.69"
+        },
+        {
+          "index": 5,
+          "hz": 10.1,
+          "raw": "10.1"
+        },
+        {
+          "index": 6,
+          "hz": 10.36,
+          "raw": "10.36"
+        },
+        {
+          "index": 7,
+          "hz": 10.5,
+          "raw": "10.5"
+        },
+        {
+          "index": 8,
+          "hz": 15.0,
+          "raw": "15"
+        },
+        {
+          "index": 9,
+          "hz": 20.5,
+          "raw": "20.5"
+        },
+        {
+          "index": 10,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 11,
+          "hz": 25.56,
+          "raw": "25.56"
+        },
+        {
+          "index": 12,
+          "hz": 34.0,
+          "raw": "34"
+        },
+        {
+          "index": 13,
+          "hz": 40.6,
+          "raw": "40.6"
+        },
+        {
+          "index": 14,
+          "hz": 52.0,
+          "raw": "52"
+        }
+      ],
+      "sourceRow": 59
+    },
+    {
+      "id": "phys_059",
+      "category": "Physical Ease & Recovery",
+      "name": "Physical Tension Release",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 53.0,
+          "raw": "53"
+        },
+        {
+          "index": 1,
+          "hz": 122.53,
+          "raw": "122.53"
+        },
+        {
+          "index": 2,
+          "hz": 272.0,
+          "raw": "272"
+        },
+        {
+          "index": 3,
+          "hz": 291.0,
+          "raw": "291"
+        },
+        {
+          "index": 4,
+          "hz": 410.0,
+          "raw": "410"
+        },
+        {
+          "index": 5,
+          "hz": 430.0,
+          "raw": "430"
+        },
+        {
+          "index": 6,
+          "hz": 506.0,
+          "raw": "506"
+        },
+        {
+          "index": 7,
+          "hz": 608.0,
+          "raw": "608"
+        },
+        {
+          "index": 8,
+          "hz": 636.0,
+          "raw": "636"
+        },
+        {
+          "index": 9,
+          "hz": 1234.0,
+          "raw": "1234"
+        }
+      ],
+      "sourceRow": 60
+    },
+    {
+      "id": "phys_060",
+      "category": "Physical Ease & Recovery",
+      "name": "Whole-Body Ease",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 231.0,
+          "raw": "231"
+        },
+        {
+          "index": 1,
+          "hz": 255.0,
+          "raw": "255"
+        },
+        {
+          "index": 2,
+          "hz": 267.0,
+          "raw": "267"
+        },
+        {
+          "index": 3,
+          "hz": 392.0,
+          "raw": "392"
+        },
+        {
+          "index": 4,
+          "hz": 474.0,
+          "raw": "474"
+        },
+        {
+          "index": 5,
+          "hz": 709.0,
+          "raw": "709"
+        },
+        {
+          "index": 6,
+          "hz": 928.0,
+          "raw": "928"
+        },
+        {
+          "index": 7,
+          "hz": 995.0,
+          "raw": "995"
+        },
+        {
+          "index": 8,
+          "hz": 1433.0,
+          "raw": "1433"
+        }
+      ],
+      "sourceRow": 61
+    },
+    {
+      "id": "phys_061",
+      "category": "Physical Ease & Recovery",
+      "name": "Recovery After Strain",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use after activity or long days to support a smoother recovery feel.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.2,
+          "raw": "1.2"
+        },
+        {
+          "index": 1,
+          "hz": 27.5,
+          "raw": "27.5"
+        },
+        {
+          "index": 2,
+          "hz": 30.0,
+          "raw": "30"
+        },
+        {
+          "index": 3,
+          "hz": 70.48,
+          "raw": "70.48"
+        },
+        {
+          "index": 4,
+          "hz": 379.0,
+          "raw": "379"
+        },
+        {
+          "index": 5,
+          "hz": 400.6,
+          "raw": "400.6"
+        },
+        {
+          "index": 6,
+          "hz": 433.0,
+          "raw": "433"
+        },
+        {
+          "index": 7,
+          "hz": 451.74,
+          "raw": "451.74"
+        },
+        {
+          "index": 8,
+          "hz": 585.0,
+          "raw": "585"
+        },
+        {
+          "index": 9,
+          "hz": 848.0,
+          "raw": "848"
+        },
+        {
+          "index": 10,
+          "hz": 943.0,
+          "raw": "943"
+        },
+        {
+          "index": 11,
+          "hz": 1010.0,
+          "raw": "1010"
+        },
+        {
+          "index": 12,
+          "hz": 1018.0,
+          "raw": "1018"
+        }
+      ],
+      "sourceRow": 62
+    },
+    {
+      "id": "phys_062",
+      "category": "Physical Ease & Recovery",
+      "name": "Comfort & Relaxed Body",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 55.0,
+          "raw": "55"
+        },
+        {
+          "index": 1,
+          "hz": 73.95,
+          "raw": "73.95"
+        },
+        {
+          "index": 2,
+          "hz": 104.0,
+          "raw": "104"
+        },
+        {
+          "index": 3,
+          "hz": 177.0,
+          "raw": "177"
+        },
+        {
+          "index": 4,
+          "hz": 376.0,
+          "raw": "376"
+        },
+        {
+          "index": 5,
+          "hz": 474.0,
+          "raw": "474"
+        },
+        {
+          "index": 6,
+          "hz": 475.56,
+          "raw": "475.56"
+        },
+        {
+          "index": 7,
+          "hz": 477.0,
+          "raw": "477"
+        },
+        {
+          "index": 8,
+          "hz": 556.0,
+          "raw": "556"
+        },
+        {
+          "index": 9,
+          "hz": 719.0,
+          "raw": "719"
+        },
+        {
+          "index": 10,
+          "hz": 1311.0,
+          "raw": "1311"
+        },
+        {
+          "index": 11,
+          "hz": 1716.4,
+          "raw": "1716.4"
+        }
+      ],
+      "sourceRow": 63
+    },
+    {
+      "id": "phys_063",
+      "category": "Physical Ease & Recovery",
+      "name": "Neck & Upper Back Ease",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 72.0,
+          "raw": "72"
+        },
+        {
+          "index": 1,
+          "hz": 221.0,
+          "raw": "221"
+        },
+        {
+          "index": 2,
+          "hz": 400.0,
+          "raw": "400"
+        },
+        {
+          "index": 3,
+          "hz": 433.0,
+          "raw": "433"
+        },
+        {
+          "index": 4,
+          "hz": 442.0,
+          "raw": "442"
+        },
+        {
+          "index": 5,
+          "hz": 753.0,
+          "raw": "753"
+        },
+        {
+          "index": 6,
+          "hz": 953.0,
+          "raw": "953"
+        },
+        {
+          "index": 7,
+          "hz": 956.0,
+          "raw": "956"
+        },
+        {
+          "index": 8,
+          "hz": 1828.0,
+          "raw": "1828"
+        }
+      ],
+      "sourceRow": 64
+    },
+    {
+      "id": "phys_064",
+      "category": "Physical Ease & Recovery",
+      "name": "Lower Back Comfort Support",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 40.7,
+          "raw": "40.7"
+        },
+        {
+          "index": 1,
+          "hz": 87.0,
+          "raw": "87"
+        },
+        {
+          "index": 2,
+          "hz": 92.84,
+          "raw": "92.84"
+        },
+        {
+          "index": 3,
+          "hz": 130.0,
+          "raw": "130"
+        },
+        {
+          "index": 4,
+          "hz": 280.93,
+          "raw": "280.93"
+        },
+        {
+          "index": 5,
+          "hz": 396.0,
+          "raw": "396"
+        },
+        {
+          "index": 6,
+          "hz": 536.0,
+          "raw": "536"
+        },
+        {
+          "index": 7,
+          "hz": 801.2,
+          "raw": "801.2"
+        },
+        {
+          "index": 8,
+          "hz": 850.0,
+          "raw": "850"
+        },
+        {
+          "index": 9,
+          "hz": 875.0,
+          "raw": "875"
+        },
+        {
+          "index": 10,
+          "hz": 989.01,
+          "raw": "989.01"
+        }
+      ],
+      "sourceRow": 65
+    },
+    {
+      "id": "phys_065",
+      "category": "Physical Ease & Recovery",
+      "name": "Legs & Feet Refresh",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 95.09,
+          "raw": "95.09"
+        },
+        {
+          "index": 1,
+          "hz": 227.0,
+          "raw": "227"
+        },
+        {
+          "index": 2,
+          "hz": 241.68,
+          "raw": "241.68"
+        },
+        {
+          "index": 3,
+          "hz": 286.38,
+          "raw": "286.38"
+        },
+        {
+          "index": 4,
+          "hz": 393.0,
+          "raw": "393"
+        },
+        {
+          "index": 5,
+          "hz": 428.3,
+          "raw": "428.3"
+        },
+        {
+          "index": 6,
+          "hz": 465.5,
+          "raw": "465.5"
+        },
+        {
+          "index": 7,
+          "hz": 470.5,
+          "raw": "470.5"
+        },
+        {
+          "index": 8,
+          "hz": 477.0,
+          "raw": "477"
+        },
+        {
+          "index": 9,
+          "hz": 510.0,
+          "raw": "510"
+        },
+        {
+          "index": 10,
+          "hz": 937.76,
+          "raw": "937.76"
+        },
+        {
+          "index": 11,
+          "hz": 1950.5,
+          "raw": "1950.5"
+        }
+      ],
+      "sourceRow": 66
+    },
+    {
+      "id": "phys_066",
+      "category": "Physical Ease & Recovery",
+      "name": "Hands & Forearms Relief",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 175.16,
+          "raw": "175.16"
+        },
+        {
+          "index": 1,
+          "hz": 259.0,
+          "raw": "259"
+        },
+        {
+          "index": 2,
+          "hz": 324.37,
+          "raw": "324.37"
+        },
+        {
+          "index": 3,
+          "hz": 325.0,
+          "raw": "325"
+        },
+        {
+          "index": 4,
+          "hz": 349.54,
+          "raw": "349.54"
+        },
+        {
+          "index": 5,
+          "hz": 414.0,
+          "raw": "414"
+        },
+        {
+          "index": 6,
+          "hz": 636.0,
+          "raw": "636"
+        },
+        {
+          "index": 7,
+          "hz": 880.0,
+          "raw": "880"
+        },
+        {
+          "index": 8,
+          "hz": 992.37,
+          "raw": "992.37"
+        },
+        {
+          "index": 9,
+          "hz": 1018.0,
+          "raw": "1018"
+        },
+        {
+          "index": 10,
+          "hz": 1220.0,
+          "raw": "1220"
+        },
+        {
+          "index": 11,
+          "hz": 1829.0,
+          "raw": "1829"
+        },
+        {
+          "index": 12,
+          "hz": 1856.0,
+          "raw": "1856"
+        }
+      ],
+      "sourceRow": 67
+    },
+    {
+      "id": "phys_067",
+      "category": "Physical Ease & Recovery",
+      "name": "Posture Reset & Ease",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use after activity or long days to support a smoother recovery feel.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 19.0,
+          "raw": "19"
+        },
+        {
+          "index": 1,
+          "hz": 377.0,
+          "raw": "377"
+        },
+        {
+          "index": 2,
+          "hz": 395.0,
+          "raw": "395"
+        },
+        {
+          "index": 3,
+          "hz": 431.65,
+          "raw": "431.65"
+        },
+        {
+          "index": 4,
+          "hz": 437.0,
+          "raw": "437"
+        },
+        {
+          "index": 5,
+          "hz": 457.64,
+          "raw": "457.64"
+        },
+        {
+          "index": 6,
+          "hz": 518.0,
+          "raw": "518"
+        },
+        {
+          "index": 7,
+          "hz": 763.0,
+          "raw": "763"
+        },
+        {
+          "index": 8,
+          "hz": 1018.14,
+          "raw": "1018.14"
+        },
+        {
+          "index": 9,
+          "hz": 1035.0,
+          "raw": "1035"
+        }
+      ],
+      "sourceRow": 68
+    },
+    {
+      "id": "phys_068",
+      "category": "Physical Ease & Recovery",
+      "name": "Warmth & Circulation Support",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 44.0,
+          "raw": "44"
+        },
+        {
+          "index": 1,
+          "hz": 47.0,
+          "raw": "47"
+        },
+        {
+          "index": 2,
+          "hz": 210.0,
+          "raw": "210"
+        },
+        {
+          "index": 3,
+          "hz": 266.0,
+          "raw": "266"
+        },
+        {
+          "index": 4,
+          "hz": 336.52,
+          "raw": "336.52"
+        },
+        {
+          "index": 5,
+          "hz": 463.13,
+          "raw": "463.13"
+        },
+        {
+          "index": 6,
+          "hz": 585.91,
+          "raw": "585.91"
+        },
+        {
+          "index": 7,
+          "hz": 593.0,
+          "raw": "593"
+        },
+        {
+          "index": 8,
+          "hz": 677.0,
+          "raw": "677"
+        },
+        {
+          "index": 9,
+          "hz": 862.0,
+          "raw": "862"
+        },
+        {
+          "index": 10,
+          "hz": 1023.0,
+          "raw": "1023"
+        },
+        {
+          "index": 11,
+          "hz": 1072.0,
+          "raw": "1072"
+        },
+        {
+          "index": 12,
+          "hz": 1519.0,
+          "raw": "1519"
+        },
+        {
+          "index": 13,
+          "hz": 1638.0,
+          "raw": "1638"
+        }
+      ],
+      "sourceRow": 69
+    },
+    {
+      "id": "phys_069",
+      "category": "Physical Ease & Recovery",
+      "name": "Restorative Body Reset",
+      "description": "Supports physical ease and a more relaxed body state during rest or recovery. Designed after long sitting, travel, or physical effort to encourage comfort and release. Use as a gentle reset when the body feels tight, heavy, or fatigued.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 17.6,
+          "raw": "17.6"
+        },
+        {
+          "index": 1,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 2,
+          "hz": 40.7,
+          "raw": "40.7"
+        },
+        {
+          "index": 3,
+          "hz": 60.0,
+          "raw": "60"
+        },
+        {
+          "index": 4,
+          "hz": 372.0,
+          "raw": "372"
+        },
+        {
+          "index": 5,
+          "hz": 381.0,
+          "raw": "381"
+        },
+        {
+          "index": 6,
+          "hz": 600.0,
+          "raw": "600"
+        },
+        {
+          "index": 7,
+          "hz": 606.0,
+          "raw": "606"
+        },
+        {
+          "index": 8,
+          "hz": 709.2,
+          "raw": "709.2"
+        },
+        {
+          "index": 9,
+          "hz": 800.4,
+          "raw": "800.4"
+        },
+        {
+          "index": 10,
+          "hz": 1026.0,
+          "raw": "1026"
+        },
+        {
+          "index": 11,
+          "hz": 1027.56,
+          "raw": "1027.56"
+        },
+        {
+          "index": 12,
+          "hz": 1153.0,
+          "raw": "1153"
+        },
+        {
+          "index": 13,
+          "hz": 1250.0,
+          "raw": "1250"
+        },
+        {
+          "index": 14,
+          "hz": 1933.0,
+          "raw": "1933"
+        }
+      ],
+      "sourceRow": 70
+    },
+    {
+      "id": "move_070",
+      "category": "Movement & Activity Support",
+      "name": "Pre-Activity Warm-Up Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 46.5,
+          "raw": "46.5"
+        },
+        {
+          "index": 1,
+          "hz": 93.0,
+          "raw": "93"
+        },
+        {
+          "index": 2,
+          "hz": 114.0,
+          "raw": "114"
+        },
+        {
+          "index": 3,
+          "hz": 236.6,
+          "raw": "236.6"
+        },
+        {
+          "index": 4,
+          "hz": 320.0,
+          "raw": "320"
+        },
+        {
+          "index": 5,
+          "hz": 463.0,
+          "raw": "463"
+        },
+        {
+          "index": 6,
+          "hz": 489.0,
+          "raw": "489"
+        },
+        {
+          "index": 7,
+          "hz": 882.0,
+          "raw": "882"
+        }
+      ],
+      "sourceRow": 71
+    },
+    {
+      "id": "move_071",
+      "category": "Movement & Activity Support",
+      "name": "Post-Workout Recovery Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Ideal before focused tasks when you want a steady, clear headspace.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 1,
+          "hz": 91.0,
+          "raw": "91"
+        },
+        {
+          "index": 2,
+          "hz": 103.0,
+          "raw": "103"
+        },
+        {
+          "index": 3,
+          "hz": 178.0,
+          "raw": "178"
+        },
+        {
+          "index": 4,
+          "hz": 195.5,
+          "raw": "195.5"
+        },
+        {
+          "index": 5,
+          "hz": 200.0,
+          "raw": "200"
+        },
+        {
+          "index": 6,
+          "hz": 287.0,
+          "raw": "287"
+        },
+        {
+          "index": 7,
+          "hz": 380.0,
+          "raw": "380"
+        },
+        {
+          "index": 8,
+          "hz": 400.6,
+          "raw": "400.6"
+        },
+        {
+          "index": 9,
+          "hz": 579.0,
+          "raw": "579"
+        },
+        {
+          "index": 10,
+          "hz": 682.0,
+          "raw": "682"
+        },
+        {
+          "index": 11,
+          "hz": 911.69,
+          "raw": "911.69"
+        },
+        {
+          "index": 12,
+          "hz": 1146.0,
+          "raw": "1146"
+        },
+        {
+          "index": 13,
+          "hz": 1217.5,
+          "raw": "1217.5"
+        }
+      ],
+      "sourceRow": 72
+    },
+    {
+      "id": "move_072",
+      "category": "Movement & Activity Support",
+      "name": "Mobility & Range Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 138.0,
+          "raw": "138"
+        },
+        {
+          "index": 1,
+          "hz": 173.0,
+          "raw": "173"
+        },
+        {
+          "index": 2,
+          "hz": 187.0,
+          "raw": "187"
+        },
+        {
+          "index": 3,
+          "hz": 238.0,
+          "raw": "238"
+        },
+        {
+          "index": 4,
+          "hz": 326.03,
+          "raw": "326.03"
+        },
+        {
+          "index": 5,
+          "hz": 364.0,
+          "raw": "364"
+        },
+        {
+          "index": 6,
+          "hz": 424.0,
+          "raw": "424"
+        },
+        {
+          "index": 7,
+          "hz": 493.22,
+          "raw": "493.22"
+        },
+        {
+          "index": 8,
+          "hz": 496.0,
+          "raw": "496"
+        },
+        {
+          "index": 9,
+          "hz": 613.0,
+          "raw": "613"
+        },
+        {
+          "index": 10,
+          "hz": 969.0,
+          "raw": "969"
+        },
+        {
+          "index": 11,
+          "hz": 1876.13,
+          "raw": "1876.13"
+        }
+      ],
+      "sourceRow": 73
+    },
+    {
+      "id": "move_073",
+      "category": "Movement & Activity Support",
+      "name": "Sports Day Reset",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 26.0,
+          "raw": "26"
+        },
+        {
+          "index": 1,
+          "hz": 221.23,
+          "raw": "221.23"
+        },
+        {
+          "index": 2,
+          "hz": 230.0,
+          "raw": "230"
+        },
+        {
+          "index": 3,
+          "hz": 297.37,
+          "raw": "297.37"
+        },
+        {
+          "index": 4,
+          "hz": 432.0,
+          "raw": "432"
+        },
+        {
+          "index": 5,
+          "hz": 488.0,
+          "raw": "488"
+        },
+        {
+          "index": 6,
+          "hz": 553.0,
+          "raw": "553"
+        },
+        {
+          "index": 7,
+          "hz": 554.67,
+          "raw": "554.67"
+        },
+        {
+          "index": 8,
+          "hz": 583.5,
+          "raw": "583.5"
+        },
+        {
+          "index": 9,
+          "hz": 611.0,
+          "raw": "611"
+        },
+        {
+          "index": 10,
+          "hz": 695.0,
+          "raw": "695"
+        },
+        {
+          "index": 11,
+          "hz": 799.0,
+          "raw": "799"
+        },
+        {
+          "index": 12,
+          "hz": 895.0,
+          "raw": "895"
+        },
+        {
+          "index": 13,
+          "hz": 1167.0,
+          "raw": "1167"
+        }
+      ],
+      "sourceRow": 74
+    },
+    {
+      "id": "move_074",
+      "category": "Movement & Activity Support",
+      "name": "Breath & Endurance Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 52.5,
+          "raw": "52.5"
+        },
+        {
+          "index": 1,
+          "hz": 237.0,
+          "raw": "237"
+        },
+        {
+          "index": 2,
+          "hz": 250.0,
+          "raw": "250"
+        },
+        {
+          "index": 3,
+          "hz": 378.0,
+          "raw": "378"
+        },
+        {
+          "index": 4,
+          "hz": 498.0,
+          "raw": "498"
+        },
+        {
+          "index": 5,
+          "hz": 594.0,
+          "raw": "594"
+        },
+        {
+          "index": 6,
+          "hz": 625.5,
+          "raw": "625.5"
+        },
+        {
+          "index": 7,
+          "hz": 778.78,
+          "raw": "778.78"
+        },
+        {
+          "index": 8,
+          "hz": 803.4,
+          "raw": "803.4"
+        },
+        {
+          "index": 9,
+          "hz": 1155.0,
+          "raw": "1155"
+        }
+      ],
+      "sourceRow": 75
+    },
+    {
+      "id": "move_075",
+      "category": "Movement & Activity Support",
+      "name": "Lightness in Movement",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 108.0,
+          "raw": "108"
+        },
+        {
+          "index": 1,
+          "hz": 140.0,
+          "raw": "140"
+        },
+        {
+          "index": 2,
+          "hz": 220.0,
+          "raw": "220"
+        },
+        {
+          "index": 3,
+          "hz": 309.89,
+          "raw": "309.89"
+        },
+        {
+          "index": 4,
+          "hz": 436.0,
+          "raw": "436"
+        },
+        {
+          "index": 5,
+          "hz": 872.0,
+          "raw": "872"
+        },
+        {
+          "index": 6,
+          "hz": 1043.0,
+          "raw": "1043"
+        },
+        {
+          "index": 7,
+          "hz": 1228.0,
+          "raw": "1228"
+        },
+        {
+          "index": 8,
+          "hz": 1430.71,
+          "raw": "1430.71"
+        },
+        {
+          "index": 9,
+          "hz": 1604.0,
+          "raw": "1604"
+        }
+      ],
+      "sourceRow": 76
+    },
+    {
+      "id": "move_076",
+      "category": "Movement & Activity Support",
+      "name": "Balance & Coordination Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 70.47,
+          "raw": "70.47"
+        },
+        {
+          "index": 1,
+          "hz": 90.8,
+          "raw": "90.8"
+        },
+        {
+          "index": 2,
+          "hz": 276.57,
+          "raw": "276.57"
+        },
+        {
+          "index": 3,
+          "hz": 309.89,
+          "raw": "309.89"
+        },
+        {
+          "index": 4,
+          "hz": 764.0,
+          "raw": "764"
+        },
+        {
+          "index": 5,
+          "hz": 801.0,
+          "raw": "801"
+        },
+        {
+          "index": 6,
+          "hz": 905.49,
+          "raw": "905.49"
+        },
+        {
+          "index": 7,
+          "hz": 999.79,
+          "raw": "999.79"
+        },
+        {
+          "index": 8,
+          "hz": 1564.68,
+          "raw": "1564.68"
+        },
+        {
+          "index": 9,
+          "hz": 1590.0,
+          "raw": "1590"
+        },
+        {
+          "index": 10,
+          "hz": 1600.0,
+          "raw": "1600"
+        },
+        {
+          "index": 11,
+          "hz": 1823.0,
+          "raw": "1823"
+        }
+      ],
+      "sourceRow": 77
+    },
+    {
+      "id": "move_077",
+      "category": "Movement & Activity Support",
+      "name": "Muscle Readiness Support",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use to encourage comfortable movement and a steady post-activity reset.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 7.83,
+          "raw": "7.83"
+        },
+        {
+          "index": 1,
+          "hz": 14.1,
+          "raw": "14.1"
+        },
+        {
+          "index": 2,
+          "hz": 64.0,
+          "raw": "64"
+        },
+        {
+          "index": 3,
+          "hz": 170.0,
+          "raw": "170"
+        },
+        {
+          "index": 4,
+          "hz": 392.0,
+          "raw": "392"
+        },
+        {
+          "index": 5,
+          "hz": 464.5,
+          "raw": "464.5"
+        },
+        {
+          "index": 6,
+          "hz": 483.0,
+          "raw": "483"
+        },
+        {
+          "index": 7,
+          "hz": 503.0,
+          "raw": "503"
+        },
+        {
+          "index": 8,
+          "hz": 673.9,
+          "raw": "673.9"
+        },
+        {
+          "index": 9,
+          "hz": 674.3,
+          "raw": "674.3"
+        },
+        {
+          "index": 10,
+          "hz": 941.39,
+          "raw": "941.39"
+        },
+        {
+          "index": 11,
+          "hz": 1060.91,
+          "raw": "1060.91"
+        },
+        {
+          "index": 12,
+          "hz": 1230.0,
+          "raw": "1230"
+        },
+        {
+          "index": 13,
+          "hz": 1402.0,
+          "raw": "1402"
+        }
+      ],
+      "sourceRow": 78
+    },
+    {
+      "id": "move_078",
+      "category": "Movement & Activity Support",
+      "name": "Active Day Recovery",
+      "description": "Supports readiness and smooth recovery around physical activity. Designed for warm-up, cool-down, and active days when you want to feel more fluid and stable. Use after activity or long days to support a smoother recovery feel.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 19.0,
+          "raw": "19"
+        },
+        {
+          "index": 1,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 2,
+          "hz": 70.48,
+          "raw": "70.48"
+        },
+        {
+          "index": 3,
+          "hz": 72.7,
+          "raw": "72.7"
+        },
+        {
+          "index": 4,
+          "hz": 173.0,
+          "raw": "173"
+        },
+        {
+          "index": 5,
+          "hz": 405.0,
+          "raw": "405"
+        },
+        {
+          "index": 6,
+          "hz": 608.0,
+          "raw": "608"
+        },
+        {
+          "index": 7,
+          "hz": 628.0,
+          "raw": "628"
+        },
+        {
+          "index": 8,
+          "hz": 632.2,
+          "raw": "632.2"
+        },
+        {
+          "index": 9,
+          "hz": 724.0,
+          "raw": "724"
+        },
+        {
+          "index": 10,
+          "hz": 1922.0,
+          "raw": "1922"
+        }
+      ],
+      "sourceRow": 79
+    },
+    {
+      "id": "dige_079",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Digestive Rhythm Balance",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 316.0,
+          "raw": "316"
+        },
+        {
+          "index": 1,
+          "hz": 329.0,
+          "raw": "329"
+        },
+        {
+          "index": 2,
+          "hz": 466.0,
+          "raw": "466"
+        },
+        {
+          "index": 3,
+          "hz": 512.0,
+          "raw": "512"
+        },
+        {
+          "index": 4,
+          "hz": 642.0,
+          "raw": "642"
+        },
+        {
+          "index": 5,
+          "hz": 715.0,
+          "raw": "715"
+        },
+        {
+          "index": 6,
+          "hz": 770.0,
+          "raw": "770"
+        },
+        {
+          "index": 7,
+          "hz": 954.32,
+          "raw": "954.32"
+        },
+        {
+          "index": 8,
+          "hz": 1062.0,
+          "raw": "1062"
+        },
+        {
+          "index": 9,
+          "hz": 1470.0,
+          "raw": "1470"
+        }
+      ],
+      "sourceRow": 80
+    },
+    {
+      "id": "dige_080",
+      "category": "Digestive & Metabolic Balance",
+      "name": "After-Meal Comfort",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 34.1,
+          "raw": "34.1"
+        },
+        {
+          "index": 1,
+          "hz": 151.43,
+          "raw": "151.43"
+        },
+        {
+          "index": 2,
+          "hz": 172.0,
+          "raw": "172"
+        },
+        {
+          "index": 3,
+          "hz": 222.0,
+          "raw": "222"
+        },
+        {
+          "index": 4,
+          "hz": 222.72,
+          "raw": "222.72"
+        },
+        {
+          "index": 5,
+          "hz": 307.77,
+          "raw": "307.77"
+        },
+        {
+          "index": 6,
+          "hz": 313.25,
+          "raw": "313.25"
+        },
+        {
+          "index": 7,
+          "hz": 381.19,
+          "raw": "381.19"
+        },
+        {
+          "index": 8,
+          "hz": 625.0,
+          "raw": "625"
+        },
+        {
+          "index": 9,
+          "hz": 701.0,
+          "raw": "701"
+        },
+        {
+          "index": 10,
+          "hz": 1146.0,
+          "raw": "1146"
+        },
+        {
+          "index": 11,
+          "hz": 1386.0,
+          "raw": "1386"
+        },
+        {
+          "index": 12,
+          "hz": 1614.0,
+          "raw": "1614"
+        },
+        {
+          "index": 13,
+          "hz": 1829.0,
+          "raw": "1829"
+        }
+      ],
+      "sourceRow": 81
+    },
+    {
+      "id": "dige_081",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Light Belly & Ease",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 27.44,
+          "raw": "27.44"
+        },
+        {
+          "index": 1,
+          "hz": 54.0,
+          "raw": "54"
+        },
+        {
+          "index": 2,
+          "hz": 142.0,
+          "raw": "142"
+        },
+        {
+          "index": 3,
+          "hz": 148.0,
+          "raw": "148"
+        },
+        {
+          "index": 4,
+          "hz": 171.0,
+          "raw": "171"
+        },
+        {
+          "index": 5,
+          "hz": 274.0,
+          "raw": "274"
+        },
+        {
+          "index": 6,
+          "hz": 478.0,
+          "raw": "478"
+        },
+        {
+          "index": 7,
+          "hz": 509.39,
+          "raw": "509.39"
+        },
+        {
+          "index": 8,
+          "hz": 615.7,
+          "raw": "615.7"
+        },
+        {
+          "index": 9,
+          "hz": 850.0,
+          "raw": "850"
+        },
+        {
+          "index": 10,
+          "hz": 872.51,
+          "raw": "872.51"
+        },
+        {
+          "index": 11,
+          "hz": 928.0,
+          "raw": "928"
+        },
+        {
+          "index": 12,
+          "hz": 950.0,
+          "raw": "950"
+        },
+        {
+          "index": 13,
+          "hz": 1660.0,
+          "raw": "1660"
+        },
+        {
+          "index": 14,
+          "hz": 1858.0,
+          "raw": "1858"
+        }
+      ],
+      "sourceRow": 82
+    },
+    {
+      "id": "dige_082",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Metabolic Steadiness Support",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 66.0,
+          "raw": "66"
+        },
+        {
+          "index": 1,
+          "hz": 81.0,
+          "raw": "81"
+        },
+        {
+          "index": 2,
+          "hz": 222.18,
+          "raw": "222.18"
+        },
+        {
+          "index": 3,
+          "hz": 466.0,
+          "raw": "466"
+        },
+        {
+          "index": 4,
+          "hz": 890.0,
+          "raw": "890"
+        },
+        {
+          "index": 5,
+          "hz": 1011.33,
+          "raw": "1011.33"
+        },
+        {
+          "index": 6,
+          "hz": 1838.0,
+          "raw": "1838"
+        },
+        {
+          "index": 7,
+          "hz": 1852.0,
+          "raw": "1852"
+        }
+      ],
+      "sourceRow": 83
+    },
+    {
+      "id": "dige_083",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Craving & Snacking Reset",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 27.69,
+          "raw": "27.69"
+        },
+        {
+          "index": 1,
+          "hz": 65.0,
+          "raw": "65"
+        },
+        {
+          "index": 2,
+          "hz": 117.5,
+          "raw": "117.5"
+        },
+        {
+          "index": 3,
+          "hz": 174.0,
+          "raw": "174"
+        },
+        {
+          "index": 4,
+          "hz": 263.11,
+          "raw": "263.11"
+        },
+        {
+          "index": 5,
+          "hz": 417.0,
+          "raw": "417"
+        },
+        {
+          "index": 6,
+          "hz": 437.6,
+          "raw": "437.6"
+        },
+        {
+          "index": 7,
+          "hz": 446.0,
+          "raw": "446"
+        },
+        {
+          "index": 8,
+          "hz": 457.64,
+          "raw": "457.64"
+        },
+        {
+          "index": 9,
+          "hz": 789.0,
+          "raw": "789"
+        },
+        {
+          "index": 10,
+          "hz": 801.0,
+          "raw": "801"
+        },
+        {
+          "index": 11,
+          "hz": 858.2,
+          "raw": "858.2"
+        },
+        {
+          "index": 12,
+          "hz": 878.0,
+          "raw": "878"
+        }
+      ],
+      "sourceRow": 84
+    },
+    {
+      "id": "dige_084",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Hydration & Flow Support",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Use as gentle support for overall balance and daily rhythm.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 15.2,
+          "raw": "15.2"
+        },
+        {
+          "index": 1,
+          "hz": 242.29,
+          "raw": "242.29"
+        },
+        {
+          "index": 2,
+          "hz": 620.0,
+          "raw": "620"
+        },
+        {
+          "index": 3,
+          "hz": 646.3,
+          "raw": "646.3"
+        },
+        {
+          "index": 4,
+          "hz": 770.0,
+          "raw": "770"
+        },
+        {
+          "index": 5,
+          "hz": 969.9,
+          "raw": "969.9"
+        },
+        {
+          "index": 6,
+          "hz": 1191.0,
+          "raw": "1191"
+        },
+        {
+          "index": 7,
+          "hz": 1950.5,
+          "raw": "1950.5"
+        }
+      ],
+      "sourceRow": 85
+    },
+    {
+      "id": "dige_085",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Morning Digestive Start",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Great as a morning routine to start clear and balanced.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 40.0,
+          "raw": "40"
+        },
+        {
+          "index": 1,
+          "hz": 43.0,
+          "raw": "43"
+        },
+        {
+          "index": 2,
+          "hz": 47.0,
+          "raw": "47"
+        },
+        {
+          "index": 3,
+          "hz": 222.0,
+          "raw": "222"
+        },
+        {
+          "index": 4,
+          "hz": 264.74,
+          "raw": "264.74"
+        },
+        {
+          "index": 5,
+          "hz": 391.54,
+          "raw": "391.54"
+        },
+        {
+          "index": 6,
+          "hz": 428.3,
+          "raw": "428.3"
+        },
+        {
+          "index": 7,
+          "hz": 462.0,
+          "raw": "462"
+        },
+        {
+          "index": 8,
+          "hz": 474.0,
+          "raw": "474"
+        },
+        {
+          "index": 9,
+          "hz": 555.1,
+          "raw": "555.1"
+        },
+        {
+          "index": 10,
+          "hz": 606.0,
+          "raw": "606"
+        },
+        {
+          "index": 11,
+          "hz": 694.7,
+          "raw": "694.7"
+        },
+        {
+          "index": 12,
+          "hz": 1195.0,
+          "raw": "1195"
+        },
+        {
+          "index": 13,
+          "hz": 1902.0,
+          "raw": "1902"
+        }
+      ],
+      "sourceRow": 86
+    },
+    {
+      "id": "dige_086",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Evening Digestive Calm",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 56.0,
+          "raw": "56"
+        },
+        {
+          "index": 1,
+          "hz": 60.0,
+          "raw": "60"
+        },
+        {
+          "index": 2,
+          "hz": 150.0,
+          "raw": "150"
+        },
+        {
+          "index": 3,
+          "hz": 164.3,
+          "raw": "164.3"
+        },
+        {
+          "index": 4,
+          "hz": 277.99,
+          "raw": "277.99"
+        },
+        {
+          "index": 5,
+          "hz": 357.0,
+          "raw": "357"
+        },
+        {
+          "index": 6,
+          "hz": 367.0,
+          "raw": "367"
+        },
+        {
+          "index": 7,
+          "hz": 387.0,
+          "raw": "387"
+        },
+        {
+          "index": 8,
+          "hz": 393.0,
+          "raw": "393"
+        },
+        {
+          "index": 9,
+          "hz": 633.1,
+          "raw": "633.1"
+        },
+        {
+          "index": 10,
+          "hz": 725.0,
+          "raw": "725"
+        },
+        {
+          "index": 11,
+          "hz": 760.0,
+          "raw": "760"
+        },
+        {
+          "index": 12,
+          "hz": 842.0,
+          "raw": "842"
+        },
+        {
+          "index": 13,
+          "hz": 984.05,
+          "raw": "984.05"
+        }
+      ],
+      "sourceRow": 87
+    },
+    {
+      "id": "dige_087",
+      "category": "Digestive & Metabolic Balance",
+      "name": "Travel Digestive Support",
+      "description": "Supports comfortable body rhythms and a calmer digestive experience. Designed for after meals, travel days, or routines focused on lightness and steadiness. Helpful during travel and transitions to support an easier adjustment.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 40.5,
+          "raw": "40.5"
+        },
+        {
+          "index": 1,
+          "hz": 55.56,
+          "raw": "55.56"
+        },
+        {
+          "index": 2,
+          "hz": 59.3,
+          "raw": "59.3"
+        },
+        {
+          "index": 3,
+          "hz": 98.0,
+          "raw": "98"
+        },
+        {
+          "index": 4,
+          "hz": 318.03,
+          "raw": "318.03"
+        },
+        {
+          "index": 5,
+          "hz": 479.48,
+          "raw": "479.48"
+        },
+        {
+          "index": 6,
+          "hz": 483.3,
+          "raw": "483.3"
+        },
+        {
+          "index": 7,
+          "hz": 510.0,
+          "raw": "510"
+        },
+        {
+          "index": 8,
+          "hz": 785.0,
+          "raw": "785"
+        },
+        {
+          "index": 9,
+          "hz": 924.57,
+          "raw": "924.57"
+        },
+        {
+          "index": 10,
+          "hz": 952.34,
+          "raw": "952.34"
+        },
+        {
+          "index": 11,
+          "hz": 1271.0,
+          "raw": "1271"
+        }
+      ],
+      "sourceRow": 88
+    },
+    {
+      "id": "mind_088",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Mindful Presence",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.49,
+          "raw": "0.49"
+        },
+        {
+          "index": 1,
+          "hz": 0.85,
+          "raw": "0.85"
+        },
+        {
+          "index": 2,
+          "hz": 1.39,
+          "raw": "1.39"
+        },
+        {
+          "index": 3,
+          "hz": 4.4,
+          "raw": "4.4"
+        },
+        {
+          "index": 4,
+          "hz": 5.12,
+          "raw": "5.12"
+        },
+        {
+          "index": 5,
+          "hz": 7.25,
+          "raw": "7.25"
+        },
+        {
+          "index": 6,
+          "hz": 7.53,
+          "raw": "7.53"
+        },
+        {
+          "index": 7,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 8,
+          "hz": 9.19,
+          "raw": "9.19"
+        },
+        {
+          "index": 9,
+          "hz": 14.3,
+          "raw": "14.3"
+        },
+        {
+          "index": 10,
+          "hz": 45.44,
+          "raw": "45.44"
+        },
+        {
+          "index": 11,
+          "hz": 66.0,
+          "raw": "66"
+        },
+        {
+          "index": 12,
+          "hz": 80.04,
+          "raw": "80.04"
+        }
+      ],
+      "sourceRow": 89
+    },
+    {
+      "id": "mind_089",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Meditation Support",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 9,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.93,
+          "raw": "0.93"
+        },
+        {
+          "index": 1,
+          "hz": 2.65,
+          "raw": "2.65"
+        },
+        {
+          "index": 2,
+          "hz": 4.17,
+          "raw": "4.17"
+        },
+        {
+          "index": 3,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 4,
+          "hz": 7.69,
+          "raw": "7.69"
+        },
+        {
+          "index": 5,
+          "hz": 9.6,
+          "raw": "9.6"
+        },
+        {
+          "index": 6,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 7,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 8,
+          "hz": 25.6,
+          "raw": "25.6"
+        }
+      ],
+      "sourceRow": 90
+    },
+    {
+      "id": "mind_090",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Quiet Inner Space",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.24,
+          "raw": "0.24"
+        },
+        {
+          "index": 1,
+          "hz": 4.0,
+          "raw": "4"
+        },
+        {
+          "index": 2,
+          "hz": 5.8,
+          "raw": "5.8"
+        },
+        {
+          "index": 3,
+          "hz": 10.55,
+          "raw": "10.55"
+        },
+        {
+          "index": 4,
+          "hz": 14.1,
+          "raw": "14.1"
+        },
+        {
+          "index": 5,
+          "hz": 15.42,
+          "raw": "15.42"
+        },
+        {
+          "index": 6,
+          "hz": 25.0,
+          "raw": "25"
+        },
+        {
+          "index": 7,
+          "hz": 70.48,
+          "raw": "70.48"
+        }
+      ],
+      "sourceRow": 91
+    },
+    {
+      "id": "mind_091",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Breath & Awareness",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.24,
+          "raw": "0.24"
+        },
+        {
+          "index": 1,
+          "hz": 1.19,
+          "raw": "1.19"
+        },
+        {
+          "index": 2,
+          "hz": 2.64,
+          "raw": "2.64"
+        },
+        {
+          "index": 3,
+          "hz": 5.79,
+          "raw": "5.79"
+        },
+        {
+          "index": 4,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 5,
+          "hz": 7.53,
+          "raw": "7.53"
+        },
+        {
+          "index": 6,
+          "hz": 9.69,
+          "raw": "9.69"
+        },
+        {
+          "index": 7,
+          "hz": 12.0,
+          "raw": "12"
+        },
+        {
+          "index": 8,
+          "hz": 22.5,
+          "raw": "22.5"
+        },
+        {
+          "index": 9,
+          "hz": 41.2,
+          "raw": "41.2"
+        }
+      ],
+      "sourceRow": 92
+    },
+    {
+      "id": "mind_092",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Body Scan Support",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.49,
+          "raw": "0.49"
+        },
+        {
+          "index": 1,
+          "hz": 0.68,
+          "raw": "0.68"
+        },
+        {
+          "index": 2,
+          "hz": 1.3,
+          "raw": "1.3"
+        },
+        {
+          "index": 3,
+          "hz": 5.12,
+          "raw": "5.12"
+        },
+        {
+          "index": 4,
+          "hz": 5.35,
+          "raw": "5.35"
+        },
+        {
+          "index": 5,
+          "hz": 7.5,
+          "raw": "7.5"
+        },
+        {
+          "index": 6,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 7,
+          "hz": 7.8,
+          "raw": "7.8"
+        },
+        {
+          "index": 8,
+          "hz": 10.36,
+          "raw": "10.36"
+        },
+        {
+          "index": 9,
+          "hz": 11.8,
+          "raw": "11.8"
+        },
+        {
+          "index": 10,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 11,
+          "hz": 48.0,
+          "raw": "48"
+        },
+        {
+          "index": 12,
+          "hz": 80.9,
+          "raw": "80.9"
+        }
+      ],
+      "sourceRow": 93
+    },
+    {
+      "id": "mind_093",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Reflect & Reset",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 11,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.11,
+          "raw": "0.11"
+        },
+        {
+          "index": 1,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 2,
+          "hz": 0.93,
+          "raw": "0.93"
+        },
+        {
+          "index": 3,
+          "hz": 4.4,
+          "raw": "4.4"
+        },
+        {
+          "index": 4,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 5,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 6,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 7,
+          "hz": 10.5,
+          "raw": "10.5"
+        },
+        {
+          "index": 8,
+          "hz": 14.3,
+          "raw": "14.3"
+        },
+        {
+          "index": 9,
+          "hz": 15.05,
+          "raw": "15.05"
+        },
+        {
+          "index": 10,
+          "hz": 23.0,
+          "raw": "23"
+        }
+      ],
+      "sourceRow": 94
+    },
+    {
+      "id": "mind_094",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Gratitude & Openness",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 12,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 1,
+          "hz": 1.05,
+          "raw": "1.05"
+        },
+        {
+          "index": 2,
+          "hz": 2.68,
+          "raw": "2.68"
+        },
+        {
+          "index": 3,
+          "hz": 4.4,
+          "raw": "4.4"
+        },
+        {
+          "index": 4,
+          "hz": 7.6,
+          "raw": "7.6"
+        },
+        {
+          "index": 5,
+          "hz": 9.0,
+          "raw": "9"
+        },
+        {
+          "index": 6,
+          "hz": 9.4,
+          "raw": "9.4"
+        },
+        {
+          "index": 7,
+          "hz": 9.9,
+          "raw": "9.9"
+        },
+        {
+          "index": 8,
+          "hz": 15.0,
+          "raw": "15"
+        },
+        {
+          "index": 9,
+          "hz": 23.6,
+          "raw": "23.6"
+        },
+        {
+          "index": 10,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 11,
+          "hz": 83.0,
+          "raw": "83"
+        }
+      ],
+      "sourceRow": 95
+    },
+    {
+      "id": "mind_095",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Intuitive Listening",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.16,
+          "raw": "0.16"
+        },
+        {
+          "index": 1,
+          "hz": 0.2,
+          "raw": "0.2"
+        },
+        {
+          "index": 2,
+          "hz": 0.4,
+          "raw": "0.4"
+        },
+        {
+          "index": 3,
+          "hz": 0.62,
+          "raw": "0.62"
+        },
+        {
+          "index": 4,
+          "hz": 1.0,
+          "raw": "1"
+        },
+        {
+          "index": 5,
+          "hz": 5.43,
+          "raw": "5.43"
+        },
+        {
+          "index": 6,
+          "hz": 7.5,
+          "raw": "7.5"
+        },
+        {
+          "index": 7,
+          "hz": 10.0,
+          "raw": "10"
+        },
+        {
+          "index": 8,
+          "hz": 10.1,
+          "raw": "10.1"
+        },
+        {
+          "index": 9,
+          "hz": 17.6,
+          "raw": "17.6"
+        },
+        {
+          "index": 10,
+          "hz": 40.39,
+          "raw": "40.39"
+        },
+        {
+          "index": 11,
+          "hz": 40.5,
+          "raw": "40.5"
+        },
+        {
+          "index": 12,
+          "hz": 70.47,
+          "raw": "70.47"
+        }
+      ],
+      "sourceRow": 96
+    },
+    {
+      "id": "mind_096",
+      "category": "Mindfulness & Inner Awareness",
+      "name": "Still Point Session",
+      "description": "Supports a quiet, present state and an easier return to inner stillness. Designed for meditation, reflection, and practices that invite calm awareness. Use when you want to slow down, listen inwardly, and settle.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 0.73,
+          "raw": "0.73"
+        },
+        {
+          "index": 1,
+          "hz": 0.9,
+          "raw": "0.9"
+        },
+        {
+          "index": 2,
+          "hz": 1.44,
+          "raw": "1.44"
+        },
+        {
+          "index": 3,
+          "hz": 3.0,
+          "raw": "3"
+        },
+        {
+          "index": 4,
+          "hz": 5.01,
+          "raw": "5.01"
+        },
+        {
+          "index": 5,
+          "hz": 5.43,
+          "raw": "5.43"
+        },
+        {
+          "index": 6,
+          "hz": 5.79,
+          "raw": "5.79"
+        },
+        {
+          "index": 7,
+          "hz": 6.88,
+          "raw": "6.88"
+        },
+        {
+          "index": 8,
+          "hz": 9.19,
+          "raw": "9.19"
+        },
+        {
+          "index": 9,
+          "hz": 9.2,
+          "raw": "9.2"
+        },
+        {
+          "index": 10,
+          "hz": 9.3,
+          "raw": "9.3"
+        },
+        {
+          "index": 11,
+          "hz": 10.3,
+          "raw": "10.3"
+        },
+        {
+          "index": 12,
+          "hz": 34.1,
+          "raw": "34.1"
+        },
+        {
+          "index": 13,
+          "hz": 38.0,
+          "raw": "38"
+        },
+        {
+          "index": 14,
+          "hz": 70.0,
+          "raw": "70"
+        }
+      ],
+      "sourceRow": 97
+    },
+    {
+      "id": "dail_097",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Whole-Day Balance",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 9.0,
+          "raw": "9"
+        },
+        {
+          "index": 1,
+          "hz": 12.09,
+          "raw": "12.09"
+        },
+        {
+          "index": 2,
+          "hz": 17.0,
+          "raw": "17"
+        },
+        {
+          "index": 3,
+          "hz": 19.5,
+          "raw": "19.5"
+        },
+        {
+          "index": 4,
+          "hz": 23.0,
+          "raw": "23"
+        },
+        {
+          "index": 5,
+          "hz": 41.2,
+          "raw": "41.2"
+        },
+        {
+          "index": 6,
+          "hz": 67.51,
+          "raw": "67.51"
+        },
+        {
+          "index": 7,
+          "hz": 105.0,
+          "raw": "105"
+        },
+        {
+          "index": 8,
+          "hz": 221.23,
+          "raw": "221.23"
+        },
+        {
+          "index": 9,
+          "hz": 230.0,
+          "raw": "230"
+        },
+        {
+          "index": 10,
+          "hz": 326.0,
+          "raw": "326"
+        },
+        {
+          "index": 11,
+          "hz": 467.8,
+          "raw": "467.8"
+        },
+        {
+          "index": 12,
+          "hz": 472.0,
+          "raw": "472"
+        }
+      ],
+      "sourceRow": 98
+    },
+    {
+      "id": "dail_098",
+      "category": "Daily Balance & Preventive Care",
+      "name": "General Resilience & Balance",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 8.5,
+          "raw": "8.5"
+        },
+        {
+          "index": 1,
+          "hz": 56.0,
+          "raw": "56"
+        },
+        {
+          "index": 2,
+          "hz": 59.3,
+          "raw": "59.3"
+        },
+        {
+          "index": 3,
+          "hz": 66.0,
+          "raw": "66"
+        },
+        {
+          "index": 4,
+          "hz": 95.0,
+          "raw": "95"
+        },
+        {
+          "index": 5,
+          "hz": 102.0,
+          "raw": "102"
+        },
+        {
+          "index": 6,
+          "hz": 105.0,
+          "raw": "105"
+        },
+        {
+          "index": 7,
+          "hz": 178.0,
+          "raw": "178"
+        },
+        {
+          "index": 8,
+          "hz": 221.23,
+          "raw": "221.23"
+        },
+        {
+          "index": 9,
+          "hz": 227.3,
+          "raw": "227.3"
+        },
+        {
+          "index": 10,
+          "hz": 258.0,
+          "raw": "258"
+        },
+        {
+          "index": 11,
+          "hz": 350.0,
+          "raw": "350"
+        },
+        {
+          "index": 12,
+          "hz": 423.0,
+          "raw": "423"
+        },
+        {
+          "index": 13,
+          "hz": 479.48,
+          "raw": "479.48"
+        },
+        {
+          "index": 14,
+          "hz": 491.0,
+          "raw": "491"
+        }
+      ],
+      "sourceRow": 99
+    },
+    {
+      "id": "dail_099",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Seasonal Transition Support",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 7.35,
+          "raw": "7.35"
+        },
+        {
+          "index": 1,
+          "hz": 9.19,
+          "raw": "9.19"
+        },
+        {
+          "index": 2,
+          "hz": 101.0,
+          "raw": "101"
+        },
+        {
+          "index": 3,
+          "hz": 118.0,
+          "raw": "118"
+        },
+        {
+          "index": 4,
+          "hz": 203.0,
+          "raw": "203"
+        },
+        {
+          "index": 5,
+          "hz": 379.48,
+          "raw": "379.48"
+        },
+        {
+          "index": 6,
+          "hz": 400.0,
+          "raw": "400"
+        },
+        {
+          "index": 7,
+          "hz": 409.14,
+          "raw": "409.14"
+        }
+      ],
+      "sourceRow": 100
+    },
+    {
+      "id": "dail_100",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Screen & City Stress Balance",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 7.63,
+          "raw": "7.63"
+        },
+        {
+          "index": 1,
+          "hz": 12.09,
+          "raw": "12.09"
+        },
+        {
+          "index": 2,
+          "hz": 18.0,
+          "raw": "18"
+        },
+        {
+          "index": 3,
+          "hz": 59.0,
+          "raw": "59"
+        },
+        {
+          "index": 4,
+          "hz": 96.5,
+          "raw": "96.5"
+        },
+        {
+          "index": 5,
+          "hz": 106.75,
+          "raw": "106.75"
+        },
+        {
+          "index": 6,
+          "hz": 235.0,
+          "raw": "235"
+        },
+        {
+          "index": 7,
+          "hz": 364.0,
+          "raw": "364"
+        }
+      ],
+      "sourceRow": 101
+    },
+    {
+      "id": "dail_101",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Social Battery Reset",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 13,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 5.14,
+          "raw": "5.14"
+        },
+        {
+          "index": 1,
+          "hz": 9.59,
+          "raw": "9.59"
+        },
+        {
+          "index": 2,
+          "hz": 70.47,
+          "raw": "70.47"
+        },
+        {
+          "index": 3,
+          "hz": 77.0,
+          "raw": "77"
+        },
+        {
+          "index": 4,
+          "hz": 126.0,
+          "raw": "126"
+        },
+        {
+          "index": 5,
+          "hz": 197.0,
+          "raw": "197"
+        },
+        {
+          "index": 6,
+          "hz": 230.0,
+          "raw": "230"
+        },
+        {
+          "index": 7,
+          "hz": 255.0,
+          "raw": "255"
+        },
+        {
+          "index": 8,
+          "hz": 276.57,
+          "raw": "276.57"
+        },
+        {
+          "index": 9,
+          "hz": 333.0,
+          "raw": "333"
+        },
+        {
+          "index": 10,
+          "hz": 445.0,
+          "raw": "445"
+        },
+        {
+          "index": 11,
+          "hz": 489.0,
+          "raw": "489"
+        },
+        {
+          "index": 12,
+          "hz": 493.36,
+          "raw": "493.36"
+        }
+      ],
+      "sourceRow": 102
+    },
+    {
+      "id": "dail_102",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Morning Balance Routine",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Great as a morning routine to start clear and balanced.",
+      "frequencyCount": 8,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 7.82,
+          "raw": "7.82"
+        },
+        {
+          "index": 1,
+          "hz": 10.55,
+          "raw": "10.55"
+        },
+        {
+          "index": 2,
+          "hz": 47.29,
+          "raw": "47.29"
+        },
+        {
+          "index": 3,
+          "hz": 231.0,
+          "raw": "231"
+        },
+        {
+          "index": 4,
+          "hz": 239.0,
+          "raw": "239"
+        },
+        {
+          "index": 5,
+          "hz": 255.0,
+          "raw": "255"
+        },
+        {
+          "index": 6,
+          "hz": 297.37,
+          "raw": "297.37"
+        },
+        {
+          "index": 7,
+          "hz": 343.0,
+          "raw": "343"
+        }
+      ],
+      "sourceRow": 103
+    },
+    {
+      "id": "dail_103",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Afternoon Balance Routine",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 10,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 15.73,
+          "raw": "15.73"
+        },
+        {
+          "index": 1,
+          "hz": 54.0,
+          "raw": "54"
+        },
+        {
+          "index": 2,
+          "hz": 62.5,
+          "raw": "62.5"
+        },
+        {
+          "index": 3,
+          "hz": 67.51,
+          "raw": "67.51"
+        },
+        {
+          "index": 4,
+          "hz": 79.0,
+          "raw": "79"
+        },
+        {
+          "index": 5,
+          "hz": 171.0,
+          "raw": "171"
+        },
+        {
+          "index": 6,
+          "hz": 185.22,
+          "raw": "185.22"
+        },
+        {
+          "index": 7,
+          "hz": 270.54,
+          "raw": "270.54"
+        },
+        {
+          "index": 8,
+          "hz": 460.0,
+          "raw": "460"
+        },
+        {
+          "index": 9,
+          "hz": 478.0,
+          "raw": "478"
+        }
+      ],
+      "sourceRow": 104
+    },
+    {
+      "id": "dail_104",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Evening Balance Routine",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Best used in the evening or before sleep as part of a calming routine.",
+      "frequencyCount": 14,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 2.4,
+          "raw": "2.4"
+        },
+        {
+          "index": 1,
+          "hz": 10.35,
+          "raw": "10.35"
+        },
+        {
+          "index": 2,
+          "hz": 15.05,
+          "raw": "15.05"
+        },
+        {
+          "index": 3,
+          "hz": 55.0,
+          "raw": "55"
+        },
+        {
+          "index": 4,
+          "hz": 61.0,
+          "raw": "61"
+        },
+        {
+          "index": 5,
+          "hz": 64.0,
+          "raw": "64"
+        },
+        {
+          "index": 6,
+          "hz": 119.0,
+          "raw": "119"
+        },
+        {
+          "index": 7,
+          "hz": 228.0,
+          "raw": "228"
+        },
+        {
+          "index": 8,
+          "hz": 248.0,
+          "raw": "248"
+        },
+        {
+          "index": 9,
+          "hz": 275.0,
+          "raw": "275"
+        },
+        {
+          "index": 10,
+          "hz": 440.0,
+          "raw": "440"
+        },
+        {
+          "index": 11,
+          "hz": 465.0,
+          "raw": "465"
+        },
+        {
+          "index": 12,
+          "hz": 467.8,
+          "raw": "467.8"
+        },
+        {
+          "index": 13,
+          "hz": 498.0,
+          "raw": "498"
+        }
+      ],
+      "sourceRow": 105
+    },
+    {
+      "id": "dail_105",
+      "category": "Daily Balance & Preventive Care",
+      "name": "Full-System Reset",
+      "description": "Supports overall balance and a steadier baseline across the day. Designed as a general-purpose session for everyday demands, screen time, travel, or transitions. Use to encourage resilience, recalibration, and a clean reset.",
+      "frequencyCount": 15,
+      "frequencies": [
+        {
+          "index": 0,
+          "hz": 18.0,
+          "raw": "18"
+        },
+        {
+          "index": 1,
+          "hz": 19.5,
+          "raw": "19.5"
+        },
+        {
+          "index": 2,
+          "hz": 24.3,
+          "raw": "24.3"
+        },
+        {
+          "index": 3,
+          "hz": 26.0,
+          "raw": "26"
+        },
+        {
+          "index": 4,
+          "hz": 52.0,
+          "raw": "52"
+        },
+        {
+          "index": 5,
+          "hz": 119.98,
+          "raw": "119.98"
+        },
+        {
+          "index": 6,
+          "hz": 129.36,
+          "raw": "129.36"
+        },
+        {
+          "index": 7,
+          "hz": 140.0,
+          "raw": "140"
+        },
+        {
+          "index": 8,
+          "hz": 185.22,
+          "raw": "185.22"
+        },
+        {
+          "index": 9,
+          "hz": 210.0,
+          "raw": "210"
+        },
+        {
+          "index": 10,
+          "hz": 243.0,
+          "raw": "243"
+        },
+        {
+          "index": 11,
+          "hz": 307.89,
+          "raw": "307.89"
+        },
+        {
+          "index": 12,
+          "hz": 343.0,
+          "raw": "343"
+        },
+        {
+          "index": 13,
+          "hz": 420.0,
+          "raw": "420"
+        },
+        {
+          "index": 14,
+          "hz": 500.0,
+          "raw": "500"
+        }
+      ],
+      "sourceRow": 106
+    }
+  ],
+  "importIssues": []
+}

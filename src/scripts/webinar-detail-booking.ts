@@ -59,7 +59,7 @@ async function logActivity(
   if (error) console.warn('[webinar-booking] activity log failed', error.message);
 }
 
-export function initWebinarDetailBooking(payload: WebinarDetailPayload): void {
+export function initWebinarDetailBooking(payload: WebinarDetailPayload, signal?: AbortSignal): void {
   if (typeof document === 'undefined') return;
 
   const root = document.getElementById('w-webinar-book-root');
@@ -389,10 +389,9 @@ export function initWebinarDetailBooking(payload: WebinarDetailPayload): void {
       </div>`);
   }
 
-  let authListening = false;
-  if (!authListening && isSupabaseConfigured()) {
-    authListening = true;
-    getSupabaseBrowser().auth.onAuthStateChange(() => void hydrate());
+  if (isSupabaseConfigured()) {
+    const { data } = getSupabaseBrowser().auth.onAuthStateChange(() => void hydrate());
+    signal?.addEventListener('abort', () => data.subscription.unsubscribe());
   }
 
   void hydrate();

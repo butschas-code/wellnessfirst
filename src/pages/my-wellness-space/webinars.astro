@@ -29,6 +29,10 @@ import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
 </AppLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initWebinarMyHub } from '@/scripts/webinar-my-hub';
-  void initWebinarMyHub();
+
+  onPage((signal) => {
+    void initWebinarMyHub();
+  }, { when: atPath('/my-wellness-space/webinars') });
 </script>

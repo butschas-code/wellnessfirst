@@ -147,6 +147,10 @@ for (const row of libraryRows) {
 </BaseLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initResourcesTopicFilters } from '@/scripts/resources-topic-filter';
-  initResourcesTopicFilters();
+
+  onPage((signal) => {
+    initResourcesTopicFilters();
+  }, { when: atPath('/resources') });
 </script>

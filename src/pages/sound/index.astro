@@ -1,0 +1,24 @@
+---
+/**
+ * Wellness Waves — the player room. The persistent player island (mounted in
+ * BaseLayout) renders the full player into #ww-room; the page itself only
+ * provides the space. Audio keeps playing when the visitor moves on.
+ */
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import { PLAYER_NAME } from '@/sound/player/brand';
+---
+
+<BaseLayout
+  title={PLAYER_NAME}
+  description="Calm, ever-changing soundscapes composed live in your browser, with optional frequency programs underneath. Not a medical device."
+  canonicalPath="/sound"
+  mainClass="!pt-0"
+  bodyClass="ww-sound-page"
+  hideFooter
+>
+  <h1 class="sr-only">{PLAYER_NAME}</h1>
+  <div id="ww-room" class="ww ww-room" aria-label={PLAYER_NAME}></div>
+  <noscript>
+    <p class="p-8 text-center text-white">{PLAYER_NAME} composes its music live in your browser and needs JavaScript.</p>
+  </noscript>
+</BaseLayout>

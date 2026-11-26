@@ -19,6 +19,10 @@ import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
 </AppLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initMemberReflectionsList } from '@/scripts/member-reflections-list';
-  void initMemberReflectionsList();
+
+  onPage((signal) => {
+    void initMemberReflectionsList();
+  }, { when: atPath('/my-wellness-space/reflections') });
 </script>

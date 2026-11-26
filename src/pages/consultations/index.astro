@@ -175,35 +175,39 @@ const groups = [
 </BaseLayout>
 
 <script>
-  const root = document.querySelector('[data-consult-filters]');
-  const noMatch = document.querySelector('[data-consult-no-match]') as HTMLElement | null;
-  const rows = () => document.querySelectorAll<HTMLElement>('[data-consultation-item]');
-  const updateNoMatch = () => {
-    let visible = 0;
-    rows().forEach((li) => {
-      if (!li.classList.contains('hidden')) visible += 1;
-    });
-    if (noMatch) {
-      noMatch.classList.toggle('hidden', visible > 0);
-    }
-  };
-  document.querySelector('[data-consult-show-all]')?.addEventListener('click', () => {
-    (root?.querySelector('button[data-filter="all"]') as HTMLButtonElement | null)?.click();
-  });
-  if (root) {
-    root.querySelectorAll('button[data-filter]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const filter = btn.getAttribute('data-filter') || 'all';
-        root.querySelectorAll('button[data-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        rows().forEach((li) => {
-          const g = li.querySelector('[data-consultation-group]')?.getAttribute('data-consultation-group') || '';
-          const show = filter === 'all' || g === filter;
-          li.classList.toggle('hidden', !show);
-        });
-        updateNoMatch();
+  import { onPage, atPath } from '@/lib/page-lifecycle';
+
+  onPage((signal) => {
+    const root = document.querySelector('[data-consult-filters]');
+    const noMatch = document.querySelector('[data-consult-no-match]') as HTMLElement | null;
+    const rows = () => document.querySelectorAll<HTMLElement>('[data-consultation-item]');
+    const updateNoMatch = () => {
+      let visible = 0;
+      rows().forEach((li) => {
+        if (!li.classList.contains('hidden')) visible += 1;
       });
+      if (noMatch) {
+        noMatch.classList.toggle('hidden', visible > 0);
+      }
+    };
+    document.querySelector('[data-consult-show-all]')?.addEventListener('click', () => {
+      (root?.querySelector('button[data-filter="all"]') as HTMLButtonElement | null)?.click();
     });
-    updateNoMatch();
-  }
+    if (root) {
+      root.querySelectorAll('button[data-filter]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-filter') || 'all';
+          root.querySelectorAll('button[data-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+          rows().forEach((li) => {
+            const g = li.querySelector('[data-consultation-group]')?.getAttribute('data-consultation-group') || '';
+            const show = filter === 'all' || g === filter;
+            li.classList.toggle('hidden', !show);
+          });
+          updateNoMatch();
+        });
+      });
+      updateNoMatch();
+    }
+  }, { when: atPath('/consultations') });
 </script>

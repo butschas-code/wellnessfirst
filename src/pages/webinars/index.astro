@@ -167,42 +167,46 @@ const filters = [
 </BaseLayout>
 
 <script>
-  const root = document.querySelector('[data-webinar-filters]');
-  const noMatch = document.querySelector('[data-webinar-no-match]') as HTMLElement | null;
-  const applyFilter = (raw: string) => {
-    document.querySelectorAll('[data-webinar-item]').forEach((li) => {
-      const f = (li as HTMLElement).dataset.webinarFormat;
-      let show = raw === 'all';
-      if (raw === 'live' || raw === 'replay') show = f === raw;
-      li.classList.toggle('hidden', !show);
-    });
-  };
-  const updateNoMatch = () => {
-    const rows = document.querySelectorAll('[data-webinar-item]');
-    let visible = 0;
-    rows.forEach((li) => {
-      if (!li.classList.contains('hidden')) visible += 1;
-    });
-    if (noMatch) {
-      const hide = visible > 0;
-      noMatch.classList.toggle('hidden', hide);
-    }
-  };
-  document.querySelector('[data-webinar-show-all]')?.addEventListener('click', () => {
-    if (!root) return;
-    const allBtn = root.querySelector('button[data-webinar-filter="all"]') as HTMLButtonElement | null;
-    allBtn?.click();
-  });
-  if (root) {
-    root.querySelectorAll('button[data-webinar-filter]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const raw = btn.getAttribute('data-webinar-filter') || 'all';
-        root.querySelectorAll('button[data-webinar-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        applyFilter(raw);
-        updateNoMatch();
+  import { onPage, atPath } from '@/lib/page-lifecycle';
+
+  onPage((signal) => {
+    const root = document.querySelector('[data-webinar-filters]');
+    const noMatch = document.querySelector('[data-webinar-no-match]') as HTMLElement | null;
+    const applyFilter = (raw: string) => {
+      document.querySelectorAll('[data-webinar-item]').forEach((li) => {
+        const f = (li as HTMLElement).dataset.webinarFormat;
+        let show = raw === 'all';
+        if (raw === 'live' || raw === 'replay') show = f === raw;
+        li.classList.toggle('hidden', !show);
       });
+    };
+    const updateNoMatch = () => {
+      const rows = document.querySelectorAll('[data-webinar-item]');
+      let visible = 0;
+      rows.forEach((li) => {
+        if (!li.classList.contains('hidden')) visible += 1;
+      });
+      if (noMatch) {
+        const hide = visible > 0;
+        noMatch.classList.toggle('hidden', hide);
+      }
+    };
+    document.querySelector('[data-webinar-show-all]')?.addEventListener('click', () => {
+      if (!root) return;
+      const allBtn = root.querySelector('button[data-webinar-filter="all"]') as HTMLButtonElement | null;
+      allBtn?.click();
     });
-    updateNoMatch();
-  }
+    if (root) {
+      root.querySelectorAll('button[data-webinar-filter]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const raw = btn.getAttribute('data-webinar-filter') || 'all';
+          root.querySelectorAll('button[data-webinar-filter]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+          btn.setAttribute('aria-pressed', 'true');
+          applyFilter(raw);
+          updateNoMatch();
+        });
+      });
+      updateNoMatch();
+    }
+  }, { when: atPath('/webinars') });
 </script>

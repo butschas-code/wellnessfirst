@@ -134,248 +134,251 @@ import AppLayout from '@/components/app/AppLayout.astro';
 </AppLayout>
 
 <script>
+  import { onPage, atPath, softReplace } from '@/lib/page-lifecycle';
   import { guardSessionOrRedirect } from '@/lib/app/guardSession';
   import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
   import { LOGIN_PATH } from '@/lib/auth/constants';
   import { formatAuthError } from '@/lib/auth/auth-errors';
 
-  function trimStr(v: unknown, max: number): string | null {
-    const s = typeof v === 'string' ? v.trim() : '';
-    if (!s) return null;
-    return s.slice(0, max);
-  }
-
-  function validateTimezone(raw: string): string | null {
-    const s = raw.trim();
-    if (!s) return null;
-    if (s.length > 64) return null;
-    if (!/^[A-Za-z0-9_/+\-]+$/.test(s)) return null;
-    return s;
-  }
-
-  function fmtConfirmed(iso: string): string {
-    try {
-      return new Intl.DateTimeFormat('en-GB', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(iso));
-    } catch {
-      return iso;
-    }
-  }
-
-  (async () => {
-    const state = document.getElementById('w-ac-state');
-    const panel = document.getElementById('w-ac-panel');
-    const emailEl = document.getElementById('w-ac-email');
-    const verifyEl = document.getElementById('w-ac-email-verify');
-    const forgotLink = document.getElementById('w-ac-forgot-link') as HTMLAnchorElement | null;
-
-    const profileForm = document.getElementById('w-ac-profile-form') as HTMLFormElement | null;
-    const pwForm = document.getElementById('w-ac-password-form') as HTMLFormElement | null;
-
-    const profileSuccess = document.getElementById('w-ac-profile-success');
-    const profileErr = document.getElementById('w-ac-profile-error');
-    const pwErr = document.getElementById('w-ac-pw-error');
-    const pwOk = document.getElementById('w-ac-pw-success');
-
-    const fullName = document.getElementById('w-ac-full-name') as HTMLInputElement | null;
-    const displayName = document.getElementById('w-ac-display-name') as HTMLInputElement | null;
-    const country = document.getElementById('w-ac-country') as HTMLInputElement | null;
-    const timezone = document.getElementById('w-ac-timezone') as HTMLInputElement | null;
-    const lang = document.getElementById('w-ac-lang') as HTMLInputElement | null;
-    const newsletter = document.getElementById('w-ac-newsletter') as HTMLInputElement | null;
-    const onboarding = document.getElementById('w-ac-onboarding') as HTMLInputElement | null;
-    const saveProfileBtn = document.getElementById('w-ac-save-profile') as HTMLButtonElement | null;
-
-    const pwNew = document.getElementById('w-ac-pw-new') as HTMLInputElement | null;
-    const pwConfirm = document.getElementById('w-ac-pw-confirm') as HTMLInputElement | null;
-    const savePwBtn = document.getElementById('w-ac-save-pw') as HTMLButtonElement | null;
-
-    if (!isSupabaseConfigured() || !profileForm || !pwForm) {
-      state!.textContent =
-        'Supabase keys are missing (PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY).';
-      return;
+  onPage((signal) => {
+    function trimStr(v: unknown, max: number): string | null {
+      const s = typeof v === 'string' ? v.trim() : '';
+      if (!s) return null;
+      return s.slice(0, max);
     }
 
-    const session = await guardSessionOrRedirect();
-    if (!session) return;
+    function validateTimezone(raw: string): string | null {
+      const s = raw.trim();
+      if (!s) return null;
+      if (s.length > 64) return null;
+      if (!/^[A-Za-z0-9_/+\-]+$/.test(s)) return null;
+      return s;
+    }
 
-    const supabase = getSupabaseBrowser();
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select(
-        'full_name, display_name, country, timezone, preferred_language, newsletter_opt_in, onboarding_completed'
-      )
-      .eq('id', session.user.id)
-      .maybeSingle();
-
-    state?.classList.add('hidden');
-    panel?.classList.remove('hidden');
-
-    const authEmail = session.user.email ?? '';
-    if (emailEl) emailEl.textContent = authEmail || '—';
-
-    if (verifyEl) {
-      const at = session.user.email_confirmed_at;
-      if (at) {
-        verifyEl.innerHTML = `<span class="text-ink">Email verified</span> · <span class="text-ink-500">${fmtConfirmed(at)}</span>`;
-      } else {
-        verifyEl.innerHTML = `<span class="text-amber-900">Not verified yet.</span> Check your inbox or <a class="font-medium text-secondary underline underline-offset-4" href="/verify-email">complete verification</a>.`;
+    function fmtConfirmed(iso: string): string {
+      try {
+        return new Intl.DateTimeFormat('en-GB', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(new Date(iso));
+      } catch {
+        return iso;
       }
     }
 
-    if (forgotLink && authEmail) {
-      forgotLink.href = `/forgot-password?email=${encodeURIComponent(authEmail)}`;
-    }
+    (async () => {
+      const state = document.getElementById('w-ac-state');
+      const panel = document.getElementById('w-ac-panel');
+      const emailEl = document.getElementById('w-ac-email');
+      const verifyEl = document.getElementById('w-ac-email-verify');
+      const forgotLink = document.getElementById('w-ac-forgot-link') as HTMLAnchorElement | null;
 
-    if (profile) {
-      if (fullName) fullName.value = profile.full_name ?? '';
-      if (displayName) displayName.value = profile.display_name ?? '';
-      if (country) country.value = profile.country ?? '';
-      if (timezone) timezone.value = profile.timezone ?? '';
-      if (lang) lang.value = profile.preferred_language ?? 'en';
-      if (newsletter) newsletter.checked = Boolean(profile.newsletter_opt_in);
-      if (onboarding) onboarding.checked = profile.onboarding_completed === true;
-    } else {
-      const meta = session.user.user_metadata as Record<string, unknown> | undefined;
-      if (fullName && typeof meta?.full_name === 'string') fullName.value = meta.full_name;
-      if (lang) lang.value = 'en';
-    }
+      const profileForm = document.getElementById('w-ac-profile-form') as HTMLFormElement | null;
+      const pwForm = document.getElementById('w-ac-password-form') as HTMLFormElement | null;
 
-    profileForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      profileSuccess?.classList.add('hidden');
-      profileErr?.classList.add('hidden');
+      const profileSuccess = document.getElementById('w-ac-profile-success');
+      const profileErr = document.getElementById('w-ac-profile-error');
+      const pwErr = document.getElementById('w-ac-pw-error');
+      const pwOk = document.getElementById('w-ac-pw-success');
 
-      const langVal = trimStr(lang?.value, 32);
-      if (!langVal || langVal.length < 2) {
-        if (profileErr) {
-          profileErr.textContent = 'Preferred language must be at least two characters.';
-          profileErr.classList.remove('hidden');
-        }
-        lang?.focus();
+      const fullName = document.getElementById('w-ac-full-name') as HTMLInputElement | null;
+      const displayName = document.getElementById('w-ac-display-name') as HTMLInputElement | null;
+      const country = document.getElementById('w-ac-country') as HTMLInputElement | null;
+      const timezone = document.getElementById('w-ac-timezone') as HTMLInputElement | null;
+      const lang = document.getElementById('w-ac-lang') as HTMLInputElement | null;
+      const newsletter = document.getElementById('w-ac-newsletter') as HTMLInputElement | null;
+      const onboarding = document.getElementById('w-ac-onboarding') as HTMLInputElement | null;
+      const saveProfileBtn = document.getElementById('w-ac-save-profile') as HTMLButtonElement | null;
+
+      const pwNew = document.getElementById('w-ac-pw-new') as HTMLInputElement | null;
+      const pwConfirm = document.getElementById('w-ac-pw-confirm') as HTMLInputElement | null;
+      const savePwBtn = document.getElementById('w-ac-save-pw') as HTMLButtonElement | null;
+
+      if (!isSupabaseConfigured() || !profileForm || !pwForm) {
+        state!.textContent =
+          'Supabase keys are missing (PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY).';
         return;
       }
 
-      const tzRaw = (timezone?.value ?? '').trim();
-      let tz: string | null = null;
-      if (tzRaw) {
-        const valid = validateTimezone(tzRaw);
-        if (!valid) {
+      const session = await guardSessionOrRedirect();
+      if (!session) return;
+
+      const supabase = getSupabaseBrowser();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select(
+          'full_name, display_name, country, timezone, preferred_language, newsletter_opt_in, onboarding_completed'
+        )
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      state?.classList.add('hidden');
+      panel?.classList.remove('hidden');
+
+      const authEmail = session.user.email ?? '';
+      if (emailEl) emailEl.textContent = authEmail || '—';
+
+      if (verifyEl) {
+        const at = session.user.email_confirmed_at;
+        if (at) {
+          verifyEl.innerHTML = `<span class="text-ink">Email verified</span> · <span class="text-ink-500">${fmtConfirmed(at)}</span>`;
+        } else {
+          verifyEl.innerHTML = `<span class="text-amber-900">Not verified yet.</span> Check your inbox or <a class="font-medium text-secondary underline underline-offset-4" href="/verify-email">complete verification</a>.`;
+        }
+      }
+
+      if (forgotLink && authEmail) {
+        forgotLink.href = `/forgot-password?email=${encodeURIComponent(authEmail)}`;
+      }
+
+      if (profile) {
+        if (fullName) fullName.value = profile.full_name ?? '';
+        if (displayName) displayName.value = profile.display_name ?? '';
+        if (country) country.value = profile.country ?? '';
+        if (timezone) timezone.value = profile.timezone ?? '';
+        if (lang) lang.value = profile.preferred_language ?? 'en';
+        if (newsletter) newsletter.checked = Boolean(profile.newsletter_opt_in);
+        if (onboarding) onboarding.checked = profile.onboarding_completed === true;
+      } else {
+        const meta = session.user.user_metadata as Record<string, unknown> | undefined;
+        if (fullName && typeof meta?.full_name === 'string') fullName.value = meta.full_name;
+        if (lang) lang.value = 'en';
+      }
+
+      profileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        profileSuccess?.classList.add('hidden');
+        profileErr?.classList.add('hidden');
+
+        const langVal = trimStr(lang?.value, 32);
+        if (!langVal || langVal.length < 2) {
           if (profileErr) {
-            profileErr.textContent =
-              'Timezone looks unusual — use letters, slashes and underscores only (e.g. Europe/Riga), or leave blank.';
+            profileErr.textContent = 'Preferred language must be at least two characters.';
             profileErr.classList.remove('hidden');
           }
-          timezone?.focus();
+          lang?.focus();
           return;
         }
-        tz = valid;
-      }
 
-      if (saveProfileBtn) {
-        saveProfileBtn.disabled = true;
-        saveProfileBtn.textContent = 'Saving…';
-      }
-
-      const payload = {
-        full_name: trimStr(fullName?.value, 120),
-        display_name: trimStr(displayName?.value, 120),
-        country: trimStr(country?.value, 100),
-        timezone: tz,
-        preferred_language: langVal,
-        newsletter_opt_in: Boolean(newsletter?.checked),
-        onboarding_completed: Boolean(onboarding?.checked),
-      };
-
-      const { error } = await supabase.from('profiles').upsert(
-        {
-          id: session.user.id,
-          email: authEmail || null,
-          ...payload,
-        },
-        { onConflict: 'id' }
-      );
-
-      if (saveProfileBtn) {
-        saveProfileBtn.disabled = false;
-        saveProfileBtn.textContent = 'Save profile';
-      }
-
-      if (error) {
-        if (profileErr) {
-          profileErr.textContent = error.message;
-          profileErr.classList.remove('hidden');
+        const tzRaw = (timezone?.value ?? '').trim();
+        let tz: string | null = null;
+        if (tzRaw) {
+          const valid = validateTimezone(tzRaw);
+          if (!valid) {
+            if (profileErr) {
+              profileErr.textContent =
+                'Timezone looks unusual — use letters, slashes and underscores only (e.g. Europe/Riga), or leave blank.';
+              profileErr.classList.remove('hidden');
+            }
+            timezone?.focus();
+            return;
+          }
+          tz = valid;
         }
-        return;
-      }
 
-      if (profileSuccess) {
-        profileSuccess.textContent =
-          'Saved. Your profile is updated — thank you for keeping it gentle and accurate.';
-        profileSuccess.classList.remove('hidden');
-      }
-      profileSuccess?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-
-    pwForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      pwErr?.classList.add('hidden');
-      pwOk?.classList.add('hidden');
-
-      const a = pwNew?.value ?? '';
-      const b = pwConfirm?.value ?? '';
-      if (!a && !b) return;
-
-      if (a.length < 8) {
-        if (pwErr) {
-          pwErr.textContent = 'Password needs at least eight characters.';
-          pwErr.classList.remove('hidden');
+        if (saveProfileBtn) {
+          saveProfileBtn.disabled = true;
+          saveProfileBtn.textContent = 'Saving…';
         }
-        pwNew?.focus();
-        return;
-      }
-      if (a !== b) {
-        if (pwErr) {
-          pwErr.textContent = 'The two password fields do not match.';
-          pwErr.classList.remove('hidden');
+
+        const payload = {
+          full_name: trimStr(fullName?.value, 120),
+          display_name: trimStr(displayName?.value, 120),
+          country: trimStr(country?.value, 100),
+          timezone: tz,
+          preferred_language: langVal,
+          newsletter_opt_in: Boolean(newsletter?.checked),
+          onboarding_completed: Boolean(onboarding?.checked),
+        };
+
+        const { error } = await supabase.from('profiles').upsert(
+          {
+            id: session.user.id,
+            email: authEmail || null,
+            ...payload,
+          },
+          { onConflict: 'id' }
+        );
+
+        if (saveProfileBtn) {
+          saveProfileBtn.disabled = false;
+          saveProfileBtn.textContent = 'Save profile';
         }
-        pwConfirm?.focus();
-        return;
-      }
 
-      if (savePwBtn) {
-        savePwBtn.disabled = true;
-        savePwBtn.textContent = 'Updating…';
-      }
-
-      const { error } = await supabase.auth.updateUser({ password: a });
-
-      if (savePwBtn) {
-        savePwBtn.disabled = false;
-        savePwBtn.textContent = 'Update password';
-      }
-
-      if (error) {
-        if (pwErr) {
-          pwErr.textContent = formatAuthError(error);
-          pwErr.classList.remove('hidden');
+        if (error) {
+          if (profileErr) {
+            profileErr.textContent = error.message;
+            profileErr.classList.remove('hidden');
+          }
+          return;
         }
-        return;
-      }
 
-      if (pwNew) pwNew.value = '';
-      if (pwConfirm) pwConfirm.value = '';
-      if (pwOk) {
-        pwOk.textContent = 'Password updated. You remain signed in.';
-        pwOk.classList.remove('hidden');
-      }
-    });
+        if (profileSuccess) {
+          profileSuccess.textContent =
+            'Saved. Your profile is updated — thank you for keeping it gentle and accurate.';
+          profileSuccess.classList.remove('hidden');
+        }
+        profileSuccess?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
 
-    document.getElementById('w-ac-signout')?.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      window.location.replace(LOGIN_PATH);
-    });
-  })();
+      pwForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        pwErr?.classList.add('hidden');
+        pwOk?.classList.add('hidden');
+
+        const a = pwNew?.value ?? '';
+        const b = pwConfirm?.value ?? '';
+        if (!a && !b) return;
+
+        if (a.length < 8) {
+          if (pwErr) {
+            pwErr.textContent = 'Password needs at least eight characters.';
+            pwErr.classList.remove('hidden');
+          }
+          pwNew?.focus();
+          return;
+        }
+        if (a !== b) {
+          if (pwErr) {
+            pwErr.textContent = 'The two password fields do not match.';
+            pwErr.classList.remove('hidden');
+          }
+          pwConfirm?.focus();
+          return;
+        }
+
+        if (savePwBtn) {
+          savePwBtn.disabled = true;
+          savePwBtn.textContent = 'Updating…';
+        }
+
+        const { error } = await supabase.auth.updateUser({ password: a });
+
+        if (savePwBtn) {
+          savePwBtn.disabled = false;
+          savePwBtn.textContent = 'Update password';
+        }
+
+        if (error) {
+          if (pwErr) {
+            pwErr.textContent = formatAuthError(error);
+            pwErr.classList.remove('hidden');
+          }
+          return;
+        }
+
+        if (pwNew) pwNew.value = '';
+        if (pwConfirm) pwConfirm.value = '';
+        if (pwOk) {
+          pwOk.textContent = 'Password updated. You remain signed in.';
+          pwOk.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('w-ac-signout')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        void softReplace(LOGIN_PATH);
+      });
+    })();
+  }, { when: atPath('/my-wellness-space/account') });
 </script>

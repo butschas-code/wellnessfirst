@@ -215,28 +215,36 @@ const menuId = 'wfg-mobile-menu';
 </header>
 
 <script>
-  const root = document.querySelector('[data-wfg-menu]') as HTMLElement | null;
-  const openBtn = document.getElementById('wfg-menu-open');
-  const closeBtn = document.getElementById('wfg-menu-close');
-  if (root && openBtn) {
-    const links = () => document.querySelectorAll<HTMLElement>('[data-wfg-menu-link]');
-    const setOpen = (open: boolean) => {
-      root.classList.toggle('hidden', !open);
-      openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      root.setAttribute('aria-hidden', open ? 'false' : 'true');
-      // Lock scrolling on <html>, not <body>: overflow on body turns it into a scroll container,
-      // which makes the sticky header stick to the body instead of the screen.
-      document.documentElement.style.overflow = open ? 'hidden' : '';
-      if (open) closeBtn?.focus();
-      else openBtn.focus();
-    };
-    openBtn.addEventListener('click', () => {
-      setOpen(root.classList.contains('hidden'));
-    });
-    closeBtn?.addEventListener('click', () => setOpen(false));
-    links().forEach((a) => a.addEventListener('click', () => setOpen(false)));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !root.classList.contains('hidden')) setOpen(false);
-    });
-  }
+  import { onPage, has } from '@/lib/page-lifecycle';
+
+  onPage((signal) => {
+    const root = document.querySelector('[data-wfg-menu]') as HTMLElement | null;
+    const openBtn = document.getElementById('wfg-menu-open');
+    const closeBtn = document.getElementById('wfg-menu-close');
+    if (root && openBtn) {
+      const links = () => document.querySelectorAll<HTMLElement>('[data-wfg-menu-link]');
+      const setOpen = (open: boolean) => {
+        root.classList.toggle('hidden', !open);
+        openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        root.setAttribute('aria-hidden', open ? 'false' : 'true');
+        // Lock scrolling on <html>, not <body>: overflow on body turns it into a scroll container,
+        // which makes the sticky header stick to the body instead of the screen.
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+        if (open) closeBtn?.focus();
+        else openBtn.focus();
+      };
+      openBtn.addEventListener('click', () => {
+        setOpen(root.classList.contains('hidden'));
+      });
+      closeBtn?.addEventListener('click', () => setOpen(false));
+      links().forEach((a) => a.addEventListener('click', () => setOpen(false)));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !root.classList.contains('hidden')) setOpen(false);
+      }, { signal });
+      // Leaving the page with the menu open must not leave scrolling locked.
+      signal.addEventListener('abort', () => {
+        document.documentElement.style.overflow = '';
+      });
+    }
+  }, { when: has('[data-wfg-menu]') });
 </script>

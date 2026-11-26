@@ -570,6 +570,10 @@ function exploreHash(id: HomePillarId): string {
 </BaseLayout>
 
 <script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
   import { initHomeParallax } from '@/scripts/home-parallax';
-  initHomeParallax();
+
+  onPage((signal) => {
+    initHomeParallax(signal);
+  }, { when: atPath('/') });
 </script>

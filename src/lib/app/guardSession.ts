@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
 import { LOGIN_PATH } from '@/lib/auth/constants';
 import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
+import { softReplace } from '@/lib/page-lifecycle';
 
 /**
  * Static-site pattern: require an authenticated user or redirect to sign-in.
@@ -18,7 +19,7 @@ export async function guardSessionOrRedirect(): Promise<Session | null> {
   } = await supabase.auth.getSession();
   if (!session) {
     const next = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
-    window.location.replace(`${LOGIN_PATH}?next=${next}`);
+    void softReplace(`${LOGIN_PATH}?next=${next}`);
     return null;
   }
   return session;

@@ -11,6 +11,7 @@ export const primaryNav: readonly PrimaryNavItem[] = [
   { href: '/webinars', label: 'Webinars' },
   { href: '/shop', label: 'Shop' },
   { href: '/liferhythm', label: 'Life Rhythm' },
+  { href: '/sound', label: 'Wellness Waves' },
   { href: '/about', label: 'About' },
   { href: '/csr', label: 'CSR' },
   { href: '/login', label: 'Sign in', iconOnly: true },

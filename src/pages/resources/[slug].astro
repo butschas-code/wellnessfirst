@@ -120,9 +120,12 @@ const heroEyebrow = [shelfEyebrow, topicEyebrow].filter(Boolean).join(' · ');
 </BaseLayout>
 
 <script>
+  import { onPage } from '@/lib/page-lifecycle';
   import { initResourceDetailAccess } from '@/scripts/resource-detail-access';
   import { initResourceDownloadTracking } from '@/scripts/resource-download-track';
 
-  initResourceDetailAccess();
-  initResourceDownloadTracking();
+  onPage((signal) => {
+    initResourceDetailAccess();
+    initResourceDownloadTracking();
+  }, { when: () => /^\/resources\/[^/]+\/?$/.test(window.location.pathname) });
 </script>

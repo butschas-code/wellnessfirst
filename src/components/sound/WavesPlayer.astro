@@ -1,0 +1,9 @@
+---
+/**
+ * Wellness Waves player, mounted once per layout. `transition:persist` keeps the
+ * same island (and its audio) alive across soft navigation (<ClientRouter />).
+ */
+import WavesShell from '@/sound/player/WavesShell';
+---
+
+<WavesShell client:only="react" transition:persist="wellness-waves" />

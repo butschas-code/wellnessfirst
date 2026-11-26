@@ -146,3 +146,9 @@ export function scrollColorTransition(): void {
     { once: true },
   );
 }
+
+/** Soft navigation: drop the previous page's scroll-driven colour triggers. */
+export function resetScrollColors(): void {
+  ScrollTrigger.getAll().forEach((t) => t.kill());
+  ScrollTrigger.clearScrollMemory?.();
+}

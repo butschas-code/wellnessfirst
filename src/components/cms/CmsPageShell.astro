@@ -38,7 +38,11 @@ const { title, description, active } = Astro.props;
     </div>
   </div>
   <script>
+    import { onPage, atPath } from '@/lib/page-lifecycle';
     import { initCmsAuthGate } from '@/scripts/cms-guard';
-    initCmsAuthGate();
+
+    onPage((signal) => {
+      initCmsAuthGate();
+    }, { when: atPath('/app/cms', true) });
   </script>
 </CmsLayout>

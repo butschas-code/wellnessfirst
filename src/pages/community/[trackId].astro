@@ -53,30 +53,33 @@ const lede = TRACK_CARD_LEDE[trackId];
   </div>
 </AppLayout>
 <script>
+  import { onPage, has, softReplace } from '@/lib/page-lifecycle';
   import { guardSessionOrRedirect } from '@/lib/app/guardSession';
   import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser';
 
-  const state = document.getElementById('comm-track-state');
-  const panel = document.getElementById('comm-track-panel');
+  onPage((signal) => {
+    const state = document.getElementById('comm-track-state');
+    const panel = document.getElementById('comm-track-panel');
 
-  (async () => {
-    if (!isSupabaseConfigured()) {
-      if (state) {
-        state.textContent =
-          'Supabase is not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then rebuild.';
+    (async () => {
+      if (!isSupabaseConfigured()) {
+        if (state) {
+          state.textContent =
+            'Supabase is not configured. Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY, then rebuild.';
+        }
+        return;
       }
-      return;
-    }
-    const session = await guardSessionOrRedirect();
-    if (!session) return;
-    if (state) state.classList.add('hidden');
-    if (panel) panel.classList.remove('hidden');
-  })();
+      const session = await guardSessionOrRedirect();
+      if (!session) return;
+      if (state) state.classList.add('hidden');
+      if (panel) panel.classList.remove('hidden');
+    })();
 
-  document.getElementById('comm-track-signout')?.addEventListener('click', async () => {
-    if (!isSupabaseConfigured()) return;
-    const supabase = getSupabaseBrowser();
-    await supabase.auth.signOut();
-    window.location.replace('/login');
-  });
+    document.getElementById('comm-track-signout')?.addEventListener('click', async () => {
+      if (!isSupabaseConfigured()) return;
+      const supabase = getSupabaseBrowser();
+      await supabase.auth.signOut();
+      void softReplace('/login');
+    });
+  }, { when: has('#comm-track-state') });
 </script>
