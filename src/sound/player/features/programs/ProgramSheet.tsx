@@ -41,14 +41,14 @@ const Row: React.FC<{ t: Technique; on: boolean; onPick: () => void }> = ({ t, o
   </button>
 );
 
-const ProgramSheet: React.FC<{ onClose: () => void; space?: Intent }> = ({ onClose, space: initialSpace }) => {
+const ProgramSheet: React.FC<{ onClose: () => void; space?: Intent; startOnYou?: boolean }> = ({ onClose, space: initialSpace, startOnYou }) => {
   const swipe = useSwipeDown(onClose);
   const { status: playStatus, currentRecipe, playRecipe } = usePlayer();
   const wellness = useWellness(500);
   const live = !!currentRecipe && (playStatus === 'playing' || playStatus === 'paused' || playStatus === 'loading');
   const playingSpace = live ? currentRecipe!.intent : null;
   const personalOn = !!pinnedPersonal() && (!live || wellness.technique?.id === pinnedPersonal()?.id);
-  const [tab, setTab] = useState<Tab>(personalOn ? 'you' : initialSpace ?? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent);
+  const [tab, setTab] = useState<Tab>(personalOn || startOnYou ? 'you' : initialSpace ?? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent);
   const space: Intent = tab === 'you' ? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent : tab;
   const setSpace = (s: Intent) => setTab(s);
   const [journeys, setJourneys] = useState<Technique[]>([]);

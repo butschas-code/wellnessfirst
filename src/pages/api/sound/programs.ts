@@ -51,8 +51,10 @@ export const GET: APIRoute = async ({ request, url }) => {
     const service = serviceClient();
     const programs = service ? await storePrograms(service, caller, generated, signals) : generated.map(fromGenerated);
     return json({ set, date, timeZone: tz, dayTempo: signals.dayTempo, stored: !!service, programs });
-  } catch {
-    return fail(500, 'programs-failed', 'Your programs could not be made just now.');
+  } catch (e) {
+    const code = (e as { code?: string })?.code ?? (e instanceof Error ? e.name : 'unknown');
+    console.error('programs GET failed', set, code, e instanceof Error ? e.message : JSON.stringify(e));
+    return fail(500, 'programs-failed', `Your programs could not be made just now (code ${code}).`);
   }
 };
 

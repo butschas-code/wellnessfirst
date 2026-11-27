@@ -52,11 +52,11 @@ vec2 bloom(vec2 p, float k, float rot, float base, float hl, float hw){
   }
   return vec2(edge, inside);
 }
-// Outline at distance d: a crisp, pixel-antialiased core (half-width w) plus a tight glow.
-// px is one device pixel in p units, so the edge stays sharp at any resolution.
-vec2 line(float d, float w, float px){
-  float core = 1. - smoothstep(w, w + 1.6 * px, d);
-  return vec2(core, exp(-d * 90.) * .32 + exp(-d * 22.) * .08);
+// Outline at distance d: a soft core (half-width w, feathered over a few pixels) plus a
+// layered glow: a near halo, a wider bloom, and a faint far haze. G scales the glow (pulses).
+vec2 line(float d, float w, float px, float G){
+  float core = 1. - smoothstep(w, w + 3.2 * px, d);
+  return vec2(core * .85, (exp(-d * 60.) * .42 + exp(-d * 16.) * .16 + exp(-d * 5.5) * .05) * G);
 }
 void main(){
   vec2 uv = gl_FragCoord.xy / r;
@@ -74,27 +74,32 @@ void main(){
   float mist = fbm(p * 2.2 + vec2(t * .018, -t * .014));
   col += C * .018 * smoothstep(.45, .95, mist) * exp(-L / (R * 2.6)) * DIM;
 
+  // A slow heartbeat (well under 1 Hz): petals open, light and glow swell together.
   float beat = .5 + .5 * sin(t * PULSE * .9);
-  float open = 1. + .045 * beat + .08 * SWELL;
-  float bright = (.55 + .55 * SWELL) * (.85 + .25 * beat) * (1. + SHIM) * DIM * LIGHT;
+  beat = beat * beat * (3. - 2. * beat);
+  float open = 1. + .075 * beat + .08 * SWELL;
+  float bright = (.55 + .55 * SWELL) * (.72 + .5 * beat) * (1. + SHIM) * DIM * LIGHT;
+  float G = .8 + .75 * beat;
   float wob = (fbm(cd * 1.2 + vec2(t * .05, -t * .04)) - .5) * .008;
 
   // Three rings of petals turning slowly in opposite directions, each opening and closing on its own phase.
   vec2 b1 = bloom(p, 8., t * .017, R * .06, R * .47 * open * (1. + .035 * sin(t * .23)), R * .17);
   vec2 b2 = bloom(p, 8., PI / 8. - t * .023, R * .04, R * .36 * open * (1. + .045 * sin(t * .19 + 2.1)), R * .15);
   vec2 b3 = bloom(p, 6., t * .031, R * .02, R * .22 * open * (1. + .055 * sin(t * .29 + 4.)), R * .1);
-  vec2 l1 = line(b1.x + wob, .0011, px);
-  vec2 l2 = line(b2.x + wob * .8, .001, px);
-  vec2 l3 = line(b3.x + wob * .6, .0009, px);
+  vec2 l1 = line(b1.x + wob, .0011, px, G);
+  vec2 l2 = line(b2.x + wob * .8, .001, px, G);
+  vec2 l3 = line(b3.x + wob * .6, .0009, px, G);
   vec3 c1 = C;
   vec3 c2 = mix(C, CREAM, .3);
   vec3 c3 = mix(C, CREAM, .6);
   float vary = .8 + .35 * fbm(cd * 2. + vec2(t * .06, 7.));
   col += (c1 * (l1.x * 1.05 + l1.y * .7) + c2 * (l2.x * 1. + l2.y * .62) + c3 * (l3.x * .95 + l3.y * .5)) * bright * vary;
   // Soft petal bodies: light pools inside each ring, densest where rings overlap.
-  col += C * .022 * (smoothstep(0., -.08, b1.y) + smoothstep(0., -.06, b2.y) + smoothstep(0., -.04, b3.y)) * DIM * LIGHT;
+  col += C * (.03 + .02 * beat) * (smoothstep(0., -.08, b1.y) + smoothstep(0., -.06, b2.y) + smoothstep(0., -.04, b3.y)) * DIM * LIGHT;
+  // An aura around the whole bloom that breathes with the beat.
+  col += C * exp(-pow(L / (R * (.62 + .05 * beat)), 2.)) * (.05 + .07 * beat) * DIM * LIGHT;
   // A quiet seed of light at the heart.
-  col += mix(C, CREAM, .5) * exp(-L * L / (R * R * .02)) * .07 * bright;
+  col += mix(C, CREAM, .5) * exp(-L * L / (R * R * .02)) * (.07 + .05 * beat) * bright;
   // Keep the very centre calm so the play / pause mark stays readable.
   col *= .45 + .55 * smoothstep(R * .05, R * .3, L);
 

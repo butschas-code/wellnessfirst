@@ -264,6 +264,9 @@ class LifeRhythm {
   private async connectAccount() {
     this.token = await accountToken();
     const box = document.getElementById('lr-account');
+    // Signed out: say what an account adds (cross-device rhythm, personal programs, saving).
+    const join = document.getElementById('lr-join');
+    if (join) join.hidden = !!this.token;
     if (!this.token || !box) return;
     box.hidden = false;
     const check = document.getElementById('lr-save-account') as HTMLInputElement;

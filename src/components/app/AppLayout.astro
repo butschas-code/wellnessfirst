@@ -81,9 +81,17 @@ const pageTitle = `${title} · ${site.name}`;
             Wellness First
           </a>
         </div>
-        <span class="text-sm font-medium uppercase tracking-[0.12em] text-ink-500">
-          {memberShell ? 'My Wellness Space' : 'Member'}
-        </span>
+        <div class="flex items-center gap-4 sm:gap-6">
+          <span class="hidden text-sm font-medium uppercase tracking-[0.12em] text-ink-500 sm:inline">
+            {memberShell ? 'My Wellness Space' : 'Member'}
+          </span>
+          <a
+            href="/"
+            class="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ink/15 px-3.5 text-sm font-medium text-ink transition-colors hover:border-ink/30 hover:bg-ink/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink/25"
+          >
+            <span aria-hidden="true">←</span> Back to home
+          </a>
+        </div>
       </div>
     </header>
     {memberShell && <MemberShellNav current={memberNav} />}
@@ -92,7 +100,7 @@ const pageTitle = `${title} · ${site.name}`;
     </main>
     <footer class="mt-auto border-t border-ink/10 py-6">
       <div class="container-wfg flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <a class="link-wfg-ghost text-sm" href="/">← Public site</a>
+        <a class="link-wfg-ghost text-sm" href="/">← Back to home</a>
         <a class="link-wfg-ghost text-sm" href="/contact">Help</a>
       </div>
     </footer>

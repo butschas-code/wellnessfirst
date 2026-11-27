@@ -29,6 +29,24 @@ const SECTIONS: Array<{ set: PersonalSet; title: string; hint: string }> = [
   { set: 'saved', title: 'Saved', hint: 'Your saved programs, exactly as they were.' },
 ];
 
+/** What a free account adds, said plainly to anyone signed out. */
+const AccountPerks: React.FC = () => (
+  <div className="fy-perks">
+    <p className="fy-perks__title">With a free account</p>
+    <ul>
+      <li>Your programs follow you to every device.</li>
+      <li>Save the ones you like. They play exactly the same later.</li>
+      <li>Find your saved programs and Life Rhythm in your Wellness Space.</li>
+    </ul>
+    <p className="fy-perks__actions">
+      <a className="chip fy-cta" href="/signup">
+        Create a free account
+      </a>
+      <a href="/login">Sign in</a>
+    </p>
+  </div>
+);
+
 interface RowProps {
   p: PersonalProgram;
   on: boolean;
@@ -124,6 +142,7 @@ export const ForYou: React.FC<{
         <a className="chip fy-cta" href="/liferhythm#lr-intake">
           Add birth details
         </a>
+        {!today.signedIn && <AccountPerks />}
       </section>
     );
   }
@@ -146,10 +165,11 @@ export const ForYou: React.FC<{
             {today.signedIn ? (
               <>Made from the birth details in this browser. <a href="/liferhythm#lr-intake">Save them to your account</a> to keep programs.</>
             ) : (
-              <>Made from the birth details in this browser. <a href="/signup">Create a free account</a> to save programs.</>
+              <>Made from the birth details in this browser.</>
             )}
           </p>
         )}
+        {!today.signedIn && <AccountPerks />}
       </div>
 
       {SECTIONS.map(({ set, title, hint }) => {

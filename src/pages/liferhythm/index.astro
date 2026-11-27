@@ -138,6 +138,19 @@ const steps = [
               <span id="lr-privacy-line">Worked out on your device. Nothing is stored on our servers.</span>
             </p>
           </form>
+
+          <aside id="lr-join" class="lr-join" aria-labelledby="lr-join-title" hidden>
+            <p id="lr-join-title" class="font-display text-lg font-medium text-ink">Get more with a free account</p>
+            <ul class="lr-join__list" role="list">
+              <li>Your rhythm on every device, not just this browser.</li>
+              <li>Sound programs in Wellness Waves made from your chart: three for each day, plus some for your strengths.</li>
+              <li>Save the programs you like and find them again in your Wellness Space.</li>
+            </ul>
+            <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <a class="btn-primary !min-h-10 !px-5 !text-sm" href="/signup">Create a free account</a>
+              <a class="lr-textbtn" href="/login">I already have one</a>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -280,6 +293,16 @@ const steps = [
   }
   .lr-textbtn:hover { color: var(--color-primary); text-decoration-color: var(--color-secondary); }
   input.input-wfg:disabled { opacity: 0.45; }
+
+  .lr-join {
+    margin-top: 1.75rem; padding: 1.25rem 1.25rem 1.35rem; border-radius: 1.1rem;
+    background: color-mix(in srgb, var(--color-primary) 5%, #fff);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+  .lr-join[hidden] { display: none; }
+  .lr-join__list { margin-top: 0.6rem; display: grid; gap: 0.4rem; font-size: 0.875rem; line-height: 1.5; color: var(--color-charcoal); }
+  .lr-join__list li { position: relative; padding-left: 1.1rem; }
+  .lr-join__list li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 0.4rem; height: 0.4rem; border-radius: 999px; background: var(--color-secondary); }
 
   .lr-time { display: flex; align-items: center; gap: 0.5rem; }
   .lr-time select.input-wfg { flex: 1; min-width: 0; appearance: none; cursor: pointer; text-align: center; font-variant-numeric: tabular-nums; padding-left: 0.5rem; padding-right: 0.5rem; }

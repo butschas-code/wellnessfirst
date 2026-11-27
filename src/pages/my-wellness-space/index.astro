@@ -1,6 +1,7 @@
 ---
 import AppLayout from '@/components/app/AppLayout.astro';
 import MemberSection from '@/components/member/MemberSection.astro';
+import { MEMBER_SHOW_RESOURCES, MEMBER_SHOW_WEBINARS } from '@/lib/member/nav';
 ---
 
 <AppLayout
@@ -26,6 +27,22 @@ import MemberSection from '@/components/member/MemberSection.astro';
       </header>
 
       <MemberSection
+        eyebrow="Life Rhythm · Wellness Waves"
+        title="Your rhythm and programs"
+        anchor="rhythm"
+        lede="The birth details you saved and the sound programs made from them."
+      >
+        <div class="w-ms-async" data-section="rhythm">
+          <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
+            <div class="h-28 rounded-lg bg-ink/[0.05]"></div>
+            <div class="h-14 rounded-lg bg-ink/[0.04]"></div>
+          </div>
+          <div data-mount class="hidden"></div>
+        </div>
+      </MemberSection>
+
+      {MEMBER_SHOW_WEBINARS && (
+      <MemberSection
         eyebrow="Calendar"
         title="Your next webinar"
         anchor="next-webinar"
@@ -39,12 +56,13 @@ import MemberSection from '@/components/member/MemberSection.astro';
           <div data-mount class="hidden"></div>
         </div>
       </MemberSection>
+      )}
 
       <MemberSection
         eyebrow="Discovery"
         title="Continue exploring"
         anchor="explore"
-        lede="A light mix of articles, live sessions, and resources — tuned to your interests when you have shared them."
+        lede="A light mix of articles, tuned to your interests when you have shared them."
       >
         <div class="w-ms-async" data-section="explore">
           <div data-skel class="animate-pulse grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
@@ -75,7 +93,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
         eyebrow="For you"
         title="Recommended for your interests"
         anchor="recommended"
-        lede="When you choose topics, we align articles, webinars, and library picks — never noisy."
+        lede="When you choose topics, we line up articles to match — never noisy."
       >
         <div class="w-ms-async" data-section="recommended">
           <div data-skel class="animate-pulse space-y-4" aria-hidden="true">
@@ -86,6 +104,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
         </div>
       </MemberSection>
 
+      {MEMBER_SHOW_RESOURCES && (
       <MemberSection
         eyebrow="Library"
         title="New resources"
@@ -100,6 +119,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
           <div data-mount class="hidden"></div>
         </div>
       </MemberSection>
+      )}
 
       <MemberSection
         eyebrow="Support"
@@ -146,6 +166,8 @@ import MemberSection from '@/components/member/MemberSection.astro';
   import { fetchMemberOverview } from '@/lib/member/overview-data';
   import { formatMemberSessionInstant } from '@/lib/member/format-dates';
   import { topicLabel } from '@/lib/member/topic-labels';
+  import { MEMBER_SHOW_RESOURCES, MEMBER_SHOW_WEBINARS } from '@/lib/member/nav';
+  import { fetchRhythmData, profileHtml, programsHtml } from '@/lib/member/rhythm-data';
 
   onPage((signal) => {
     function esc(s: string): string {
@@ -218,6 +240,14 @@ import MemberSection from '@/components/member/MemberSection.astro';
       const name = displayName(data.profile, session.user.email ?? undefined);
       const nameEl = document.getElementById('w-ms-name');
       if (nameEl) nameEl.textContent = name;
+
+      /* ─── Life Rhythm and saved programs ─── */
+      void fetchRhythmData(session.access_token).then((r) => {
+        const progs = r.profile || r.programs.length
+          ? `<div class="mt-12"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Saved programs</p><div class="mt-4">${programsHtml(r.programs, 3)}</div></div>`
+          : '';
+        revealSection('rhythm', profileHtml(r.profile) + progs);
+      });
 
       const fullNameOk = Boolean(data.profile?.full_name?.trim());
       const hasInterests = data.topicKeys.length > 0;
@@ -309,7 +339,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
           href: `/articles/${a.slug}`,
         });
       }
-      for (const w of data.exploreWebinars) {
+      for (const w of MEMBER_SHOW_WEBINARS ? data.exploreWebinars : []) {
         const tz = w.timezone ?? 'Europe/Riga';
         explorePieces.push({
           kind: 'webinar',
@@ -319,7 +349,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
           href: `/webinars/${w.slug}`,
         });
       }
-      for (const r of data.exploreResources) {
+      for (const r of MEMBER_SHOW_RESOURCES ? data.exploreResources : []) {
         const url = r.external_url || r.file_url;
         explorePieces.push({
           kind: 'resource',
@@ -336,11 +366,9 @@ import MemberSection from '@/components/member/MemberSection.astro';
           'explore',
           `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
             <p class="font-display text-lg text-ink">Nothing to surface yet</p>
-            <p class="mt-2 text-sm leading-relaxed text-ink-600">Articles and the library will fill this strip as content grows.</p>
+            <p class="mt-2 text-sm leading-relaxed text-ink-600">New articles will fill this strip as they arrive.</p>
             <div class="mt-6 flex flex-wrap gap-4">
               <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Articles</a>
-              <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">Webinars</a>
-              <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/resources">Resources</a>
             </div>
           </div>`,
         );
@@ -403,7 +431,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
           'recommended',
           `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
             <p class="font-display text-lg text-ink">Tell us what draws you</p>
-            <p class="mt-2 text-sm leading-relaxed text-ink-600">Choose a few topics and we will align suggestions across articles, webinars, and the library — calm and optional.</p>
+            <p class="mt-2 text-sm leading-relaxed text-ink-600">Choose a few topics and we will line up articles to match — calm and optional.</p>
             <a class="mt-4 inline-flex text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/my-wellness-space/interests">Choose interests</a>
           </div>`,
         );
@@ -415,7 +443,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
           blocks.push(`<div><h3 class="text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">Articles</h3><ul class="mt-4 max-w-2xl">${recRows}</ul></div>`);
         }
 
-        if (data.recommendedWebinars.length > 0) {
+        if (MEMBER_SHOW_WEBINARS && data.recommendedWebinars.length > 0) {
           const wRows = data.recommendedWebinars
             .map((w) => {
               const tz = w.timezone ?? 'Europe/Riga';
@@ -434,7 +462,7 @@ import MemberSection from '@/components/member/MemberSection.astro';
         }
 
         const recRes = data.recommendedResources;
-        if (recRes.length > 0) {
+        if (MEMBER_SHOW_RESOURCES && recRes.length > 0) {
           const resRows = recRes
             .map((r) => {
               const topic = r.topic_key ? `<span class="mt-1 block text-xs uppercase tracking-wider text-ink-400">${esc(topicLabel(r.topic_key))}</span>` : '';
@@ -463,10 +491,9 @@ import MemberSection from '@/components/member/MemberSection.astro';
             'recommended',
             `<div class="max-w-lg border-l-[3px] border-secondary/35 pl-5 sm:pl-6">
               <p class="font-display text-lg text-ink">Nothing extra matched yet</p>
-              <p class="mt-2 text-sm leading-relaxed text-ink-600">Published pieces and sessions aligned with your topics will appear here.</p>
+              <p class="mt-2 text-sm leading-relaxed text-ink-600">Published pieces aligned with your topics will appear here.</p>
               <div class="mt-6 flex flex-wrap gap-4">
                 <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">Articles</a>
-                <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">Webinars</a>
               </div>
             </div>`,
           );
@@ -476,7 +503,6 @@ import MemberSection from '@/components/member/MemberSection.astro';
             `<div class="space-y-14">${blocks.join('')}</div>
             <p class="mt-10 flex flex-wrap gap-6">
               <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/articles">All articles</a>
-              <a class="text-sm font-medium text-secondary underline decoration-line underline-offset-4" href="/webinars">All webinars</a>
             </p>`,
           );
         }

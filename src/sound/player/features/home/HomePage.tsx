@@ -29,6 +29,9 @@ const shortcutSpace = (): Intent | null => {
   return SPACES.some((space) => space.intent === requested) ? (requested as Intent) : null;
 };
 
+/** Link from the Wellness Space (?programs=for-you) opens Programs on "For you". */
+const wantsForYou = () => new URLSearchParams(window.location.search).get('programs') === 'for-you';
+
 const TIMER_STEPS = [0, 30, 60, 120];
 
 const BREATH_WORD = { in: 'in', hold: 'hold', out: 'out', rest: 'hold' } as const;
@@ -56,6 +59,20 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
   const [feeling, setFeeling] = useState(false);
   const [info, setInfo] = useState(false);
   const [picking, setPicking] = useState(false);
+  const [pickYou, setPickYou] = useState(false);
+  useEffect(() => {
+    const open = () => {
+      if (!wantsForYou()) return;
+      setPickYou(true);
+      setPicking(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('programs');
+      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+    };
+    open();
+    document.addEventListener('astro:page-load', open);
+    return () => document.removeEventListener('astro:page-load', open);
+  }, []);
   const [choosingSound, setChoosingSound] = useState(false);
   const natureOn = shapeParams.texture > 0.05;
   const [shortcut] = useState(shortcutSpace);
@@ -287,7 +304,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
       )}
       {picking && (
         <Suspense fallback={null}>
-          <ProgramSheet space={space ?? sel} onClose={() => setPicking(false)} />
+          <ProgramSheet
+            space={space ?? sel}
+            startOnYou={pickYou}
+            onClose={() => {
+              setPicking(false);
+              setPickYou(false);
+            }}
+          />
         </Suspense>
       )}
       {info && <SpaceInfoSheet space={space ?? sel} onClose={() => setInfo(false)} />}

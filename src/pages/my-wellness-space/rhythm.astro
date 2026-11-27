@@ -1,0 +1,68 @@
+---
+import AppLayout from '@/components/app/AppLayout.astro';
+import MemberSection from '@/components/member/MemberSection.astro';
+import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
+---
+
+<AppLayout
+  title="Life Rhythm and programs"
+  description="Your saved Life Rhythm details and Wellness Waves programs."
+  memberShell={true}
+  memberNav="rhythm"
+>
+  <div class="container-wfg pb-24 pt-10 sm:pt-14">
+    <p id="w-rh-state" class="text-sm text-ink-500">Opening your rhythm…</p>
+    <div id="w-rh-skel" class="hidden"><MemberSkeletonBlock rows={4} /></div>
+    <div id="w-rh-panel" class="hidden">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-secondary">Life Rhythm · Wellness Waves</p>
+      <h1 class="font-display mt-3 text-[2rem] tracking-tight text-ink sm:text-[2.25rem]">Your rhythm and programs</h1>
+      <p class="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-ink-600">
+        The birth details you saved, and the sound programs you chose to keep.
+      </p>
+      <p id="w-rh-err" class="mt-8 hidden rounded-lg border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-ink-800"></p>
+
+      <MemberSection eyebrow="Life Rhythm" title="Your birth details" anchor="profile">
+        <div id="w-rh-profile"></div>
+      </MemberSection>
+
+      <MemberSection eyebrow="Wellness Waves" title="Saved programs" anchor="programs" lede="Made from your chart. Open one in Wellness Waves under Programs → For you → Saved.">
+        <div id="w-rh-programs"></div>
+      </MemberSection>
+    </div>
+  </div>
+</AppLayout>
+
+<script>
+  import { onPage, atPath } from '@/lib/page-lifecycle';
+  import { guardSessionOrRedirect } from '@/lib/app/guardSession';
+  import { isSupabaseConfigured } from '@/lib/supabase/browser';
+  import { fetchRhythmData, profileHtml, programsHtml } from '@/lib/member/rhythm-data';
+
+  onPage(() => {
+    (async () => {
+      const state = document.getElementById('w-rh-state');
+      const skel = document.getElementById('w-rh-skel');
+      const panel = document.getElementById('w-rh-panel');
+      if (!isSupabaseConfigured()) {
+        if (state) state.textContent = 'Supabase is not configured.';
+        return;
+      }
+      const session = await guardSessionOrRedirect();
+      if (!session) return;
+      state?.classList.add('hidden');
+      skel?.classList.remove('hidden');
+
+      const data = await fetchRhythmData(session.access_token);
+
+      skel?.classList.add('hidden');
+      panel?.classList.remove('hidden');
+      const err = document.getElementById('w-rh-err');
+      if (data.error && err) {
+        err.textContent = 'We could not load everything just now. Refresh when you have a moment.';
+        err.classList.remove('hidden');
+      }
+      document.getElementById('w-rh-profile')!.innerHTML = profileHtml(data.profile);
+      document.getElementById('w-rh-programs')!.innerHTML = programsHtml(data.programs);
+    })();
+  }, { when: atPath('/my-wellness-space/rhythm') });
+</script>

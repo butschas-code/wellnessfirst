@@ -64,6 +64,21 @@ export interface WellnessStatus {
   pulseHz: number;
 }
 
+/**
+ * Stops whatever ramp a gain is on and holds its exact value from `at`, so the
+ * next ramp starts where the sound really is. `g.value` read from the main
+ * thread can be a few ms stale mid-ramp; that step is an audible click.
+ */
+function holdAt(p: AudioParam, at: number): void {
+  const withHold = p as AudioParam & { cancelAndHoldAtTime?: (t: number) => AudioParam };
+  if (typeof withHold.cancelAndHoldAtTime === 'function') {
+    withHold.cancelAndHoldAtTime(at);
+  } else {
+    p.cancelScheduledValues(at);
+    p.setValueAtTime(p.value, at);
+  }
+}
+
 export class AudioEngine {
   private static instance: AudioEngine | null = null;
 
@@ -247,7 +262,7 @@ export class AudioEngine {
     }
     window.setTimeout(() => {
       if (!this.composer) this.output?.pause();
-    }, fadeDuration * 1000 + 300);
+    }, fadeDuration * 1000 + 300 + Math.min(600, ((this.ctx?.outputLatency || 0) + (this.ctx?.baseLatency || 0)) * 1000));
   }
 
   // =========================================================================
@@ -420,10 +435,13 @@ export class AudioEngine {
       // Short fade so pausing never clicks, then freeze the audio clock.
       const v = this.volumeGain!.gain;
       const now = this.ctx.currentTime;
-      v.cancelScheduledValues(now);
-      v.setValueAtTime(v.value, now);
-      v.linearRampToValueAtTime(0, now + 0.25);
-      await new Promise((r) => setTimeout(r, 280));
+      holdAt(v, now);
+      v.linearRampToValueAtTime(0, now + 0.3);
+      // Wait until the silence has actually reached the speakers: the audio clock runs
+      // ahead of the output (and the media element adds its own buffer). Suspending or
+      // pausing earlier cuts the sound mid-wave, which is heard as a click.
+      const latency = (this.ctx.outputLatency || 0) + (this.ctx.baseLatency || 0);
+      await new Promise((r) => setTimeout(r, 300 + Math.min(600, latency * 1000) + 150));
       await this.ctx.suspend();
     }
     this.output?.pause();
@@ -460,8 +478,7 @@ export class AudioEngine {
     if (this.ctx && this.volumeGain && this.ctx.state === 'running') {
       const g = this.volumeGain.gain;
       const now = this.ctx.currentTime;
-      g.cancelScheduledValues(now);
-      g.setValueAtTime(g.value, now);
+      holdAt(g, now);
       g.linearRampToValueAtTime(this.volumeCurve(this.currentVolume), now + Math.max(0.02, fadeSeconds));
       this.scheduleSleepFade(now + Math.max(0.02, fadeSeconds));
     }
@@ -566,8 +583,7 @@ export class AudioEngine {
     const now = this.ctx.currentTime;
     (Object.keys(this.chain.buses) as MixBusId[]).forEach((id) => {
       const g = this.chain!.buses[id].gain;
-      g.cancelScheduledValues(now);
-      g.setValueAtTime(g.value, now);
+      holdAt(g, now);
       g.linearRampToValueAtTime(this.effectiveBusGain(id), now + seconds);
     });
   }

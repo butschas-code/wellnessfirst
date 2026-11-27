@@ -16,6 +16,11 @@
 .ww .fy-why--pro { white-space: pre-wrap; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 0.72rem; line-height: 1.55; padding: 10px 12px; border-radius: 12px; background: var(--glass); border: 1px solid var(--hair); overflow-x: auto; }
 .ww .fy-invite p { margin: 0 0 14px; }
 .ww .fy-cta { display: inline-flex; align-items: center; text-decoration: none; color: var(--paper); }
+.ww .fy-perks { margin-top: 14px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--glass-line); background: var(--glass); }
+.ww .fy-perks__title { margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper-dim); }
+.ww .fy-perks ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.84rem; line-height: 1.45; color: var(--paper); }
+.ww .fy-perks__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 12px 0 0; font-size: 0.84rem; }
+.ww .fy-perks__actions a:not(.chip) { color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }
 
 /* On the cream sheet the dark-theme "selected" fill (cream) disappears: use navy ink instead. */
 .ww .sheet .space-chips .chip[aria-selected='true'],
