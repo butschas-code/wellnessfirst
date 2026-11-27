@@ -1,0 +1,537 @@
+[
+  {
+    "kind": "today",
+    "slot": "morning",
+    "name": "Steady Morning: settle, then unwind",
+    "description": "Today is an even, steady day. This builds on the part of you that your chart shows as most at ease. It moves through 14 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "focus",
+    "recipeId": "quiet-momentum",
+    "validFrom": "2026-11-27",
+    "validTo": "2026-11-27",
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "focus",
+      "recipeId": "quiet-momentum",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "focu_039",
+          "frequencyIndices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "ener_035",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "amplify",
+          "sourceProgramId": "rela_008",
+          "frequencyIndices": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "focu_042",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 840,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.vitality-low",
+        "layer": "natal",
+        "use": "support",
+        "category": "Energy & Vitality",
+        "weight": 1
+      },
+      {
+        "ruleId": "natal.strongest-planet",
+        "layer": "natal",
+        "use": "amplify",
+        "category": "Relaxation & Stress Balance",
+        "weight": 0.4
+      }
+    ],
+    "contentHash": "3ae9d39f9337f5471e3f86bc66643935",
+    "genKey": "fixture-sam:1:today:morning:2026-11-27:1.0.0"
+  },
+  {
+    "kind": "today",
+    "slot": "midday",
+    "name": "Steady Midday: settle, then unwind",
+    "description": "Today is an even, steady day. This builds on the part of you that your chart shows as most at ease. It moves through 14 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "focus",
+    "recipeId": "quiet-momentum",
+    "validFrom": "2026-11-27",
+    "validTo": "2026-11-27",
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "focus",
+      "recipeId": "quiet-momentum",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "focu_046",
+          "frequencyIndices": [
+            0,
+            1,
+            2
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "ener_028",
+          "frequencyIndices": [
+            0,
+            1,
+            2
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "amplify",
+          "sourceProgramId": "rela_013",
+          "frequencyIndices": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "focu_043",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 840,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.vitality-low",
+        "layer": "natal",
+        "use": "support",
+        "category": "Energy & Vitality",
+        "weight": 1
+      },
+      {
+        "ruleId": "natal.strongest-planet",
+        "layer": "natal",
+        "use": "amplify",
+        "category": "Relaxation & Stress Balance",
+        "weight": 0.4
+      }
+    ],
+    "contentHash": "555d4cda24a260ef867508ae2e0cbb0d",
+    "genKey": "fixture-sam:1:today:midday:2026-11-27:1.0.0"
+  },
+  {
+    "kind": "today",
+    "slot": "evening",
+    "name": "Soft Evening: settle, then turn inward",
+    "description": "Today is an even, steady day. It moves through 10 frequencies, one every 90 seconds, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "meditate",
+    "recipeId": "open-space",
+    "validFrom": "2026-11-27",
+    "validTo": "2026-11-27",
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "meditate",
+      "recipeId": "open-space",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "mind_092",
+          "frequencyIndices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "stepSeconds": 90
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "focu_047",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 90
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "mind_093",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 90
+        }
+      ],
+      "totalSeconds": 900,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.mercury-low",
+        "layer": "natal",
+        "use": "support",
+        "category": "Mental Focus & Clarity",
+        "weight": 0.35
+      }
+    ],
+    "contentHash": "3a128ba8fc3a5d36f5ea560d7e4650fb",
+    "genKey": "fixture-sam:1:today:evening:2026-11-27:1.0.0"
+  },
+  {
+    "kind": "chapter",
+    "slot": null,
+    "name": "This Chapter: Clear Mind",
+    "description": "Your current chapter has good backing, so this leans into what it brings. Made for the stretch of time you are in now, until February 2029. It moves through 11 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "focus",
+    "recipeId": "quiet-momentum",
+    "validFrom": "2026-11-27",
+    "validTo": "2029-02-15",
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "focus",
+      "recipeId": "quiet-momentum",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "focu_044",
+          "frequencyIndices": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "amplify",
+          "sourceProgramId": "focu_046",
+          "frequencyIndices": [
+            0,
+            1,
+            2
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "focu_039",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 660,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "chapter.strong-backing",
+        "layer": "chapter",
+        "use": "amplify",
+        "category": "Mental Focus & Clarity",
+        "weight": 0.35
+      }
+    ],
+    "contentHash": "dcafeffe1bb4f161d3bfb2157049dff9",
+    "genKey": "fixture-sam:1:chapter:Mercury-Rahu-2029-02-15:1.0.0"
+  },
+  {
+    "kind": "strength",
+    "slot": null,
+    "name": "Your Strength: Calm Ground",
+    "description": "This builds on the part of you that your chart shows as most at ease. It moves through 16 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "relax",
+    "recipeId": "soft-landing",
+    "validFrom": "2026-11-27",
+    "validTo": null,
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "relax",
+      "recipeId": "soft-landing",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "rela_008",
+          "frequencyIndices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "amplify",
+          "sourceProgramId": "rela_005",
+          "frequencyIndices": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "amplify",
+          "sourceProgramId": "rela_004",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "rela_009",
+          "frequencyIndices": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 960,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.strongest-planet",
+        "layer": "natal",
+        "use": "amplify",
+        "category": "Relaxation & Stress Balance",
+        "weight": 0.4
+      }
+    ],
+    "contentHash": "64210a483f4e59997ef6535572aa8de8",
+    "genKey": "fixture-sam:1:strength:0:1.0.0"
+  },
+  {
+    "kind": "challenge",
+    "slot": null,
+    "name": "Gentle Support: Bright Start",
+    "description": "Your energy is worth pacing, so this adds a gentle lift you can come back to through the day. It moves through 9 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "energy",
+    "recipeId": "first-light",
+    "validFrom": "2026-11-27",
+    "validTo": null,
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "energy",
+      "recipeId": "first-light",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "ener_032",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "ener_034",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "ener_036",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "ener_030",
+          "frequencyIndices": [
+            0,
+            1,
+            2
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 540,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.vitality-low",
+        "layer": "natal",
+        "use": "support",
+        "category": "Energy & Vitality",
+        "weight": 1
+      }
+    ],
+    "contentHash": "af847998147cc776bd298a8552e607f7",
+    "genKey": "fixture-sam:1:challenge:0:1.0.0"
+  },
+  {
+    "kind": "challenge",
+    "slot": null,
+    "name": "Gentle Support: Clear Mind",
+    "description": "Concentration is something your chart asks you to build on purpose, so this brings in a steadier pulse for focused work. It moves through 13 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "intent": "focus",
+    "recipeId": "quiet-momentum",
+    "validFrom": "2026-11-27",
+    "validTo": null,
+    "composition": {
+      "schema": "wellness-waves/composition@1",
+      "intent": "focus",
+      "recipeId": "quiet-momentum",
+      "phases": [
+        {
+          "role": "arrive",
+          "sourceProgramId": "focu_044",
+          "frequencyIndices": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "focu_042",
+          "frequencyIndices": [
+            0,
+            1
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "support",
+          "sourceProgramId": "focu_043",
+          "frequencyIndices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "stepSeconds": 60
+        },
+        {
+          "role": "integrate",
+          "sourceProgramId": "focu_047",
+          "frequencyIndices": [
+            1,
+            2,
+            3
+          ],
+          "stepSeconds": 60
+        }
+      ],
+      "totalSeconds": 780,
+      "versions": {
+        "catalog": "1.0.0",
+        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
+        "policy": "1.0.0",
+        "rulebook": "1.0.0",
+        "composer": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "natal.mercury-low",
+        "layer": "natal",
+        "use": "support",
+        "category": "Mental Focus & Clarity",
+        "weight": 0.35
+      }
+    ],
+    "contentHash": "d3ee982fc30d92cef8777639e78f57f1",
+    "genKey": "fixture-sam:1:challenge:1:1.0.0"
+  }
+]

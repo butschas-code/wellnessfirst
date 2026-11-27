@@ -1,6 +1,6 @@
 # Onda inside Wellness First: white-label player + chart-based programs
 
-**Status:** Phase 1 (port) and Phase 2 (player on the site) done 2026-11-26, see `src/sound/PORTED_FROM.md` · **Date:** 2026-11-19 · **Updated:** 2026-11-26
+**Status:** Phase 1 (port) and Phase 2 (player on the site) done 2026-11-26, see `src/sound/PORTED_FROM.md`. Phases 3–5 built 2026-11-27 (see §11); rulebook v1 awaits sign-off · **Date:** 2026-11-19 · **Updated:** 2026-11-27
 
 ### Decisions (2026-11-19)
 - **No shared system.** Onda stays Onda: free, marketed separately, own repo, own Supabase, own users. Wellness First gets a **standalone white-label copy** of the player, which is a one-time port into this repo and evolves on its own from then on. No package, no runtime link and no shared accounts with Onda.
@@ -241,3 +241,30 @@ sound_user_state    -- favourites, recents, Sound DNA, feel, prefs (port of onda
 6. ~~Access~~: free until the paywall. Saving needs a free account (existing member system).
 7. ~~Naming~~: template names only.
 8. ~~Licensing~~: internal note only, nothing on the website.
+
+## 11. Phases 3–5 as built (2026-11-27)
+
+**Rulebook v1 is a draft.** `src/lib/sound/rulebook.ts` (`RULEBOOK_STATUS = 'draft'`) holds every rule with its id, layer, categories, weight and plain/Pro copy. It follows the §5.3 table, plus five rules marked `draft: 'added'` (strongest/quietest planet fallbacks so every chart gets a strength and a challenge, chapter low/strong backing) and the slot table (`SLOT_SPACE`: which space each Today slot uses by day tempo). Sascha signs off; any change bumps `RULEBOOK_VERSION`.
+
+| Piece | Where |
+|---|---|
+| `astro_profiles` (versioned, consent, owner-only RLS, details immutable), `sound_signals`, `sound_programs` (immutable, `gen_key` for idempotent first open), `sound_program_saves`, `sound_listens.program_id` FK | `supabase/migrations/20261127100000_wellness_waves_personal_programs.sql` |
+| Birth profile shape + validation, consent wording (`CONSENT_VERSION`) | `src/lib/sound/profile.ts` |
+| Signals (chart → facts → rulebook; day evaluated at local noon, no wall clock) | `src/lib/sound/signals.ts` |
+| Program sets, template names/descriptions, Pro text | `src/lib/sound/programs.ts` |
+| Composer, `planForComposition`, `validateComposition`, content hash | `src/sound/engine/compose/` |
+| Endpoints (§7) | `src/pages/api/astro/profile.ts`, `src/pages/api/sound/{programs,listen}.ts`, `src/pages/api/sound/program/[id].ts`, `…/[id]/save.ts` |
+| Life Rhythm: consent checkbox (signed in only), reads the account profile when signed in, "Remove" | `src/scripts/astro-account.ts`, `src/scripts/astro-controller.ts`, `src/pages/liferhythm/index.astro` |
+| Player "For you" chip in the Programs sheet (Today ×3 with "now", This chapter, Strengths, Gentle support, Saved; Simple/Pro "why"; save/unsave) | `src/sound/player/features/personal/`, `host.ts`, `runtime/siteHost.ts` |
+| Tests: golden files, every Hz traces to a catalog row, bands, tamper refusal, rulebook table, claims lint | `tests/sound/personalPrograms.test.ts`, `tests/sound/__golden__/` |
+
+Choices made while building (change if wanted):
+- **Seed = the chart, not the account** (`chartSeed`: birth date/time/place). Same chart and date → same program for anyone, signed in or not.
+- **Compositions are pulses only** (no literal tones, no binaural), ≤ 40 Hz, bands from `curated.ts`. 2–4 values per phase, a contiguous window of the catalog program, in catalog order. Steps: 60 s (90 s Sleep/Stillness, 75 s Recover).
+- **A category is a strength or a challenge, never both** (higher natal weight wins; ties go to support).
+- **Picking a personal program pins it**: it plays under any soundscape and survives space changes and reloads until the member picks another program or Just music.
+- **Anonymous**: the player sends browser-stored birth details to `POST /api/sound/programs`, which computes and returns programs without storing them (privacy policy updated). Saving needs an account and saved details.
+- **Server key**: program inserts need `SUPABASE_SERVICE_ROLE_KEY` (server secret). Without it, signed-in members still get programs but they are not stored and cannot be saved.
+- Composition schema literal is `wellness-waves/composition@1` (not `onda/…`, per the rename rule).
+
+Not done yet: applying the migration to the live project, setting the service key, the "Listen to today's program" link in Life Rhythm and the My Wellness Space library (§8), linking listens to `program_id` from the player, retention job (Phase 6).

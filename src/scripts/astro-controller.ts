@@ -56,6 +56,7 @@ import * as I from '../lib/astro-insights.ts';
 import { buildReading } from '../lib/astro-reading.ts';
 import { nakshatraDay, upcomingShifts, weekAhead } from '../lib/astro-today.ts';
 import { chartSvg, type ChartStyle } from './astro-charts.ts';
+import { accountToken, loadAccountProfile, removeAccountProfile, saveAccountProfile, sameDetails } from './astro-account.ts';
 import {
   type GeocodedPlace,
   type UserBirthProfile,
@@ -219,6 +220,10 @@ class LifeRhythm {
   private todayPlace: TodayPlace | null = null;
   private autoPlace: TodayPlace | null = null;
   private mode: 'simple' | 'pro' = 'simple';
+  /** Signed-in member's access token (birth details can be saved to the account). */
+  private token: string | null = null;
+  /** The details saved on the account, if any. */
+  private accountProfile: UserBirthProfile | null = null;
   private tab: Tab = 'today';
   private chartStyle: ChartStyle = 'north';
   private varga = 'D1';
@@ -241,11 +246,89 @@ class LifeRhythm {
     if (saved?.birthDate && Number.isFinite(saved.latitude)) {
       this.fillForm(saved);
       this.run(saved, false);
-      const start = document.getElementById('lr-hero-start') as HTMLAnchorElement | null;
-      if (start) {
-        start.textContent = 'See your rhythm';
-        start.href = '#lr-results';
+      this.markStarted();
+    }
+    void this.connectAccount();
+  }
+
+  private markStarted() {
+    const start = document.getElementById('lr-hero-start') as HTMLAnchorElement | null;
+    if (start) {
+      start.textContent = 'See your rhythm';
+      start.href = '#lr-results';
+    }
+  }
+
+  /* ─── Account: birth details saved to the member's account (signed in only) ─── */
+
+  private async connectAccount() {
+    this.token = await accountToken();
+    const box = document.getElementById('lr-account');
+    if (!this.token || !box) return;
+    box.hidden = false;
+    const check = document.getElementById('lr-save-account') as HTMLInputElement;
+    check.addEventListener('change', () => this.renderAccount());
+    document.getElementById('lr-account-remove')?.addEventListener('click', () => void this.removeFromAccount());
+    try {
+      const acc = await loadAccountProfile(this.token);
+      this.accountProfile = acc?.profile ?? null;
+      // Signed in with saved details: the account is the source, on any device.
+      if (this.accountProfile && (!this.profile || !sameDetails(this.profile, this.accountProfile))) {
+        this.fillForm(this.accountProfile);
+        this.run(this.accountProfile, false);
+        this.markStarted();
       }
+      check.checked = !!this.accountProfile;
+    } catch {
+      /* offline or not set up: Life Rhythm keeps working from this browser */
+    }
+    this.renderAccount();
+  }
+
+  private renderAccount(message?: string) {
+    const check = document.getElementById('lr-save-account') as HTMLInputElement | null;
+    const status = document.getElementById('lr-account-status');
+    const badge = document.getElementById('lr-account-badge');
+    const privacy = document.getElementById('lr-privacy-line');
+    const onAccount = !!this.accountProfile && !!this.profile && sameDetails(this.profile, this.accountProfile);
+    if (badge) badge.hidden = !this.token || !onAccount;
+    if (privacy && this.token) {
+      privacy.textContent = check?.checked
+        ? 'Worked out on your device. Saved to your account only because you agreed above.'
+        : 'Worked out on your device. Nothing is stored on our servers.';
+    }
+    if (status) {
+      status.textContent =
+        message ??
+        (this.accountProfile
+          ? onAccount
+            ? 'These details are saved to your account. Changing them saves a new version.'
+            : 'Your account has different details saved. Submit to save these as a new version.'
+          : '');
+    }
+  }
+
+  private async saveToAccount(profile: UserBirthProfile) {
+    if (!this.token) return;
+    try {
+      const saved = await saveAccountProfile(this.token, profile);
+      this.accountProfile = saved.profile;
+      this.renderAccount();
+    } catch (e) {
+      this.renderAccount(e instanceof Error ? e.message : 'Your birth details could not be saved.');
+    }
+  }
+
+  private async removeFromAccount() {
+    if (!this.token) return;
+    if (!window.confirm('Remove your birth details from your account? They stay in this browser until you clear them.')) return;
+    try {
+      await removeAccountProfile(this.token);
+      this.accountProfile = null;
+      (document.getElementById('lr-save-account') as HTMLInputElement).checked = false;
+      this.renderAccount('Removed from your account.');
+    } catch (e) {
+      this.renderAccount(e instanceof Error ? e.message : 'Your birth details could not be removed.');
     }
   }
 
@@ -290,10 +373,11 @@ class LifeRhythm {
       }
       err.hidden = true;
       const p = this.place!;
-      this.run(
-        { name, birthDate: date, birthTime: t, isTimeUnknown: isUnknown, cityName: placeInput.value, latitude: p.latitude, longitude: p.longitude, timezone: offsetForLocal(p.timezone, date, t), ianaTimezone: p.timezone },
-        true
-      );
+      const profile: UserBirthProfile = { name, birthDate: date, birthTime: t, isTimeUnknown: isUnknown, cityName: placeInput.value, latitude: p.latitude, longitude: p.longitude, timezone: offsetForLocal(p.timezone, date, t), ianaTimezone: p.timezone };
+      this.run(profile, true);
+      // Saved only with the member's explicit consent (the checkbox), never by default.
+      if (this.token && (document.getElementById('lr-save-account') as HTMLInputElement | null)?.checked) void this.saveToAccount(profile);
+      else this.renderAccount();
     });
 
     document.querySelectorAll<HTMLElement>('[data-lr-demo]').forEach((b) =>
@@ -466,6 +550,7 @@ class LifeRhythm {
     this.setTab(this.mode === 'simple' && this.tab === 'chart' ? 'today' : this.tab, false);
     if (scroll) this.results.scrollIntoView({ behavior: 'smooth', block: 'start' });
     void this.resolveAutoPlace();
+    if (this.token) this.renderAccount();
   }
 
   private compute(p: UserBirthProfile): ComprehensiveKundliResult {

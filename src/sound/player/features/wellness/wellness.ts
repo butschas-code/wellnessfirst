@@ -15,6 +15,15 @@ export const setWellnessEnabled = (on: boolean) => Storage.set('programs_auto', 
 
 const choices = () => Storage.get<Partial<Record<Intent, string>>>('technique_choice', {});
 
+/**
+ * A personal program the listener chose ("For you"). It stays under whatever
+ * soundscape plays, across spaces, until they pick another program or Just
+ * music: the player never switches programs on its own.
+ */
+const PIN_KEY = 'personal_pin';
+export const pinnedPersonal = (): Technique | null => Storage.get<Technique | null>(PIN_KEY, null);
+const unpin = () => Storage.remove(PIN_KEY);
+
 /** A space's Frequency programs, as techniques. The catalog chunk loads on first use. */
 export async function programsFor(intent: Intent): Promise<Technique[]> {
   const { programTechniquesFor } = await import('../../../engine/domain/wellness/programTechniques');
@@ -27,6 +36,8 @@ export async function programsFor(intent: Intent): Promise<Technique[]> {
  * space's Frequency programs (a different one for each release).
  */
 export async function techniqueFor(recipe: Pick<SoundscapeRecipe, 'id' | 'intent'>): Promise<Technique | null> {
+  const pinned = pinnedPersonal();
+  if (pinned) return pinned;
   const programs = await programsFor(recipe.intent);
   const picked = choices()[recipe.intent];
   if (picked) {
@@ -55,12 +66,27 @@ export async function startAutoWellness(recipe: Pick<SoundscapeRecipe, 'id' | 'i
 
 /** The listener picks a program or technique for a space: remember it and play it. */
 export async function chooseTechnique(recipe: Pick<SoundscapeRecipe, 'id' | 'intent'>, t: Technique): Promise<boolean> {
+  unpin();
   Storage.set('technique_choice', { ...choices(), [recipe.intent]: t.id });
   setWellnessEnabled(true);
   return run(t);
 }
 
+/** Remembers a personal program so the next soundscape that starts plays it (nothing plays yet). */
+export function pinPersonal(t: Technique): void {
+  Storage.set(PIN_KEY, t);
+  setWellnessEnabled(true);
+}
+
+/** The listener picks a personal program: it plays under the current soundscape and stays pinned. */
+export function choosePersonal(t: Technique): boolean {
+  Storage.set(PIN_KEY, t);
+  setWellnessEnabled(true);
+  return run(t);
+}
+
 export function turnWellnessOff(): void {
+  unpin();
   setWellnessEnabled(false);
   AudioEngine.getInstance().stopTechnique();
 }

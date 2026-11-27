@@ -13,7 +13,7 @@ import { getSupabaseBrowser, isSupabaseConfigured } from '@/lib/supabase/browser
 import { Storage } from '../../engine/lib/storage';
 import { Logger } from '../../engine/lib/logger';
 import { SYNC_KEYS, type SyncedState, mergeState, sameState } from '../../engine/state/syncState';
-import { configureHost, type Listen } from '../host';
+import { configureHost, type Listen, type PersonalResult, type PersonalSet } from '../host';
 
 const STATE_TABLE = 'sound_user_state';
 const LISTEN_TABLE = 'sound_listens';
@@ -183,6 +183,77 @@ function startSync(db: SupabaseClient, uid: string): () => void {
   };
 }
 
+// ---------------------------------------------------------- personal programs --
+
+/** Life Rhythm's browser copy of the birth details (src/scripts/astro-ui.ts STORAGE_KEY). */
+const LR_PROFILE_KEY = 'wfg_astro_active_profile';
+
+function deviceProfile(): unknown | null {
+  try {
+    const raw = localStorage.getItem(LR_PROFILE_KEY);
+    const p = raw ? JSON.parse(raw) : null;
+    return p && typeof p === 'object' && typeof p.birthDate === 'string' ? p : null;
+  } catch {
+    return null;
+  }
+}
+
+const deviceTz = () => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+};
+
+const todayLocal = () => new Date().toLocaleDateString('en-CA');
+
+async function accessToken(): Promise<string | null> {
+  const db = client();
+  if (!db) return null;
+  const { data } = await db.auth.getSession();
+  return data.session?.access_token ?? null;
+}
+
+async function personalPrograms(set: PersonalSet): Promise<PersonalResult> {
+  const token = await accessToken();
+  const day = `date=${todayLocal()}&tz=${encodeURIComponent(deviceTz())}`;
+  try {
+    if (token) {
+      const res = await fetch(`/api/sound/programs?set=${set}&${day}`, { headers: { Authorization: `Bearer ${token}` } });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok) return { status: 'ok', programs: body.programs ?? [], signedIn: true, canSave: !!body.stored || set === 'saved', source: 'account', date: body.date };
+      if (res.status !== 404 || body.error !== 'no-profile') return { status: 'unavailable', message: body.message };
+    }
+    if (set === 'saved') return token ? { status: 'ok', programs: [], signedIn: true, canSave: true, source: 'account' } : { status: 'signed-out' };
+    // No account profile (or signed out): the same programs from this browser's birth details, unsaved.
+    const profile = deviceProfile();
+    if (!profile) return { status: 'no-profile', signedIn: !!token };
+    const res = await fetch('/api/sound/programs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ set, profile, date: todayLocal(), tz: deviceTz() }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) return { status: 'unavailable', message: body.message };
+    return { status: 'ok', programs: body.programs ?? [], signedIn: !!token, canSave: false, source: 'device', date: body.date };
+  } catch (e) {
+    Logger.warn('Personal programs failed', { error: String(e) });
+    return { status: 'unavailable', message: 'You seem to be offline.' };
+  }
+}
+
+async function saveProgram(id: string, saved: boolean): Promise<boolean> {
+  const token = await accessToken();
+  if (!token) return !saved;
+  const res = await fetch(`/api/sound/program/${encodeURIComponent(id)}/save`, {
+    method: saved ? 'POST' : 'DELETE',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: saved ? '{}' : undefined,
+  });
+  return res.ok ? saved : !saved;
+}
+
 // ---------------------------------------------------------------------- wiring --
 
 function client(): SupabaseClient | null {
@@ -196,7 +267,7 @@ function client(): SupabaseClient | null {
 
 /** Plugs Wellness First into the player. Returns a cleanup function. */
 export function connectHost(): () => void {
-  configureHost({ recordListen: queueListen });
+  configureHost({ recordListen: queueListen, personalPrograms, saveProgram });
   const db = client();
   if (!db) return () => {};
 

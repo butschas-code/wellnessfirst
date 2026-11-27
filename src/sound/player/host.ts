@@ -9,6 +9,8 @@
  * state sync and the listening log in Supabase).
  */
 
+import type { Composition } from '../engine/compose/types';
+
 /** Why a stretch of listening was logged. `chunk`: periodic save during a long session. */
 export type EndedBy = 'switch' | 'stop' | 'timer' | 'leave' | 'chunk';
 
@@ -29,16 +31,53 @@ export interface Listen {
 
 export type FunnelStep = 'visit' | 'cta' | 'play' | 'signup' | 'signed_in' | 'favorite';
 
+/* ───────────── personal programs (Phase 5) ───────────── */
+
+export type PersonalSet = 'today' | 'chapter' | 'strengths' | 'challenges' | 'saved';
+
+/** One personal program as the site returns it (see src/lib/sound/server.ts ApiProgram). */
+export interface PersonalProgram {
+  /** null: computed from browser-only birth details, playable but not saveable. */
+  id: string | null;
+  kind: 'today' | 'chapter' | 'strength' | 'challenge' | 'standard';
+  slot: 'morning' | 'midday' | 'evening' | null;
+  name: string;
+  description: string;
+  descriptionPro: string;
+  intent: string;
+  recipeId: string;
+  composition: Composition;
+  reasons: Array<{ ruleId: string; layer: string; use: string; category: string; weight: number }>;
+  validFrom: string;
+  validTo: string | null;
+  contentHash: string;
+  saved: boolean;
+  savedAt?: string | null;
+}
+
+export type PersonalResult =
+  | { status: 'ok'; programs: PersonalProgram[]; signedIn: boolean; canSave: boolean; source: 'account' | 'device'; date?: string }
+  /** No birth details anywhere: invite to add them (never a gate before listening). */
+  | { status: 'no-profile'; signedIn: boolean }
+  | { status: 'signed-out' }
+  | { status: 'unavailable'; message?: string };
+
 export interface Host {
   /** One stretch of listening ended. */
   recordListen(listen: Listen): void;
   /** A product milestone (play, favourite, …) for first-party analytics. */
   track(step: FunnelStep, props?: Record<string, string>): void;
+  /** Personal programs for a set, made from the member's (or this browser's) birth details. */
+  personalPrograms(set: PersonalSet): Promise<PersonalResult>;
+  /** Save or unsave a stored program (free account). Resolves to the new saved state. */
+  saveProgram(id: string, saved: boolean): Promise<boolean>;
 }
 
 let host: Host = {
   recordListen: () => {},
   track: () => {},
+  personalPrograms: async () => ({ status: 'unavailable' }),
+  saveProgram: async () => false,
 };
 
 export function configureHost(impl: Partial<Host>): void {
@@ -53,3 +92,6 @@ export function recordListen(listen: Listen): void {
 export function trackFunnel(step: FunnelStep, props?: Record<string, string>): void {
   host.track(step, props);
 }
+
+export const personalPrograms = (set: PersonalSet) => host.personalPrograms(set);
+export const saveProgram = (id: string, saved: boolean) => host.saveProgram(id, saved);

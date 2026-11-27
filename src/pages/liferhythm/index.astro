@@ -4,6 +4,7 @@ import MarketingHero from '@/components/layout/MarketingHero.astro';
 import HomePageFooter from '@/components/home/HomePageFooter.astro';
 import { marketingPageLayout } from '@/lib/marketing-page';
 import { DISCLAIMER } from '@/lib/astro-copy';
+import { CONSENT_TEXT } from '@/lib/sound/profile';
 
 const pageTitle = 'Life Rhythm — Wellness First Global';
 const pageDescription =
@@ -121,12 +122,20 @@ const steps = [
               <p id="lr-place-hint" class="lr-hint">Choose from the list so we get the exact location and time zone.</p>
             </div>
 
+            <div id="lr-account" hidden>
+              <label class="lr-check lr-check--consent">
+                <input id="lr-save-account" type="checkbox" />
+                <span>{CONSENT_TEXT}</span>
+              </label>
+              <p id="lr-account-status" class="lr-hint" role="status"></p>
+            </div>
+
             <p id="lr-form-error" class="lr-error" role="alert" hidden></p>
 
             <button type="submit" class="btn-primary w-full !min-h-12 !text-base">Show my rhythm</button>
             <p class="flex items-center justify-center gap-2 text-center text-xs text-ink-500">
               <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.3"/></svg>
-              Worked out on your device. Nothing is stored on our servers.
+              <span id="lr-privacy-line">Worked out on your device. Nothing is stored on our servers.</span>
             </p>
           </form>
         </div>
@@ -156,6 +165,7 @@ const steps = [
               <div class="flex flex-wrap items-center gap-3">
                 <span data-lr-profiles hidden><label for="lr-profile-switch" class="sr-only">Profile</label><select id="lr-profile-switch" class="lr-head-select"></select></span>
                 <a href="#lr-intake" id="lr-edit" class="lr-head-link">Edit details</a>
+                <span id="lr-account-badge" class="lr-head-link" hidden>Saved to your account · <button type="button" id="lr-account-remove" class="underline underline-offset-2">Remove</button></span>
               </div>
             </div>
           </div>
@@ -262,6 +272,8 @@ const steps = [
   }
   .lr-check { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.8125rem; color: var(--color-charcoal); cursor: pointer; }
   .lr-check input { width: 1rem; height: 1rem; accent-color: var(--color-primary); }
+  .lr-check--consent { display: flex; align-items: flex-start; line-height: 1.45; }
+  .lr-check--consent input { flex: none; margin-top: 0.2rem; }
   .lr-textbtn {
     font-size: 0.8125rem; font-weight: 500; color: var(--color-ink-500); cursor: pointer;
     text-decoration: underline; text-decoration-color: var(--color-line-strong); text-underline-offset: 4px;

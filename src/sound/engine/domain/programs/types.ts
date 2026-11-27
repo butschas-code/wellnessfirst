@@ -80,6 +80,8 @@ export interface PlanStep {
   durationSeconds: number;
   flags: string[];
   reason?: string;
+  /** Catalog program the value comes from (set for compositions, which mix programs). */
+  sourceProgramId?: string;
 }
 
 export interface RenderPlan {

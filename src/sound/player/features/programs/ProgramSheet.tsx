@@ -13,8 +13,14 @@ import { usePlayer } from '../../sessions/playerContext';
 import { FLAGSHIP_BY_INTENT, SPACES, flagshipForNow, recipesFor } from '../../ui/catalogue';
 import type { Intent } from '../../../engine/types/index';
 import { TECHNIQUE_NOTE, type Technique, breathingFor, singlesFor } from '../../../engine/domain/wellness/techniques';
-import { chooseTechnique, programsFor, turnWellnessOff, useWellness } from '../wellness/wellness';
+import { choosePersonal, chooseTechnique, pinPersonal, pinnedPersonal, programsFor, turnWellnessOff, useWellness } from '../wellness/wellness';
 import { useSwipeDown } from '../../ui/mobile';
+import { ForYou } from '../personal/ForYou';
+import { techniqueForProgram } from '../personal/personal';
+import type { PersonalProgram } from '../../host';
+
+/** "For you" sits next to the spaces as its own category. */
+type Tab = Intent | 'you';
 
 const GROUPS = {
   journeys: { title: 'Journeys', hint: 'Move through several frequencies, one each minute' },
@@ -41,16 +47,32 @@ const ProgramSheet: React.FC<{ onClose: () => void; space?: Intent }> = ({ onClo
   const wellness = useWellness(500);
   const live = !!currentRecipe && (playStatus === 'playing' || playStatus === 'paused' || playStatus === 'loading');
   const playingSpace = live ? currentRecipe!.intent : null;
-  const [space, setSpace] = useState<Intent>(initialSpace ?? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent);
+  const personalOn = !!pinnedPersonal() && (!live || wellness.technique?.id === pinnedPersonal()?.id);
+  const [tab, setTab] = useState<Tab>(personalOn ? 'you' : initialSpace ?? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent);
+  const space: Intent = tab === 'you' ? playingSpace ?? currentRecipe?.intent ?? flagshipForNow().intent : tab;
+  const setSpace = (s: Intent) => setTab(s);
   const [journeys, setJourneys] = useState<Technique[]>([]);
 
   useEffect(() => {
+    if (tab === 'you') return;
     let alive = true;
     void programsFor(space).then((p) => alive && setJourneys(p));
     return () => {
       alive = false;
     };
-  }, [space]);
+  }, [space, tab]);
+
+  // A personal program plays under whatever soundscape is on, or starts its suggested one.
+  const playPersonal = async (p: PersonalProgram) => {
+    const t = await techniqueForProgram(p);
+    if (!t) return;
+    if (live) choosePersonal(t);
+    else {
+      pinPersonal(t);
+      await playRecipe(p.recipeId);
+    }
+    onClose();
+  };
 
   const pick = async (t: Technique) => {
     let recipe = live && playingSpace === space ? currentRecipe! : null;
@@ -95,12 +117,21 @@ const ProgramSheet: React.FC<{ onClose: () => void; space?: Intent }> = ({ onClo
         </div>
 
         <div className="space-chips" role="tablist" aria-label="Space">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'you'}
+            className={`chip chip--you${personalOn && live ? ' is-playing' : ''}`}
+            onClick={() => setTab('you')}
+          >
+            For you
+          </button>
           {SPACES.map((s) => (
             <button
               key={s.intent}
               type="button"
               role="tab"
-              aria-selected={space === s.intent}
+              aria-selected={tab === s.intent}
               className={`chip${s.intent === playingSpace ? ' is-playing' : ''}`}
               onClick={() => setSpace(s.intent)}
             >
@@ -109,11 +140,17 @@ const ProgramSheet: React.FC<{ onClose: () => void; space?: Intent }> = ({ onClo
           ))}
         </div>
 
-        {group('journeys', journeys)}
-        {group('steady', singlesFor(space))}
-        {group('breathe', breathingFor(space))}
+        {tab === 'you' ? (
+          <ForYou activeId={live ? wellness.technique?.id ?? null : pinnedPersonal()?.id ?? null} onPlay={(p) => void playPersonal(p)} />
+        ) : (
+          <>
+            {group('journeys', journeys)}
+            {group('steady', singlesFor(space))}
+            {group('breathe', breathingFor(space))}
+          </>
+        )}
 
-        {(playingSpace === space || !live) && (
+        {(tab === 'you' ? live : playingSpace === space || !live) && (
           <section className="pick-group">
             <div className="options">
               <button type="button" className="option" role="radio" aria-checked={live && !wellness.technique} onClick={off}>
