@@ -12,9 +12,14 @@ import { catalog, catalogRef, programById } from '../domain/programs/catalog';
 import { POLICY, POLICY_VERSION, planFor } from '../domain/programs/adaptationPolicy';
 import { COMPOSITION_SCHEMA, type Composition } from './types';
 import { contentHash } from './hash';
+import { isArc, planForArc, validateArc, type ArcComposition } from './arc';
+
+/** Anything stored in sound_programs.composition: a catalog composition or a personal arc. */
+export type AnyComposition = Composition | ArcComposition;
 
 /** Problems that make a composition unsafe to play (wrong schema, values not in the catalog, …). */
 export function validateComposition(c: unknown): string[] {
+  if (isArc(c)) return validateArc(c);
   const errors: string[] = [];
   const x = c as Partial<Composition> | null;
   if (!x || typeof x !== 'object') return ['Not an object.'];
@@ -39,7 +44,8 @@ export function validateComposition(c: unknown): string[] {
   return errors;
 }
 
-export function planForComposition(c: Composition, name = 'Personal program'): RenderPlan {
+export function planForComposition(c: AnyComposition, name = 'Personal program'): RenderPlan {
+  if (isArc(c)) return planForArc(c, name);
   const errors = validateComposition(c);
   if (errors.length) throw new Error(`Invalid composition: ${errors.join(' ')}`);
   const steps: PlanStep[] = [];

@@ -7,8 +7,8 @@
  * and placements, breathes with the music's smoothed level, sends a soft
  * soft wave outward on each chord change, and mirrors a running frequency
  * program's slow swells (< 1 Hz only: faster visual flicker is a photosensitivity
- * hazard, so faster program rates are never flashed). Renders at reduced
- * resolution (the image is soft by nature), ≤ 30 fps, pauses in hidden tabs,
+ * hazard, so faster program rates are never flashed). Renders at device
+ * resolution (capped for battery) so the petal lines stay crisp, ≤ 30 fps, pauses in hidden tabs,
  * and holds a still frame under prefers-reduced-motion.
  */
 
@@ -52,8 +52,12 @@ vec2 bloom(vec2 p, float k, float rot, float base, float hl, float hw){
   }
   return vec2(edge, inside);
 }
-// Glowing outline at distance d.
-vec2 line(float d, float w){ return vec2(exp(-pow(d / w, 2.)), exp(-d * 26.) * .45 + exp(-d * 7.) * .16); }
+// Outline at distance d: a crisp, pixel-antialiased core (half-width w) plus a tight glow.
+// px is one device pixel in p units, so the edge stays sharp at any resolution.
+vec2 line(float d, float w, float px){
+  float core = 1. - smoothstep(w, w + 1.6 * px, d);
+  return vec2(core, exp(-d * 90.) * .32 + exp(-d * 22.) * .08);
+}
 void main(){
   vec2 uv = gl_FragCoord.xy / r;
   vec2 p = (gl_FragCoord.xy - r * CENTER) / r.y;
@@ -64,10 +68,11 @@ void main(){
   vec2 cd = vec2(cos(a), sin(a));
 
   // Night: near-black with a faint tint of the space's light gathered behind the bloom.
+  float px = 1. / r.y;
   vec3 col = DEEP;
   col += MID * exp(-L * L / (R * R * 5.)) * DIM;
   float mist = fbm(p * 2.2 + vec2(t * .018, -t * .014));
-  col += C * .035 * smoothstep(.35, .95, mist) * exp(-L / (R * 2.6)) * DIM;
+  col += C * .018 * smoothstep(.45, .95, mist) * exp(-L / (R * 2.6)) * DIM;
 
   float beat = .5 + .5 * sin(t * PULSE * .9);
   float open = 1. + .045 * beat + .08 * SWELL;
@@ -78,16 +83,16 @@ void main(){
   vec2 b1 = bloom(p, 8., t * .017, R * .06, R * .47 * open * (1. + .035 * sin(t * .23)), R * .17);
   vec2 b2 = bloom(p, 8., PI / 8. - t * .023, R * .04, R * .36 * open * (1. + .045 * sin(t * .19 + 2.1)), R * .15);
   vec2 b3 = bloom(p, 6., t * .031, R * .02, R * .22 * open * (1. + .055 * sin(t * .29 + 4.)), R * .1);
-  vec2 l1 = line(b1.x + wob, .0045);
-  vec2 l2 = line(b2.x + wob * .8, .0042);
-  vec2 l3 = line(b3.x + wob * .6, .0038);
+  vec2 l1 = line(b1.x + wob, .0011, px);
+  vec2 l2 = line(b2.x + wob * .8, .001, px);
+  vec2 l3 = line(b3.x + wob * .6, .0009, px);
   vec3 c1 = C;
   vec3 c2 = mix(C, CREAM, .3);
   vec3 c3 = mix(C, CREAM, .6);
   float vary = .8 + .35 * fbm(cd * 2. + vec2(t * .06, 7.));
-  col += (c1 * (l1.x * .8 + l1.y * .8) + c2 * (l2.x * .75 + l2.y * .7) + c3 * (l3.x * .7 + l3.y * .55)) * bright * vary;
+  col += (c1 * (l1.x * 1.05 + l1.y * .7) + c2 * (l2.x * 1. + l2.y * .62) + c3 * (l3.x * .95 + l3.y * .5)) * bright * vary;
   // Soft petal bodies: light pools inside each ring, densest where rings overlap.
-  col += C * .05 * (smoothstep(.01, -.08, b1.y) + smoothstep(.01, -.06, b2.y) + smoothstep(.01, -.04, b3.y)) * DIM * LIGHT;
+  col += C * .022 * (smoothstep(0., -.08, b1.y) + smoothstep(0., -.06, b2.y) + smoothstep(0., -.04, b3.y)) * DIM * LIGHT;
   // A quiet seed of light at the heart.
   col += mix(C, CREAM, .5) * exp(-L * L / (R * R * .02)) * .07 * bright;
   // Keep the very centre calm so the play / pause mark stays readable.
@@ -209,10 +214,10 @@ export const TideStage: React.FC = () => {
       const shim = shimRate > 0 ? 0.12 * Math.sin(2 * Math.PI * shimRate * time) : 0;
 
       const isVideoStage = exportTime !== undefined || window.location.pathname.includes('/video') || window.location.pathname.includes('/short');
-      // Soft light needs few pixels: render small (≤ ~160k px) and let CSS scale it up during normal app use.
-      // During video/shorts production, render at full high-resolution (up to 1080p/4k).
-      let dpr = Math.min(1.5, window.devicePixelRatio || 1) * (isVideoStage ? 1.0 : 0.5);
-      const maxArea = isVideoStage ? 2073600 : 160000;
+      // The petals are fine lines, so render at the screen's own resolution (capped for battery);
+      // a low-res canvas stretched by CSS blurs them. Video/shorts production renders up to 1080p.
+      let dpr = Math.min(isVideoStage ? 1 : 2, window.devicePixelRatio || 1);
+      const maxArea = isVideoStage ? 2073600 : 1800000;
       const area = cv.clientWidth * cv.clientHeight * dpr * dpr;
       if (area > maxArea) dpr *= Math.sqrt(maxArea / area);
       const w = Math.max(2, Math.round(cv.clientWidth * dpr));

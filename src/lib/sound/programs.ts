@@ -1,32 +1,24 @@
 /**
  * Wellness Waves — personal program sets (§5.4–5.6).
  *
- * signals → composer requests → compositions → template name and description.
+ * signals → composed arcs (dayArc.ts) → template name and description.
+ * Every set is composed from the chart, value by value: Today as three day
+ * arcs, This Chapter, Your Strengths and Gentle Support as theme arcs. No set
+ * picks from the catalog any more (rulebook 2.0.0); stored catalog-based
+ * programs from rulebook 1 still validate and play.
  * Pure and deterministic: no clock, no database, no LLM. The API stores what
  * this returns; anonymous visitors get the same programs without storage.
  *
  * Names and descriptions are templates only (decided 2026-11-26). Simple view
- * never names planets; Pro view lists every catalog value and the rule ids.
+ * never names planets; Pro view lists every rate, its voices and the rule ids.
  */
 
 import type { Intent } from '../../sound/engine/types/index';
-import { compose, homeCategories, band, contentHash, type Composition, type ComposeRequest, type PhaseRole } from '../../sound/engine/compose/index';
-import { programById } from '../../sound/engine/domain/programs/catalog';
+import { contentHash, type AnyComposition, type ArcComposition, type Composition } from '../../sound/engine/compose/index';
+import { ARC_RULEBOOK_STATUS, ARC_RULEBOOK_VERSION, LIBRARY, NATURE, AREA_NATURE, arcRuleById, audibleTone, catalogEcho, composeDayArc, composeThemeArc, strengthThemes, supportThemes, type ArcFacts, type DayArc, type Theme } from './dayArc';
 import type { BirthProfile } from './profile';
 import type { SoundSignals } from './signals';
-import {
-  RULEBOOK_STATUS,
-  RULEBOOK_VERSION,
-  TEMPO_LINE,
-  SLOT_SPACE,
-  type CatalogCategory,
-  type CategoryWeights,
-  type DayTempo,
-  type Reason,
-  type Slot,
-  ranked,
-  ruleById,
-} from './rulebook';
+import { TEMPO_LINE, type CatalogCategory, type DayTempo, type Reason, type Slot } from './rulebook';
 
 export type ProgramKind = 'today' | 'chapter' | 'strength' | 'challenge';
 export type ProgramSet = 'today' | 'chapter' | 'strengths' | 'challenges';
@@ -42,14 +34,22 @@ export interface GeneratedProgram {
   descriptionPro: string;
   intent: Intent;
   recipeId: string;
-  composition: Composition;
-  reasons: Reason[];
-  versions: Composition['versions'] & { signals: string };
+  composition: AnyComposition;
+  reasons: Array<Reason | ArcReason>;
+  versions: Record<string, string> & { signals: string };
   contentHash: string;
   /** Deterministic key of this generation request; UNIQUE per user in the database. */
   genKey: string;
   profileId: string;
   profileVersion: number;
+}
+
+/** Why an arc movement looks the way it does (rulebook 2). */
+export interface ArcReason {
+  ruleId: string;
+  layer: 'arc';
+  /** Movement ids the rule shaped. */
+  movements: string[];
 }
 
 /* ───────────────────────── authored copy ───────────────────────── */
@@ -97,79 +97,8 @@ export const CATEGORY_VERB: Record<CatalogCategory, string> = {
 };
 
 const TEMPO_WORD: Record<DayTempo, string> = { push: 'Bright', steady: 'Steady', soften: 'Soft', rest: 'Quiet' };
-const SLOT_WORD: Record<Slot, string> = { morning: 'Morning', midday: 'Midday', evening: 'Evening' };
-const SPACE_WORD: Record<Intent, string> = {
-  focus: 'Focus',
-  relax: 'Unwind',
-  sleep: 'Sleep',
-  meditate: 'Stillness',
-  energy: 'Energy',
-  balance: 'Balance',
-  recover: 'Recover',
-};
 
 /* ───────────────────────── helpers ───────────────────────── */
-
-const fmtHz = (raw: string) => raw.replace(/\.0+$/, '');
-
-function count(c: Composition) {
-  return c.phases.reduce((n, p) => n + p.frequencyIndices.length, 0);
-}
-
-function stepPhrase(c: Composition): string {
-  const s = c.phases[0]?.stepSeconds ?? 60;
-  return s === 60 ? 'one each minute' : s % 60 === 0 ? `one every ${s / 60} minutes` : `one every ${s} seconds`;
-}
-
-function shapeSentence(c: Composition): string {
-  return `It moves through ${count(c)} frequencies, ${stepPhrase(c)}, as a soft pulse under any soundscape, and loops until you change it.`;
-}
-
-/** Category each phase actually drew from. */
-const phaseCategory = (c: Composition, role: PhaseRole) =>
-  c.phases.filter((p) => p.role === role).map((p) => programById(p.sourceProgramId)!.category as CatalogCategory);
-
-/** The reasons that explain this composition: rules whose category made it into a matching phase. */
-function reasonsFor(c: Composition, all: Reason[], extra: (r: Reason) => boolean = () => false): Reason[] {
-  const support = new Set(phaseCategory(c, 'support'));
-  const amplify = new Set(phaseCategory(c, 'amplify'));
-  const seen = new Set<string>();
-  return all.filter((r) => {
-    const hit = (r.use === 'support' && support.has(r.category)) || (r.use === 'amplify' && amplify.has(r.category)) || extra(r);
-    const key = `${r.ruleId}|${r.category}`;
-    if (!hit || seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-/** First rule sentences, without repeats, up to `n`. */
-function simpleLines(reasons: Reason[], n: number): string[] {
-  const out: string[] = [];
-  for (const r of reasons) {
-    const line = ruleById(r.ruleId)?.simple;
-    if (line && !out.includes(line)) out.push(line);
-    if (out.length >= n) break;
-  }
-  return out;
-}
-
-function proText(c: Composition, reasons: Reason[], tempo?: DayTempo): string {
-  const b = band(c.intent);
-  const lines = [
-    `Rulebook ${c.versions.rulebook}${RULEBOOK_STATUS === 'draft' ? ' (draft, awaiting sign-off)' : ''} · composer ${c.versions.composer} · adaptation policy ${c.versions.policy} · catalog ${c.versions.catalog} (sha256 ${c.versions.catalogSha.slice(0, 12)}…).`,
-    `Space: ${SPACE_WORD[c.intent]}, band ${b.minHz}–${b.maxHz} Hz, played as amplitude pulse (no tones, no binaural). Step ${c.phases[0]?.stepSeconds ?? 60} s; one cycle ${Math.round(c.totalSeconds / 60)} min; loops until changed.${tempo ? ` Day tempo: ${tempo}.` : ''}`,
-    ...c.phases.map((p, i) => {
-      const prog = programById(p.sourceProgramId)!;
-      const values = p.frequencyIndices.map((idx) => `${fmtHz(prog.frequencies.find((f) => f.index === idx)!.raw)} Hz [#${idx}]`);
-      return `${i + 1}. ${p.role} · ${prog.id} (${prog.category}): ${values.join(', ')}.`;
-    }),
-    reasons.length
-      ? `Rules fired: ${reasons.map((r) => `${r.ruleId} → ${r.use} ${r.category} (${r.weight})`).join('; ')}.`
-      : 'Rules fired: none beyond the space defaults.',
-  ];
-  return lines.join('\n');
-}
 
 /** A seed tied to the chart itself (not the account), so the same chart and day give the same program. */
 export function chartSeed(p: BirthProfile): string {
@@ -180,7 +109,7 @@ function finish(
   base: Omit<GeneratedProgram, 'contentHash' | 'versions' | 'recipeId' | 'intent'>,
   signals: SoundSignals
 ): GeneratedProgram {
-  const c = base.composition;
+  const c = base.composition as Composition | ArcComposition;
   return {
     ...base,
     intent: c.intent,
@@ -192,49 +121,104 @@ function finish(
 
 /* ───────────────────────── the sets ───────────────────────── */
 
-function today(signals: SoundSignals, profile: BirthProfile, slot: Slot, tempo: DayTempo): GeneratedProgram {
-  const intent = SLOT_SPACE[slot][tempo];
-  const home = homeCategories(intent);
-  const support = ranked(signals.support);
-  const amplify = ranked(signals.amplify);
-  const phases: ComposeRequest['phases'] = [
-    { role: 'arrive', categories: home },
-    { role: 'support', categories: [...support, ...home] },
-    ...(slot === 'evening' ? [] : [{ role: 'amplify' as const, categories: [...amplify, ...home] }]),
-    { role: 'integrate', categories: home },
+/* ───────────────────────── today: personal day arcs ───────────────────────── */
+
+const SLOT_TITLE: Record<Slot, string> = { morning: 'Morning Rise', midday: 'Midday Current', evening: 'Evening Descent' };
+
+/** Plain words for each movement (Simple view). */
+const MOVE_WORD: Record<string, string> = {
+  'morning.ground': 'grounds',
+  'morning.wake': 'wakes slowly',
+  'morning.rise': 'rises to your home tone',
+  'morning.lift': 'lifts',
+  'morning.spark': 'sparks',
+  'morning.settle': 'settles',
+  'midday.reset': 'resets',
+  'midday.focus': 'focuses',
+  'midday.drive': 'drives',
+  'midday.pause': 'pauses',
+  'midday.renew': 'renews',
+  'midday.return': 'returns',
+  'evening.unwind': 'unwinds',
+  'evening.ground': 'grounds',
+  'evening.release': 'releases',
+  'evening.drift': 'drifts',
+  'evening.deep': 'goes deep',
+  'theme.arrive': 'arrives at your home tone',
+  'theme.approach': 'moves in',
+  'theme.hold': 'stays with it',
+  'theme.deepen': 'deepens',
+  'theme.integrate': 'comes back to centre',
+};
+
+const hzText = (v: number) => (v < 1 ? v.toFixed(2) : v < 10 ? v.toFixed(2).replace(/0$/, '') : v.toFixed(1).replace(/\.0$/, ''));
+const minutes = (s: number) => Math.round(s / 60);
+
+function arcShapeSentence(c: ArcComposition): string {
+  const ms = c.movements;
+  const words = ms.map((m) => MOVE_WORD[m.id] ?? m.id.split('.')[1]);
+  const lo = Math.min(...ms.flatMap((m) => [m.fromHz, m.toHz]));
+  const hi = Math.max(...ms.flatMap((m) => [m.fromHz, m.toHz]));
+  const last = ms[ms.length - 1];
+  return `Over ${minutes(c.totalSeconds)} minutes it ${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}, between ${hzText(lo)} and ${hzText(hi)} Hz, then holds ${hzText(last.toHz)} Hz until you change it.`;
+}
+
+function arcProText(arc: DayArc, f: ArcFacts, tempo: DayTempo, daily = true): string {
+  const c = arc.composition;
+  const voice = (v: { source: string; weight: number }) => (v.source in LIBRARY_LABELS ? v.source : `${v.source} ${v.weight}`);
+  const lines = [
+    `Day arc · rulebook ${c.versions.rulebook}${ARC_RULEBOOK_STATUS === 'draft' ? ' (draft, awaiting sign-off)' : ''} · composer ${c.versions.composer} · library ${c.versions.library}. Built value by value from the chart; no catalog program is reused.`,
+    daily
+      ? `Constitution lean: ${arc.lean} (vata ${arc.shares.vata}, pitta ${arc.shares.pitta}, kapha ${arc.shares.kapha}). Home tone ${hzText(arc.home)} Hz. Hour ruler at ${c.slot === 'morning' ? '08:00' : c.slot === 'midday' ? '13:00' : '21:00'}: ${arc.hora}. Weekday lord ${f.today.vara}; Moon in ${f.today.moonNakshatra} (${f.today.moonLord}), ${f.today.waxing ? 'waxing' : 'waning'}. Periods ${f.dasha.maha}/${f.dasha.antar}${f.dasha.pratyantar ? `/${f.dasha.pratyantar}` : ''}. Day tempo: ${tempo}.`
+      : `Theme: ${c.theme}. Home tone ${hzText(arc.home)} Hz. Periods ${f.dasha.maha}/${f.dasha.antar} until ${f.chapterUntil}. Natal only: does not change from day to day${c.theme?.startsWith('chapter') ? ' within this sub-period' : ''}.`,
+    ...c.movements.map((m, i) => {
+      const rate = m.fromHz === m.toHz ? `${hzText(m.fromHz)} Hz` : `${hzText(m.fromHz)} → ${hzText(m.toHz)} Hz`;
+      const extras = [
+        m.shape === 'firm' ? 'firm pulse' : 'round pulse',
+        `drift ±${Math.round(m.jitter.pct * 1000) / 10}% every ${m.jitter.every} s`,
+        ...(m.burst ? [`${m.burst.hz} Hz bursts ${m.burst.on} s every ${m.burst.every} s`] : []),
+        ...(m.breath ? [`breathing swell ${Math.round(m.breath.hz * 600) / 10}/min`] : []),
+      ];
+      const echo = catalogEcho(m.toHz);
+      return `${i + 1}. ${m.id.split('.')[1]} · ${rate} · ${minutes(m.seconds)} min · ${extras.join(', ')} · voices: ${m.voices.map(voice).join(', ')}${echo ? ` · ≈ ${echo.raw} Hz in ${echo.name} (${echo.id})` : ''}.`;
+    }),
+    `Planet tones (orbit raised by octaves): ${(['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu'] as const).map((p) => `${p} ${audibleTone(p).toFixed(2)}`).join(', ')} Hz.`,
+    `Rules: ${arc.rules.join(', ')}.`,
   ];
-  const composition = compose({
-    intent,
-    phases,
-    seed: `${chartSeed(profile)}|today|${signals.date}|${slot}`,
-    rulebookVersion: RULEBOOK_VERSION,
-  });
-  const reasons = reasonsFor(composition, signals.reasons, (r) => r.layer === 'day');
-  // Evenings wind down: the name follows the space, not the busiest phase.
-  const lead =
-    slot === 'evening'
-      ? (home[0] as CatalogCategory)
-      : (phaseCategory(composition, 'amplify')[0] ?? phaseCategory(composition, 'support')[0] ?? (home[0] as CatalogCategory));
-  const name = `${TEMPO_WORD[tempo]} ${SLOT_WORD[slot]}: settle, then ${CATEGORY_VERB[lead]}`;
-  // The day line describes the whole day; the chart line explains the phase the name is about.
-  const chartReasons = reasons.filter((r) => r.layer !== 'day');
-  const ordered =
-    slot === 'evening'
-      ? chartReasons.filter((r) => home.includes(r.category))
-      : [...chartReasons.filter((r) => r.category === lead), ...chartReasons.filter((r) => r.category !== lead)];
-  const description = [TEMPO_LINE[signals.dayTempo], ...simpleLines(ordered, 1), shapeSentence(composition)].join(' ');
+  return lines.join('\n');
+}
+
+const LIBRARY_LABELS: Record<string, true> = Object.fromEntries(Object.values(LIBRARY).map((l) => [l.label, true]));
+
+function today(signals: SoundSignals, profile: BirthProfile, slot: Slot, tempo: DayTempo): GeneratedProgram {
+  const f = signals.arc;
+  if (!f) throw new Error('Day arcs need the full chart facts (computeSignals).');
+  const arc = composeDayArc(f, slot, tempo, `${chartSeed(profile)}|arc|${signals.date}|${slot}`);
+  const composition = arc.composition;
+  const reasons: ArcReason[] = arc.rules.map((ruleId) => ({
+    ruleId,
+    layer: 'arc',
+    movements: composition.movements.filter((m) => m.rules.includes(ruleId)).map((m) => m.id),
+  }));
+  // Lean lines only where the lean changes this slot (earthy: mornings; fiery: midday; airy: all).
+  const leanHere = (id: string) => !(id === 'lean.kapha' && slot !== 'morning') && !(id === 'lean.pitta' && slot !== 'midday');
+  const chartLine = [...arc.rules.filter((id) => !id.startsWith('lean.')), ...arc.rules.filter((id) => id.startsWith('lean.'))]
+    .filter((id) => !id.startsWith('tempo.') && leanHere(id))
+    .map((id) => arcRuleById(id)?.simple)
+    .find((t): t is string => !!t);
+  const description = [TEMPO_LINE[tempo], ...(chartLine ? [chartLine] : []), arcShapeSentence(composition)].join(' ');
   return finish(
     {
       kind: 'today',
       slot,
       validFrom: signals.date,
       validTo: signals.date,
-      name,
+      name: `${TEMPO_WORD[tempo]} ${SLOT_TITLE[slot]}`,
       description,
-      descriptionPro: proText(composition, reasons, tempo),
+      descriptionPro: arcProText(arc, f, tempo),
       composition,
       reasons,
-      genKey: `${profile.id}:${profile.version}:today:${slot}:${signals.date}:${RULEBOOK_VERSION}`,
+      genKey: `${profile.id}:${profile.version}:today:${slot}:${signals.date}:arc-${ARC_RULEBOOK_VERSION}`,
       profileId: profile.id,
       profileVersion: profile.version,
     },
@@ -242,91 +226,43 @@ function today(signals: SoundSignals, profile: BirthProfile, slot: Slot, tempo: 
   );
 }
 
-function natal(signals: SoundSignals, profile: BirthProfile, kind: 'strength' | 'challenge', rank: number): GeneratedProgram | null {
-  const use = kind === 'strength' ? 'amplify' : 'support';
-  const weights: CategoryWeights = signals.natal[use];
-  const other: CategoryWeights = signals.natal[use === 'amplify' ? 'support' : 'amplify'];
-  // A category is either a strength or a challenge, never both: the higher weight wins, ties go to support.
-  const cats = ranked(weights).filter((c) => (use === 'support' ? weights[c] >= other[c] : weights[c] > other[c]));
-  const category = cats[rank];
-  if (!category) return null;
-  const intent = CATEGORY_SPACE[category];
-  const home = homeCategories(intent);
-  const composition = compose({
-    intent,
-    phases: [
-      { role: 'arrive', categories: home },
-      { role: use, categories: [category] },
-      { role: use, categories: [category, ...cats.filter((c) => c !== category)] },
-      { role: 'integrate', categories: home },
-    ],
-    seed: `${chartSeed(profile)}|${kind}|${rank}`,
-    rulebookVersion: RULEBOOK_VERSION,
-  });
-  const reasons = reasonsFor(
-    composition,
-    signals.reasons.filter((r) => r.layer === 'natal')
-  );
-  const title = CATEGORY_TITLE[category];
-  const name = kind === 'strength' ? `Your Strength: ${title}` : `Gentle Support: ${title}`;
-  const description = [...simpleLines(reasons.filter((r) => r.category === category), 1), shapeSentence(composition)].join(' ');
+/* ───────────────────────── chapter, strengths, support: theme arcs ───────────────────────── */
+
+const until = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+function themeProgram(signals: SoundSignals, profile: BirthProfile, kind: 'chapter' | 'strength' | 'challenge', theme: Theme, rank: number): GeneratedProgram {
+  const f = signals.arc;
+  if (!f) throw new Error('Theme arcs need the full chart facts (computeSignals).');
+  const seedKey = kind === 'chapter' ? `chapter|${f.dasha.maha}-${f.dasha.antar}-${f.chapterUntil}` : `${kind}|${rank}`;
+  const arc = composeThemeArc(f, theme, `${chartSeed(profile)}|arc|${seedKey}`);
+  const composition = arc.composition;
+  const reasons: ArcReason[] = arc.rules.map((ruleId) => ({
+    ruleId,
+    layer: 'arc',
+    movements: composition.movements.filter((m) => m.rules.includes(ruleId)).map((m) => m.id),
+  }));
+  const chapterLine = kind === 'chapter' ? arc.rules.map((id) => arcRuleById(id)?.simple).find((t): t is string => !!t) : undefined;
+  const description = [
+    chapterLine ?? arc.line,
+    ...(kind === 'chapter' ? [`Made for the stretch of time you are in now, until ${until(f.chapterUntil)}.`] : []),
+    arcShapeSentence(composition),
+  ].join(' ');
+  const prefix = kind === 'chapter' ? 'This Chapter' : kind === 'strength' ? 'Your Strength' : 'Gentle Support';
   return finish(
     {
       kind,
       slot: null,
       validFrom: signals.date,
-      validTo: null,
-      name,
+      validTo: kind === 'chapter' ? f.chapterUntil : null,
+      name: `${prefix}: ${arc.title}`,
       description,
-      descriptionPro: proText(composition, reasons),
+      descriptionPro: arcProText(arc, f, signals.dayTempo, false),
       composition,
       reasons,
-      genKey: `${profile.id}:${profile.version}:${kind}:${rank}:${RULEBOOK_VERSION}`,
-      profileId: profile.id,
-      profileVersion: profile.version,
-    },
-    signals
-  );
-}
-
-function chapter(signals: SoundSignals, profile: BirthProfile): GeneratedProgram {
-  const support = ranked(signals.chapter.support);
-  const amplify = ranked(signals.chapter.amplify);
-  const lead = support[0] ?? amplify[0] ?? 'Daily Balance & Preventive Care';
-  const intent = CATEGORY_SPACE[lead];
-  const home = homeCategories(intent);
-  const composition = compose({
-    intent,
-    phases: [
-      { role: 'arrive', categories: home },
-      ...(support.length ? [{ role: 'support' as const, categories: support }] : []),
-      ...(amplify.length ? [{ role: 'amplify' as const, categories: amplify }] : []),
-      { role: 'integrate', categories: home },
-    ],
-    seed: `${chartSeed(profile)}|chapter|${signals.chapter.lord}-${signals.chapter.subLord}-${signals.chapter.until}`,
-    rulebookVersion: RULEBOOK_VERSION,
-  });
-  const reasons = reasonsFor(
-    composition,
-    signals.reasons.filter((r) => r.layer === 'chapter')
-  );
-  const description = [
-    ...simpleLines(reasons, 1),
-    `Made for the stretch of time you are in now, until ${new Date(`${signals.chapter.until}T12:00:00Z`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })}.`,
-    shapeSentence(composition),
-  ].join(' ');
-  return finish(
-    {
-      kind: 'chapter',
-      slot: null,
-      validFrom: signals.date,
-      validTo: signals.chapter.until,
-      name: `This Chapter: ${CATEGORY_TITLE[lead]}`,
-      description,
-      descriptionPro: proText(composition, reasons),
-      composition,
-      reasons,
-      genKey: `${profile.id}:${profile.version}:chapter:${signals.chapter.lord}-${signals.chapter.subLord}-${signals.chapter.until}:${RULEBOOK_VERSION}`,
+      genKey:
+        kind === 'chapter'
+          ? `${profile.id}:${profile.version}:chapter:${f.dasha.maha}-${f.dasha.antar}-${f.chapterUntil}:arc-${ARC_RULEBOOK_VERSION}`
+          : `${profile.id}:${profile.version}:${kind}:${rank}:arc-${ARC_RULEBOOK_VERSION}`,
       profileId: profile.id,
       profileVersion: profile.version,
     },
@@ -342,11 +278,11 @@ export function buildProgramSet(set: ProgramSet, signals: SoundSignals, profile:
     case 'today':
       return signals.windows.map((w) => today(signals, profile, w.slot, w.tempo));
     case 'chapter':
-      return [chapter(signals, profile)];
+      return [themeProgram(signals, profile, 'chapter', { kind: 'chapter' }, 0)];
     case 'strengths':
-      return Array.from({ length: NATAL_COUNT }, (_, i) => natal(signals, profile, 'strength', i)).filter((p): p is GeneratedProgram => !!p);
+      return strengthThemes(signals.arc!, NATAL_COUNT).map((t, i) => themeProgram(signals, profile, 'strength', t, i));
     case 'challenges':
-      return Array.from({ length: NATAL_COUNT }, (_, i) => natal(signals, profile, 'challenge', i)).filter((p): p is GeneratedProgram => !!p);
+      return supportThemes(signals.arc!, NATAL_COUNT).map((t, i) => themeProgram(signals, profile, 'challenge', t, i));
   }
 }
 
@@ -363,4 +299,8 @@ export const TEMPLATE_COPY = [
   'It moves through frequencies, as a soft pulse under any soundscape, and loops until you change it.',
   'Made for the stretch of time you are in now.',
   'Your Strength', 'Gentle Support', 'This Chapter', 'settle, then',
+  ...Object.values(SLOT_TITLE),
+  ...Object.values(NATURE).flatMap((n) => [n.strong.title, n.strong.line, n.support.title, n.support.line]),
+  ...Object.values(AREA_NATURE).flatMap((a) => [a.title, a.line]),
+  ...Object.values(MOVE_WORD),
 ];

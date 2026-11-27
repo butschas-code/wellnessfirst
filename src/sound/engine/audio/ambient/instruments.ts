@@ -90,8 +90,15 @@ export class Smoother {
   }
 
   valueAt(t: number): number {
-    let seg = this.segs[0];
-    for (const s of this.segs) if (s.t0 <= t) seg = s;
+    // Segments are kept in start order: binary search for the last one starting at or before t.
+    let lo = 0;
+    let hi = this.segs.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (this.segs[mid].t0 <= t) lo = mid;
+      else hi = mid - 1;
+    }
+    const seg = this.segs[lo];
     if (t >= seg.t1) return seg.v1;
     if (t <= seg.t0) return seg.v0;
     return seg.v0 + ((seg.v1 - seg.v0) * (t - seg.t0)) / (seg.t1 - seg.t0);
@@ -105,7 +112,9 @@ export class Smoother {
   set(value: number, at: number, seconds: number): void {
     const v = this.valueAt(at);
     this.segs = this.segs.filter((s) => s.t0 < at);
-    if (this.segs.length > 8) this.segs = this.segs.slice(-8);
+    // Long schedules (a whole arc movement of drift and bursts) are planned ahead, so keep
+    // enough history for valueAt(now) to stay right; trim only far beyond that.
+    if (this.segs.length > 4096) this.segs = this.segs.slice(-2048);
     this.param.cancelScheduledValues(at);
     this.param.linearRampToValueAtTime(v, at);
     this.param.linearRampToValueAtTime(value, at + Math.max(0.01, seconds));

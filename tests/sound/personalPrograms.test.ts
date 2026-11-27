@@ -9,10 +9,11 @@ import { computeSignals, localNoon, signalsFromFacts } from '../../src/lib/sound
 import { buildProgramSet, PROGRAM_SETS, TEMPLATE_COPY, CATEGORY_SPACE, slotForHour, type GeneratedProgram } from '../../src/lib/sound/programs';
 import { RULES, RULEBOOK_VERSION, applyRules, dayTempo, slotTempo, type ChartFacts, type Level, type Planet } from '../../src/lib/sound/rulebook';
 import { browserToBirthProfile, type BrowserProfile } from '../../src/lib/sound/profile';
-import { band, planForComposition, validateComposition, SUGGESTED_RECIPE, stableStringify, type Composition } from '../../src/sound/engine/compose/index';
+import { band, compose, homeCategories, planForComposition, validateComposition, SUGGESTED_RECIPE, stableStringify, type Composition } from '../../src/sound/engine/compose/index';
 import { programById } from '../../src/sound/engine/domain/programs/catalog';
 import { FLAGSHIP_BY_INTENT } from '../../src/sound/player/ui/catalogue';
 import { techniqueForProgram } from '../../src/sound/player/features/personal/personal';
+import { ARC_RULES } from '../../src/lib/sound/dayArc';
 
 const ALEX: BrowserProfile = {
   name: 'Alex',
@@ -100,45 +101,37 @@ describe('Determinism (golden files)', () => {
   });
 });
 
-describe('Every value traces to the catalog', () => {
-  const dates = Array.from({ length: 21 }, (_, i) => new Date(Date.UTC(2026, 10, 1) + i * 9 * 86_400_000).toISOString().slice(0, 10));
-  const programs = [ALEX, JORDAN, NO_TIME].flatMap((p) => dates.flatMap((d) => allPrograms(p, d, p.ianaTimezone!)));
+describe('Stored rulebook-1 programs (catalog compositions) still play exactly', () => {
+  // Nothing new is composed this way since rulebook 2, but saved programs are immutable and must keep playing.
+  const intents = ['focus', 'relax', 'sleep', 'meditate', 'energy', 'balance', 'recover'] as const;
+  const programs = intents.flatMap((intent) =>
+    ['a', 'b', 'c'].map((seed) =>
+      compose({
+        intent,
+        phases: [
+          { role: 'arrive', categories: homeCategories(intent) },
+          { role: 'support', categories: ['Emotional Balance', ...homeCategories(intent)] },
+          { role: 'integrate', categories: homeCategories(intent) },
+        ],
+        seed,
+        rulebookVersion: '1.0.0',
+      })
+    )
+  );
 
-  it('generates a good spread of programs', () => {
-    expect(programs.length).toBeGreaterThan(300);
-    expect(new Set(programs.map((p) => p.intent)).size).toBeGreaterThanOrEqual(4);
-  });
-
-  it('every rendered Hz is the catalog value at its (program, index)', () => {
-    for (const g of programs) {
-      const plan = planForComposition(g.composition, g.name);
+  it('every rendered Hz is the catalog value at its (program, index), inside the space band', () => {
+    for (const c of programs) {
+      expect(validateComposition(c)).toEqual([]);
+      const plan = planForComposition(c);
       expect(plan.renderable).toBe(true);
-      expect(plan.sequence.length).toBe(g.composition.phases.reduce((n, p) => n + p.frequencyIndices.length, 0));
+      const { minHz, maxHz } = band(c.intent);
       for (const s of plan.sequence) {
-        const prog = programById(s.sourceProgramId!);
-        expect(prog, `${g.name}: ${s.sourceProgramId}`).toBeTruthy();
-        const row = prog!.frequencies.find((f) => f.index === s.sourceIndex);
-        expect(row, `${s.sourceProgramId}#${s.sourceIndex}`).toBeTruthy();
-        expect(s.renderedHz).toBe(row!.hz);
-        expect(s.sourceHz).toBe(row!.hz);
-        expect(s.sourceRaw).toBe(row!.raw);
-      }
-    }
-  });
-
-  it('every value is inside its space band, pulses only, policy-bounded steps', () => {
-    for (const g of programs) {
-      const { minHz, maxHz } = band(g.intent);
-      const plan = planForComposition(g.composition);
-      for (const s of plan.sequence) {
+        const row = programById(s.sourceProgramId!)!.frequencies.find((f) => f.index === s.sourceIndex)!;
+        expect(s.renderedHz).toBe(row.hz);
         expect(s.renderedHz).toBeGreaterThanOrEqual(minHz);
         expect(s.renderedHz).toBeLessThanOrEqual(maxHz);
-        expect(['swell', 'am']).toContain(s.method);
-        expect(s.durationSeconds).toBeGreaterThanOrEqual(20);
-        expect(s.durationSeconds).toBeLessThanOrEqual(300);
       }
-      expect(validateComposition(g.composition)).toEqual([]);
-      expect(g.composition.totalSeconds).toBe(plan.passSeconds);
+      expect(c.totalSeconds).toBe(plan.passSeconds);
     }
   });
 
@@ -147,19 +140,18 @@ describe('Every value traces to the catalog', () => {
     expect(band('focus')).toEqual({ minHz: 4, maxHz: 40 });
   });
 
-  it('the player plays exactly the plan, looping, and refuses a tampered program', async () => {
-    const g = programs[5];
-    const asApi = { ...g, id: null, saved: false, slot: g.slot };
+  it('the player plays exactly the plan and refuses a tampered program', async () => {
+    const c = programs[5];
+    const asApi = { id: null, saved: false, slot: null, kind: 'chapter' as const, name: 'Old', description: '', descriptionPro: '', intent: c.intent, recipeId: c.recipeId, composition: c, reasons: [], validFrom: '2026-01-01', validTo: null, contentHash: 'abc' };
     const t = await techniqueForProgram(asApi);
-    const plan = planForComposition(g.composition);
+    const plan = planForComposition(c);
     expect(t!.pulse!.sequence!.map((s) => [s.hz, s.seconds])).toEqual(plan.sequence.map((s) => [s.renderedHz, s.durationSeconds]));
-    expect(t!.id).toBe(`ww:${g.contentHash}`);
-    const bad = { ...asApi, composition: { ...g.composition, phases: [{ ...g.composition.phases[0], frequencyIndices: [999] }] } };
+    const bad = { ...asApi, composition: { ...c, phases: [{ ...c.phases[0], frequencyIndices: [999] }] } };
     expect(await techniqueForProgram(bad)).toBeNull();
   });
 
   it('a tampered composition is refused', () => {
-    const c = programs[0].composition;
+    const c = programs[0];
     const fake = (patch: Partial<Composition['phases'][number]>): Composition => ({ ...c, phases: [{ ...c.phases[0], ...patch }] });
     expect(validateComposition(fake({ frequencyIndices: [999] }))).not.toEqual([]);
     expect(validateComposition(fake({ sourceProgramId: 'xxxx_000' }))).not.toEqual([]);
@@ -243,7 +235,7 @@ describe('Copy', () => {
   const PLANET_NAMES = /\b(Sun|Moon|Mars|Mercury|Jupiter|Venus|Saturn|Rahu|Ketu)\b/;
 
   it('rule and template copy passes the claims lint', () => {
-    for (const text of [...RULES.map((r) => r.simple), ...TEMPLATE_COPY]) {
+    for (const text of [...RULES.map((r) => r.simple), ...ARC_RULES.flatMap((r) => (r.simple ? [r.simple] : [])), ...TEMPLATE_COPY]) {
       for (const re of BANNED) expect(text, text).not.toMatch(re);
       expect(text, text).not.toMatch(PLANET_NAMES);
     }
@@ -257,7 +249,8 @@ describe('Copy', () => {
         expect(text, text).not.toMatch(PLANET_NAMES);
       }
       expect(g.description.split(/(?<=\.)\s/).length).toBeLessThanOrEqual(4);
-      expect(g.descriptionPro).toContain(g.composition.phases[0].sourceProgramId);
+      const c = g.composition;
+      expect(g.descriptionPro).toContain('phases' in c ? c.phases[0].sourceProgramId : c.movements[0].id.split('.')[1]);
     }
   });
 

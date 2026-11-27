@@ -2,536 +2,1794 @@
   {
     "kind": "today",
     "slot": "morning",
-    "name": "Steady Morning: settle, then unwind",
-    "description": "Today is an even, steady day. This builds on the part of you that your chart shows as most at ease. It moves through 14 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Steady Morning Rise",
+    "description": "Today is an even, steady day. Your mornings get a brighter, firmer lift. Over 15 minutes it wakes slowly, rises to your home tone, lifts and settles, between 7.41 and 14.3 Hz, then holds 11.8 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
     "validTo": "2026-11-27",
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": "morning",
       "intent": "focus",
       "recipeId": "quiet-momentum",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "focu_039",
-          "frequencyIndices": [
-            0,
-            1,
-            2,
-            3
+          "id": "morning.wake",
+          "fromHz": 7.41,
+          "toHz": 7.41,
+          "seconds": 150,
+          "depth": 0.27,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.35
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.8
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.37
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.hora"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "ener_035",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "morning.rise",
+          "fromHz": 7.41,
+          "toHz": 11.07,
+          "seconds": 240,
+          "depth": 0.27,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.06,
+            "every": 3
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.home"
+          ]
         },
         {
-          "role": "amplify",
-          "sourceProgramId": "rela_008",
-          "frequencyIndices": [
-            5,
-            6,
-            7,
-            8
+          "id": "morning.lift",
+          "fromHz": 11.07,
+          "toHz": 14.34,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "firm",
+          "jitter": {
+            "pct": 0.08,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 2.52
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.32
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.day",
+            "base.period"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "focu_042",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "morning.settle",
+          "fromHz": 14.34,
+          "toHz": 11.76,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.06,
+            "every": 3
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "strong.top"
+          ]
         }
       ],
-      "totalSeconds": 840,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|2026-11-27|morning",
+      "totalSeconds": 870,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.vitality-low",
-        "layer": "natal",
-        "use": "support",
-        "category": "Energy & Vitality",
-        "weight": 1
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "morning.rise"
+        ]
       },
       {
-        "ruleId": "natal.strongest-planet",
-        "layer": "natal",
-        "use": "amplify",
-        "category": "Relaxation & Stress Balance",
-        "weight": 0.4
+        "ruleId": "base.hora",
+        "layer": "arc",
+        "movements": [
+          "morning.wake"
+        ]
+      },
+      {
+        "ruleId": "base.period",
+        "layer": "arc",
+        "movements": [
+          "morning.lift"
+        ]
+      },
+      {
+        "ruleId": "base.day",
+        "layer": "arc",
+        "movements": [
+          "morning.lift"
+        ]
+      },
+      {
+        "ruleId": "lean.kapha",
+        "layer": "arc",
+        "movements": []
+      },
+      {
+        "ruleId": "low.mars",
+        "layer": "arc",
+        "movements": []
+      },
+      {
+        "ruleId": "strong.top",
+        "layer": "arc",
+        "movements": [
+          "morning.settle"
+        ]
+      },
+      {
+        "ruleId": "tempo.steady",
+        "layer": "arc",
+        "movements": []
       }
     ],
-    "contentHash": "3ae9d39f9337f5471e3f86bc66643935",
-    "genKey": "fixture-sam:1:today:morning:2026-11-27:1.0.0"
+    "contentHash": "91c1853b11d31d41fd94f75f0382fb1b",
+    "genKey": "fixture-sam:1:today:morning:2026-11-27:arc-2.0.0"
   },
   {
     "kind": "today",
     "slot": "midday",
-    "name": "Steady Midday: settle, then unwind",
-    "description": "Today is an even, steady day. This builds on the part of you that your chart shows as most at ease. It moves through 14 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Steady Midday Current",
+    "description": "Today is an even, steady day. Short, bright bursts are woven into the focus part. Over 21 minutes it resets, focuses, drives, pauses and returns, between 9.15 and 18.8 Hz, then holds 13.6 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
     "validTo": "2026-11-27",
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": "midday",
       "intent": "focus",
       "recipeId": "quiet-momentum",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "focu_046",
-          "frequencyIndices": [
-            0,
-            1,
-            2
+          "id": "midday.reset",
+          "fromHz": 11.87,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 1.8
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.5
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.hora",
+            "base.home"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "ener_028",
-          "frequencyIndices": [
-            0,
-            1,
-            2
+          "id": "midday.focus",
+          "fromHz": 11.07,
+          "toHz": 14.6,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.08,
+            "every": 2.5
+          },
+          "burst": {
+            "hz": 40,
+            "on": 2,
+            "every": 15
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 1.64
+            },
+            {
+              "source": "Venus",
+              "weight": 0.9
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.56
+            },
+            {
+              "source": "Gamma bursts",
+              "weight": 1
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.period",
+            "need.focus"
+          ]
         },
         {
-          "role": "amplify",
-          "sourceProgramId": "rela_013",
-          "frequencyIndices": [
-            6,
-            7,
-            8,
-            9
+          "id": "midday.drive",
+          "fromHz": 14.6,
+          "toHz": 18.79,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "firm",
+          "jitter": {
+            "pct": 0.1,
+            "every": 2
+          },
+          "voices": [
+            {
+              "source": "Sun",
+              "weight": 1.17
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.46
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.period"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "focu_043",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "midday.pause",
+          "fromHz": 9.15,
+          "toHz": 9.15,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.14
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 1.8
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.6
+            },
+            {
+              "source": "Mars",
+              "weight": 0.48
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "quiet.top"
+          ]
+        },
+        {
+          "id": "midday.return",
+          "fromHz": 9.15,
+          "toHz": 13.58,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.07,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 1.26
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.5
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.37
+            }
+          ],
+          "rules": [
+            "base.day"
+          ]
         }
       ],
-      "totalSeconds": 840,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|2026-11-27|midday",
+      "totalSeconds": 1260,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.vitality-low",
-        "layer": "natal",
-        "use": "support",
-        "category": "Energy & Vitality",
-        "weight": 1
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "midday.reset"
+        ]
       },
       {
-        "ruleId": "natal.strongest-planet",
-        "layer": "natal",
-        "use": "amplify",
-        "category": "Relaxation & Stress Balance",
-        "weight": 0.4
+        "ruleId": "base.hora",
+        "layer": "arc",
+        "movements": [
+          "midday.reset"
+        ]
+      },
+      {
+        "ruleId": "base.period",
+        "layer": "arc",
+        "movements": [
+          "midday.focus",
+          "midday.drive"
+        ]
+      },
+      {
+        "ruleId": "base.day",
+        "layer": "arc",
+        "movements": [
+          "midday.return"
+        ]
+      },
+      {
+        "ruleId": "lean.kapha",
+        "layer": "arc",
+        "movements": []
+      },
+      {
+        "ruleId": "need.focus",
+        "layer": "arc",
+        "movements": [
+          "midday.focus"
+        ]
+      },
+      {
+        "ruleId": "quiet.top",
+        "layer": "arc",
+        "movements": [
+          "midday.pause"
+        ]
+      },
+      {
+        "ruleId": "tempo.steady",
+        "layer": "arc",
+        "movements": []
       }
     ],
-    "contentHash": "555d4cda24a260ef867508ae2e0cbb0d",
-    "genKey": "fixture-sam:1:today:midday:2026-11-27:1.0.0"
+    "contentHash": "d0b22033ad7f33027c8ad028d4bd5704",
+    "genKey": "fixture-sam:1:today:midday:2026-11-27:arc-2.0.0"
   },
   {
     "kind": "today",
     "slot": "evening",
-    "name": "Soft Evening: settle, then turn inward",
-    "description": "Today is an even, steady day. It moves through 10 frequencies, one every 90 seconds, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Soft Evening Descent",
+    "description": "Today asks for a gentler pace. Over 27 minutes it unwinds, grounds, releases, drifts and goes deep, between 1.15 and 11.1 Hz, then holds 1.15 Hz until you change it.",
     "intent": "meditate",
     "recipeId": "open-space",
     "validFrom": "2026-11-27",
     "validTo": "2026-11-27",
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": "evening",
       "intent": "meditate",
       "recipeId": "open-space",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "mind_092",
-          "frequencyIndices": [
-            0,
-            1,
-            2,
-            3
+          "id": "evening.unwind",
+          "fromHz": 11.07,
+          "toHz": 9.08,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Venus",
+              "weight": 1.8
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.64
+            }
           ],
-          "stepSeconds": 90
+          "rules": [
+            "base.home",
+            "base.hora"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "focu_047",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "evening.ground",
+          "fromHz": 9.08,
+          "toHz": 7.76,
+          "seconds": 280,
+          "depth": 0.27,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 4
+          },
+          "breath": {
+            "hz": 0.09,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 1.38
+            },
+            {
+              "source": "Venus",
+              "weight": 1.08
+            }
           ],
-          "stepSeconds": 90
+          "rules": []
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "mind_093",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "evening.release",
+          "fromHz": 7.76,
+          "toHz": 5.96,
+          "seconds": 350,
+          "depth": 0.27,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 4
+          },
+          "breath": {
+            "hz": 0.083,
+            "depth": 0.14
+          },
+          "voices": [
+            {
+              "source": "Ketu",
+              "weight": 1.12
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.46
+            },
+            {
+              "source": "Rahu",
+              "weight": 0.42
+            }
           ],
-          "stepSeconds": 90
+          "rules": [
+            "base.period"
+          ]
+        },
+        {
+          "id": "evening.drift",
+          "fromHz": 5.96,
+          "toHz": 1.53,
+          "seconds": 410,
+          "depth": 0.3,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 5
+          },
+          "breath": {
+            "hz": 0.083,
+            "depth": 0.15
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 1.38
+            },
+            {
+              "source": "Jupiter",
+              "weight": 1.02
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.8
+            }
+          ],
+          "rules": [
+            "base.day"
+          ]
+        },
+        {
+          "id": "evening.deep",
+          "fromHz": 1.53,
+          "toHz": 1.15,
+          "seconds": 350,
+          "depth": 0.3,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.04,
+            "every": 6
+          },
+          "breath": {
+            "hz": 0.075,
+            "depth": 0.15
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 1.38
+            },
+            {
+              "source": "Ketu",
+              "weight": 0.7
+            },
+            {
+              "source": "Moon today",
+              "weight": 0.6
+            },
+            {
+              "source": "Slow wave",
+              "weight": 1
+            }
+          ],
+          "rules": []
         }
       ],
-      "totalSeconds": 900,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|2026-11-27|evening",
+      "totalSeconds": 1630,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.mercury-low",
-        "layer": "natal",
-        "use": "support",
-        "category": "Mental Focus & Clarity",
-        "weight": 0.35
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "evening.unwind"
+        ]
+      },
+      {
+        "ruleId": "base.hora",
+        "layer": "arc",
+        "movements": [
+          "evening.unwind"
+        ]
+      },
+      {
+        "ruleId": "base.period",
+        "layer": "arc",
+        "movements": [
+          "evening.release"
+        ]
+      },
+      {
+        "ruleId": "base.day",
+        "layer": "arc",
+        "movements": [
+          "evening.drift"
+        ]
+      },
+      {
+        "ruleId": "lean.kapha",
+        "layer": "arc",
+        "movements": []
+      },
+      {
+        "ruleId": "tempo.soften",
+        "layer": "arc",
+        "movements": []
       }
     ],
-    "contentHash": "3a128ba8fc3a5d36f5ea560d7e4650fb",
-    "genKey": "fixture-sam:1:today:evening:2026-11-27:1.0.0"
+    "contentHash": "aa08283257461f4231f5f1a2b4785123",
+    "genKey": "fixture-sam:1:today:evening:2026-11-27:arc-2.0.0"
   },
   {
     "kind": "chapter",
     "slot": null,
-    "name": "This Chapter: Clear Mind",
-    "description": "Your current chapter has good backing, so this leans into what it brings. Made for the stretch of time you are in now, until February 2029. It moves through 11 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "This Chapter: Quick Mind",
+    "description": "This stretch of time has good backing, so this builds on it. Made for the stretch of time you are in now, until February 2029. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 11.1 and 14.9 Hz, then holds 12.8 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
     "validTo": "2029-02-15",
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": null,
+      "theme": "chapter:Mercury-Rahu-2029-02-15",
       "intent": "focus",
       "recipeId": "quiet-momentum",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "focu_044",
-          "frequencyIndices": [
-            2,
-            3,
-            4,
-            5
+          "id": "theme.arrive",
+          "fromHz": 11.07,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.home"
+          ]
         },
         {
-          "role": "amplify",
-          "sourceProgramId": "focu_046",
-          "frequencyIndices": [
-            0,
-            1,
-            2
+          "id": "theme.approach",
+          "fromHz": 11.07,
+          "toHz": 14.79,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 1.37
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "chapter.build"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "focu_039",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "theme.hold",
+          "fromHz": 14.79,
+          "toHz": 14.79,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 1.37
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "chapter.build"
+          ]
+        },
+        {
+          "id": "theme.deepen",
+          "fromHz": 14.79,
+          "toHz": 14.92,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Rahu",
+              "weight": 1.8
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.46
+            }
+          ],
+          "rules": [
+            "chapter.build"
+          ]
+        },
+        {
+          "id": "theme.integrate",
+          "fromHz": 14.92,
+          "toHz": 12.85,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "voices": [
+            {
+              "source": "Rahu",
+              "weight": 1.8
+            },
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
         }
       ],
-      "totalSeconds": 660,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|chapter|Mercury-Rahu-2029-02-15",
+      "totalSeconds": 1320,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "chapter.strong-backing",
-        "layer": "chapter",
-        "use": "amplify",
-        "category": "Mental Focus & Clarity",
-        "weight": 0.35
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "theme.arrive",
+          "theme.integrate"
+        ]
+      },
+      {
+        "ruleId": "chapter.lords",
+        "layer": "arc",
+        "movements": []
+      },
+      {
+        "ruleId": "chapter.build",
+        "layer": "arc",
+        "movements": [
+          "theme.approach",
+          "theme.hold",
+          "theme.deepen"
+        ]
       }
     ],
-    "contentHash": "dcafeffe1bb4f161d3bfb2157049dff9",
-    "genKey": "fixture-sam:1:chapter:Mercury-Rahu-2029-02-15:1.0.0"
+    "contentHash": "5eba71cf89b04ccc4ac9bca4c979adc8",
+    "genKey": "fixture-sam:1:chapter:Mercury-Rahu-2029-02-15:arc-2.0.0"
   },
   {
     "kind": "strength",
     "slot": null,
-    "name": "Your Strength: Calm Ground",
-    "description": "This builds on the part of you that your chart shows as most at ease. It moves through 16 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Your Strength: Easy Grace",
+    "description": "Ease and enjoyment come naturally to you, so this leans into a soft, warm calm. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 9.34 and 11.1 Hz, then holds 10.4 Hz until you change it.",
     "intent": "relax",
     "recipeId": "soft-landing",
     "validFrom": "2026-11-27",
     "validTo": null,
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": null,
+      "theme": "strength:Venus",
       "intent": "relax",
       "recipeId": "soft-landing",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "rela_008",
-          "frequencyIndices": [
-            0,
-            1,
-            2,
-            3
+          "id": "theme.arrive",
+          "fromHz": 11.07,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.home"
+          ]
         },
         {
-          "role": "amplify",
-          "sourceProgramId": "rela_005",
-          "frequencyIndices": [
-            3,
-            4,
-            5,
-            6
+          "id": "theme.approach",
+          "fromHz": 11.07,
+          "toHz": 9.34,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.06,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 3.42
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
         },
         {
-          "role": "amplify",
-          "sourceProgramId": "rela_004",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "theme.hold",
+          "fromHz": 9.34,
+          "toHz": 9.34,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.06,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 3.42
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "rela_009",
-          "frequencyIndices": [
-            0,
-            1,
-            2,
-            3
+          "id": "theme.deepen",
+          "fromHz": 9.34,
+          "toHz": 9.69,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.06,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 2.88
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
+        },
+        {
+          "id": "theme.integrate",
+          "fromHz": 9.69,
+          "toHz": 10.36,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Venus",
+              "weight": 2.88
+            },
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
         }
       ],
-      "totalSeconds": 960,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|strength|0",
+      "totalSeconds": 1320,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.strongest-planet",
-        "layer": "natal",
-        "use": "amplify",
-        "category": "Relaxation & Stress Balance",
-        "weight": 0.4
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "theme.arrive",
+          "theme.integrate"
+        ]
+      },
+      {
+        "ruleId": "set.strength",
+        "layer": "arc",
+        "movements": [
+          "theme.approach",
+          "theme.hold",
+          "theme.deepen"
+        ]
       }
     ],
-    "contentHash": "64210a483f4e59997ef6535572aa8de8",
-    "genKey": "fixture-sam:1:strength:0:1.0.0"
+    "contentHash": "f89117350499c79c7a771b0454728d0c",
+    "genKey": "fixture-sam:1:strength:0:arc-2.0.0"
   },
   {
-    "kind": "challenge",
+    "kind": "strength",
     "slot": null,
-    "name": "Gentle Support: Bright Start",
-    "description": "Your energy is worth pacing, so this adds a gentle lift you can come back to through the day. It moves through 9 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Your Strength: Steady Fire",
+    "description": "Steady energy and a clear sense of direction come naturally to you, so this builds on that. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 11.1 and 14.7 Hz, then holds 12.8 Hz until you change it.",
     "intent": "energy",
     "recipeId": "first-light",
     "validFrom": "2026-11-27",
     "validTo": null,
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": null,
+      "theme": "strength:Sun",
       "intent": "energy",
       "recipeId": "first-light",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "ener_032",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "theme.arrive",
+          "fromHz": 11.07,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.home"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "ener_034",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "theme.approach",
+          "fromHz": 11.07,
+          "toHz": 14.53,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "firm",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Sun",
+              "weight": 2.19
+            },
+            {
+              "source": "Venus",
+              "weight": 0.72
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "ener_036",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "theme.hold",
+          "fromHz": 14.53,
+          "toHz": 14.53,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "firm",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Sun",
+              "weight": 2.19
+            },
+            {
+              "source": "Venus",
+              "weight": 0.72
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "ener_030",
-          "frequencyIndices": [
-            0,
-            1,
-            2
+          "id": "theme.deepen",
+          "fromHz": 14.53,
+          "toHz": 14.73,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "firm",
+          "jitter": {
+            "pct": 0.09,
+            "every": 2.5
+          },
+          "voices": [
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Venus",
+              "weight": 1.08
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.strength"
+          ]
+        },
+        {
+          "id": "theme.integrate",
+          "fromHz": 14.73,
+          "toHz": 12.77,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "voices": [
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
         }
       ],
-      "totalSeconds": 540,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|strength|1",
+      "totalSeconds": 1320,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.vitality-low",
-        "layer": "natal",
-        "use": "support",
-        "category": "Energy & Vitality",
-        "weight": 1
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "theme.arrive",
+          "theme.integrate"
+        ]
+      },
+      {
+        "ruleId": "set.strength",
+        "layer": "arc",
+        "movements": [
+          "theme.approach",
+          "theme.hold",
+          "theme.deepen"
+        ]
       }
     ],
-    "contentHash": "af847998147cc776bd298a8552e607f7",
-    "genKey": "fixture-sam:1:challenge:0:1.0.0"
+    "contentHash": "f69e68fba6e0719fd22055b90241cdc0",
+    "genKey": "fixture-sam:1:strength:1:arc-2.0.0"
   },
   {
     "kind": "challenge",
     "slot": null,
-    "name": "Gentle Support: Clear Mind",
-    "description": "Concentration is something your chart asks you to build on purpose, so this brings in a steadier pulse for focused work. It moves through 13 frequencies, one each minute, as a soft pulse under any soundscape, and loops until you change it.",
+    "name": "Gentle Support: Gentle Start",
+    "description": "Getting going can take more effort for you, so this builds up slowly from a calm start. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 10 and 11.1 Hz, then holds 10.5 Hz until you change it.",
+    "intent": "balance",
+    "recipeId": "even-keel",
+    "validFrom": "2026-11-27",
+    "validTo": null,
+    "composition": {
+      "schema": "wellness-waves/arc@1",
+      "slot": null,
+      "theme": "support:Mars",
+      "intent": "balance",
+      "recipeId": "even-keel",
+      "movements": [
+        {
+          "id": "theme.arrive",
+          "fromHz": 11.07,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
+        },
+        {
+          "id": "theme.approach",
+          "fromHz": 11.07,
+          "toHz": 10.14,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mars",
+              "weight": 0.9
+            },
+            {
+              "source": "Moon",
+              "weight": 0.55
+            }
+          ],
+          "rules": [
+            "set.support.planet"
+          ]
+        },
+        {
+          "id": "theme.hold",
+          "fromHz": 10.14,
+          "toHz": 10.14,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mars",
+              "weight": 0.9
+            },
+            {
+              "source": "Moon",
+              "weight": 0.55
+            }
+          ],
+          "rules": [
+            "set.support.planet"
+          ]
+        },
+        {
+          "id": "theme.deepen",
+          "fromHz": 10.14,
+          "toHz": 10.02,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 0.83
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
+          ],
+          "rules": [
+            "set.support.planet"
+          ]
+        },
+        {
+          "id": "theme.integrate",
+          "fromHz": 10.02,
+          "toHz": 10.53,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 0.83
+            },
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
+        }
+      ],
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|challenge|0",
+      "totalSeconds": 1320,
+      "versions": {
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
+      }
+    },
+    "reasons": [
+      {
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "theme.arrive",
+          "theme.integrate"
+        ]
+      },
+      {
+        "ruleId": "set.support.planet",
+        "layer": "arc",
+        "movements": [
+          "theme.approach",
+          "theme.hold",
+          "theme.deepen"
+        ]
+      }
+    ],
+    "contentHash": "a19a37776cee2b0a73d81cdb7bac6f69",
+    "genKey": "fixture-sam:1:challenge:0:arc-2.0.0"
+  },
+  {
+    "kind": "challenge",
+    "slot": null,
+    "name": "Gentle Support: Clear Focus",
+    "description": "Focus gets less built-in backing in your chart, so this adds short, bright bursts to hold attention. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 11.1 and 13.8 Hz, then holds 12 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
     "validTo": null,
     "composition": {
-      "schema": "wellness-waves/composition@1",
+      "schema": "wellness-waves/arc@1",
+      "slot": null,
+      "theme": "support:Mercury",
       "intent": "focus",
       "recipeId": "quiet-momentum",
-      "phases": [
+      "movements": [
         {
-          "role": "arrive",
-          "sourceProgramId": "focu_044",
-          "frequencyIndices": [
-            2,
-            3,
-            4,
-            5
+          "id": "theme.arrive",
+          "fromHz": 11.07,
+          "toHz": 11.07,
+          "seconds": 180,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.1
+          },
+          "voices": [
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            },
+            {
+              "source": "Sun",
+              "weight": 1.46
+            },
+            {
+              "source": "Ketu",
+              "weight": 1.4
+            },
+            {
+              "source": "Rahu",
+              "weight": 1.2
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.12
+            },
+            {
+              "source": "Jupiter",
+              "weight": 0.93
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Mars",
+              "weight": 0.6
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "base.home"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "focu_042",
-          "frequencyIndices": [
-            0,
-            1
+          "id": "theme.approach",
+          "fromHz": 11.07,
+          "toHz": 13.84,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 1.37
+            },
+            {
+              "source": "Moon",
+              "weight": 0.55
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.support.planet"
+          ]
         },
         {
-          "role": "support",
-          "sourceProgramId": "focu_043",
-          "frequencyIndices": [
-            1,
-            2,
-            3,
-            4
+          "id": "theme.hold",
+          "fromHz": 13.84,
+          "toHz": 13.84,
+          "seconds": 360,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "burst": {
+            "hz": 40,
+            "on": 2,
+            "every": 15
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 1.37
+            },
+            {
+              "source": "Moon",
+              "weight": 0.55
+            },
+            {
+              "source": "Gamma bursts",
+              "weight": 1
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.support.planet"
+          ]
         },
         {
-          "role": "integrate",
-          "sourceProgramId": "focu_047",
-          "frequencyIndices": [
-            1,
-            2,
-            3
+          "id": "theme.deepen",
+          "fromHz": 13.84,
+          "toHz": 12.93,
+          "seconds": 300,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3.5
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Moon",
+              "weight": 0.83
+            }
           ],
-          "stepSeconds": 60
+          "rules": [
+            "set.support.planet"
+          ]
+        },
+        {
+          "id": "theme.integrate",
+          "fromHz": 12.93,
+          "toHz": 11.96,
+          "seconds": 240,
+          "depth": 0.24,
+          "shape": "sine",
+          "jitter": {
+            "pct": 0.05,
+            "every": 3
+          },
+          "breath": {
+            "hz": 0.1,
+            "depth": 0.12
+          },
+          "voices": [
+            {
+              "source": "Mercury",
+              "weight": 0.91
+            },
+            {
+              "source": "Moon",
+              "weight": 2.76
+            },
+            {
+              "source": "Venus",
+              "weight": 2.7
+            }
+          ],
+          "rules": [
+            "base.home"
+          ]
         }
       ],
-      "totalSeconds": 780,
+      "holdLast": true,
+      "seed": "1985-02-03Tnoon@51.5074,-0.1278|arc|challenge|1",
+      "totalSeconds": 1320,
       "versions": {
-        "catalog": "1.0.0",
-        "catalogSha": "9ba804397f9ff19ba4bd2f6f69b6cbf02c215f5f58467ff4efa72c04783b1fc7",
-        "policy": "1.0.0",
-        "rulebook": "1.0.0",
-        "composer": "1.0.0"
+        "composer": "2.0.0",
+        "rulebook": "2.0.0",
+        "library": "1.0.0"
       }
     },
     "reasons": [
       {
-        "ruleId": "natal.mercury-low",
-        "layer": "natal",
-        "use": "support",
-        "category": "Mental Focus & Clarity",
-        "weight": 0.35
+        "ruleId": "base.home",
+        "layer": "arc",
+        "movements": [
+          "theme.arrive",
+          "theme.integrate"
+        ]
+      },
+      {
+        "ruleId": "set.support.planet",
+        "layer": "arc",
+        "movements": [
+          "theme.approach",
+          "theme.hold",
+          "theme.deepen"
+        ]
       }
     ],
-    "contentHash": "d3ee982fc30d92cef8777639e78f57f1",
-    "genKey": "fixture-sam:1:challenge:1:1.0.0"
+    "contentHash": "3a4ab08291bf90ffe67e7ec2b6168c23",
+    "genKey": "fixture-sam:1:challenge:1:arc-2.0.0"
   }
 ]

@@ -8,12 +8,17 @@
  *   pulse   pulseGain = (1 − d/2) + (d/2)·sin(2πft): the whole mix flutters at f
  *   breath  breathGain glides between 1 − depth and 1 in the pattern's segments
  *           (in, hold, out, hold); the stage reads the same schedule to breathe
+ * Personal arcs add, per step: a glide across the step, a slow seeded drift
+ * around the rate (jitter), short bursts at a second rate, a firmer pulse shape
+ * (a locked third harmonic) and a breathing swell; and they hold the last step
+ * instead of starting over.
  * Linear, self-tracked automation only (Smoother), so offline renders match
  * live playback exactly. Visuals never mirror anything faster than 1 Hz.
  */
 
 import { Smoother } from '../ambient/instruments';
-import type { BreathPattern, Technique } from '../../domain/wellness/techniques';
+import { SeededRNG } from '../../lib/rng';
+import type { BreathPattern, SequenceStep, Technique } from '../../domain/wellness/techniques';
 
 export interface WellnessNodes {
   /** The summed music. */
@@ -38,7 +43,14 @@ interface Segment {
   from: number;
   to: number;
   phase: BreathPhase;
+  /** Bottom of this swell (1 − depth). */
+  low: number;
 }
+
+/** Third-harmonic share of the firm pulse shape (a gentle step towards a square). */
+const FIRM_HARMONIC = 0.22;
+/** Burst attack and release, seconds. */
+const BURST_EDGE = 0.3;
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
 
@@ -52,6 +64,13 @@ export class WellnessLayer {
   private pulseBase: Smoother;
   private pulseDepth: Smoother | null = null;
   private pulseRate: Smoother | null = null;
+  /** Firm shape: a second oscillator locked at three times the rate. */
+  private lfo3: OscillatorNode | null = null;
+  private lfo3DepthNode: GainNode | null = null;
+  private pulseRate3: Smoother | null = null;
+  private pulseDepth3: Smoother | null = null;
+  /** True while a personal arc uses the breath path for its swell. */
+  private pulseBreath = false;
   private breath: Smoother;
   private out: Smoother;
   private nodes: AudioNode[] = [];
@@ -101,10 +120,21 @@ export class WellnessLayer {
       this.pulseDepth.set(p.depth / 2, t, fadeIn);
       this.pulseBase.set(1 - p.depth / 2, t, fadeIn);
       if (p.to) this.pulseRate.set(p.to.hz, t + fadeIn, p.to.minutes * 60);
+      if (p.sequence?.some((s) => s.shape === 'firm')) {
+        this.lfo3 = ctx.createOscillator();
+        this.lfo3.type = 'sine';
+        this.pulseRate3 = new Smoother(this.lfo3.frequency, p.hz * 3, t);
+        this.lfo3DepthNode = ctx.createGain();
+        this.pulseDepth3 = new Smoother(this.lfo3DepthNode.gain, 0, t);
+        this.lfo3.connect(this.lfo3DepthNode);
+        this.lfo3DepthNode.connect(pulse.gain);
+        // Same start time and an exact 3:1 rate at every moment keep the two phase-locked.
+        this.lfo3.start(t);
+      }
       if (p.sequence?.length) {
-        this.nextStepAt = t + p.sequence[0].seconds;
-        this.stepIndex = 0;
-        if (p.sequence[0].tone) this.scheduleTone(p.sequence[0].hz, t, p.sequence[0].seconds);
+        // Step 0 is scheduled by scheduleSteps like every other step.
+        this.nextStepAt = t;
+        this.stepIndex = -1;
       }
     }
   }
@@ -139,7 +169,7 @@ export class WellnessLayer {
       for (const [phase, dur, to] of parts) {
         if (dur <= 0) continue;
         this.breath.set(to, s, dur);
-        this.segments.push({ start: s, end: s + dur, from, to, phase });
+        this.segments.push({ start: s, end: s + dur, from, to, phase, low });
         from = to;
         s += dur;
       }
@@ -148,29 +178,104 @@ export class WellnessLayer {
     }
   }
 
-  /** Frequency programs: glide to each next frequency (and its depth) in catalog order, looping. */
+  /** Sets the pulse rate (and the locked third harmonic) with a linear glide. */
+  private setRate(hz: number, at: number, seconds: number): void {
+    this.pulseRate!.set(hz, at, seconds);
+    this.pulseRate3?.set(hz * 3, at, seconds);
+  }
+
+  /**
+   * Frequency programs: glide to each next frequency (and its depth) in order.
+   * Catalog programs loop; personal arcs (holdLast) stay on their last step.
+   */
   private scheduleSteps(until: number): void {
-    const seq = this.technique.pulse?.sequence;
+    const p = this.technique.pulse;
+    const seq = p?.sequence;
     if (!seq?.length || !this.pulseRate || !this.pulseDepth) return;
     const glide = 4;
     let guard = 0;
     while (this.nextStepAt < until && guard++ < 32) {
       const at = this.nextStepAt;
-      this.stepIndex = (this.stepIndex + 1) % seq.length;
-      const step = seq[this.stepIndex];
+      const first = this.stepIndex < 0;
+      const last = this.stepIndex === seq.length - 1;
+      const held = !first && last && !!p!.holdLast;
+      this.stepIndex = held ? this.stepIndex : (this.stepIndex + 1) % seq.length;
+      const raw = seq[this.stepIndex];
+      // A held step keeps its end rate; it does not jump back to where it started.
+      const step: SequenceStep = held ? { ...raw, hz: raw.toHz ?? raw.hz, toHz: raw.toHz ?? raw.hz } : raw;
+      const g = first ? 0.05 : glide;
       if (step.tone) {
         // A pitch, not a rate: let the pulse rest and sound the value as a soft tone.
         this.pulseDepth.set(0, at, glide);
+        this.pulseDepth3?.set(0, at, glide);
         this.pulseBase.set(1, at, glide);
         this.scheduleTone(step.hz, at, step.seconds);
       } else {
-        this.pulseRate.set(step.hz, at, glide);
-        this.pulseDepth.set(step.depth / 2, at, glide);
-        this.pulseBase.set(1 - step.depth / 2, at, glide);
+        this.scheduleRate(step, at, g, `${p!.seed ?? this.technique.id}|${this.steps}`);
+        const dg = first ? 4 : glide;
+        this.pulseDepth.set(step.depth / 2, at, dg);
+        this.pulseDepth3?.set(step.shape === 'firm' ? (step.depth / 2) * FIRM_HARMONIC : 0, at, dg);
+        this.pulseBase.set(1 - step.depth / 2, at, dg);
       }
+      this.scheduleSwell(step, at);
       this.nextStepAt = at + step.seconds;
       this.steps++;
     }
+  }
+
+  /** Rate automation for one step: glide in, then glide / drift / bursts in time order. */
+  private scheduleRate(step: SequenceStep, at: number, glide: number, seed: string): void {
+    const dur = step.seconds;
+    const to = step.toHz ?? step.hz;
+    const base = (t: number) => step.hz + (to - step.hz) * Math.max(0, Math.min(1, (t - at) / dur));
+    const segs: Array<{ at: number; hz: number; s: number }> = [{ at, hz: step.hz, s: glide }];
+    const j = step.jitter;
+    if (j && j.pct > 0 && j.every > 0) {
+      const rng = new SeededRNG(seed);
+      for (let t = at + glide; t < at + dur - 0.01; t += j.every) {
+        const s = Math.min(j.every, at + dur - t);
+        segs.push({ at: t, hz: base(t + s) * (1 + j.pct * (2 * rng.next() - 1)), s });
+      }
+    } else if (to !== step.hz) {
+      segs.push({ at: at + glide, hz: to, s: Math.max(0.05, dur - glide) });
+    }
+    const b = step.burst;
+    if (b) {
+      const windows: Array<[number, number]> = [];
+      for (let t = at + b.every; t + b.on + BURST_EDGE < at + dur; t += b.every) windows.push([t, t + b.on + BURST_EDGE]);
+      const inside = (t: number) => windows.some(([s, e]) => t >= s && t < e);
+      for (let i = segs.length - 1; i > 0; i--) if (inside(segs[i].at)) segs.splice(i, 1);
+      for (const [s] of windows) {
+        segs.push({ at: s, hz: b.hz, s: BURST_EDGE });
+        segs.push({ at: s + b.on, hz: base(s + b.on + BURST_EDGE), s: BURST_EDGE });
+      }
+      segs.sort((x, y) => x.at - y.at);
+    }
+    for (const sg of segs) this.setRate(sg.hz, sg.at, sg.s);
+  }
+
+  /** Personal arcs: a breathing swell for the step, or back to level when it has none. */
+  private scheduleSwell(step: SequenceStep, at: number): void {
+    const br = step.breath;
+    if (!br) {
+      if (this.pulseBreath) this.breath.set(1, at, 4);
+      return;
+    }
+    this.pulseBreath = true;
+    const cycle = 1 / br.hz;
+    const low = 1 - br.depth;
+    let from = this.segments.length ? this.segments[this.segments.length - 1].to : 1;
+    for (let s = at; s + cycle <= at + step.seconds + 0.01; s += cycle) {
+      const inhale = cycle * 0.4;
+      // In-breath: the music opens; out-breath (longer): it settles.
+      this.breath.set(1, s, inhale);
+      this.segments.push({ start: s, end: s + inhale, from, to: 1, phase: 'in', low });
+      this.breath.set(low, s + inhale, cycle - inhale);
+      this.segments.push({ start: s + inhale, end: s + cycle, from: 1, to: low, phase: 'out', low });
+      from = low;
+    }
+    const now = this.ctx.currentTime;
+    this.segments = this.segments.filter((sg) => sg.end > now - 1).slice(-400);
   }
 
   /** One catalog value as a pure tone at its literal pitch, faded in and out over 4 s. */
@@ -207,12 +312,11 @@ export class WellnessLayer {
 
   /** Where the breath is now; null for techniques without breathing. */
   breathAt(t = this.ctx.currentTime): BreathState | null {
-    if (this.technique.kind !== 'breath' || this.stopped) return null;
-    const low = 1 - this.technique.breath!.depth;
+    if ((this.technique.kind !== 'breath' && !this.pulseBreath) || this.stopped) return null;
     const seg = this.segments.find((s) => t >= s.start && t < s.end);
     if (!seg) return { value: 0, phase: 'rest', remaining: 0 };
     const v = seg.from + ((seg.to - seg.from) * (t - seg.start)) / (seg.end - seg.start);
-    return { value: clamp((v - low) / (1 - low)), phase: seg.phase, remaining: seg.end - t };
+    return { value: clamp((v - seg.low) / (1 - seg.low)), phase: seg.phase, remaining: seg.end - t };
   }
 
   /** Current pulse rate in Hz (it may be gliding); 0 for non-pulse techniques. */
@@ -227,7 +331,7 @@ export class WellnessLayer {
     this.stopped = true;
     this.out.set(0, now, fade);
     const end = now + fade + 0.1;
-    [this.lfo, ...this.toneVoices.map((v) => v.osc)].forEach((o) => {
+    [this.lfo, this.lfo3, ...this.toneVoices.map((v) => v.osc)].forEach((o) => {
       try {
         o?.stop(end);
       } catch {
@@ -238,7 +342,7 @@ export class WellnessLayer {
   }
 
   dispose(): void {
-    [this.lfo, this.lfoDepthNode, ...this.nodes, ...this.toneVoices.flatMap((v) => [v.osc, v.env])].forEach((n) => {
+    [this.lfo, this.lfoDepthNode, this.lfo3, this.lfo3DepthNode, ...this.nodes, ...this.toneVoices.flatMap((v) => [v.osc, v.env])].forEach((n) => {
       try {
         n?.disconnect();
       } catch {

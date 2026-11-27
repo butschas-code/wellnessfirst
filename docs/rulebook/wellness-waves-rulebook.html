@@ -1,0 +1,268 @@
+<title>Wellness Waves Rulebook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column; rule groups as tables that become stacked cards on phones. */
+:root {
+  --bg: #fbfaf7; --surface: #f3efe7; --fg: #0a2334; --muted: #4a5c68; --line: #dcd6cb;
+  --sage: #5f7d4c; --sage-bg: #e6eedf; --mist: #3f6d75; --mist-bg: #e1ecee; --amber: #8a5a1f; --amber-bg: #f6ead6;
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1418; --surface: #121e24; --fg: #ece8df; --muted: #a3b0b5; --line: #24343c;
+  --sage: #a9c193; --sage-bg: #1c2a1e; --mist: #a2c0c5; --mist-bg: #16262b; --amber: #e2bf86; --amber-bg: #2b2214; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0b1418; --surface: #121e24; --fg: #ece8df; --muted: #a3b0b5; --line: #24343c;
+  --sage: #a9c193; --sage-bg: #1c2a1e; --mist: #a2c0c5; --mist-bg: #16262b; --amber: #e2bf86; --amber-bg: #2b2214; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font: 400 16px/1.6 var(--sans); }
+.wrap { max-width: 920px; margin: 0 auto; padding-block: 48px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.prose { max-width: 66ch; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.75rem; margin-top: 64px; }
+h3 { font-size: 1.25rem; margin-top: 36px; }
+p { margin: 12px 0 0; }
+.eyebrow { font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.15rem; color: var(--muted); margin-top: 16px; }
+.status { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 24px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 0.9rem; }
+.status b { font-weight: 600; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 20px; }
+.step { padding: 16px; border-top: 2px solid var(--sage); background: var(--surface); border-radius: 0 0 8px 8px; }
+.step strong { display: block; font-weight: 600; margin-bottom: 4px; }
+.step span { font-size: 0.92rem; color: var(--muted); }
+.scale { overflow-x: auto; margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+th { text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); }
+td { padding: 14px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.when { width: 30%; }
+td.cat { width: 20%; font-weight: 500; }
+td.quote { color: var(--muted); font-family: var(--serif); font-size: 1.02rem; font-style: italic; }
+.pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; margin: 2px 4px 2px 0; }
+.support { background: var(--mist-bg); color: var(--mist); }
+.build { background: var(--sage-bg); color: var(--sage); }
+.added { background: var(--amber-bg); color: var(--amber); }
+.weight { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: var(--muted); display: block; margin-top: 6px; }
+.note { margin-top: 14px; font-size: 0.9rem; color: var(--muted); }
+.decide { margin-top: 20px; display: grid; gap: 12px; }
+.decide li { padding: 14px 16px; background: var(--amber-bg); border-radius: 8px; list-style: none; }
+.decide ul { padding: 0; margin: 0; display: grid; gap: 10px; }
+.decide b { font-weight: 600; }
+dl.map { display: grid; grid-template-columns: max-content 1fr; gap: 6px 20px; margin-top: 16px; font-size: 0.95rem; }
+dl.map dt { font-weight: 600; }
+dl.map dd { margin: 0; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; font-size: 0.88rem; color: var(--muted); align-items: center; }
+footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 0.85rem; color: var(--muted); }
+@media (max-width: 640px) {
+  table.rules thead { display: none; }
+  table.rules, table.rules tbody, table.rules tr, table.rules td { display: block; width: auto; }
+  table.rules tr { padding: 14px 0; border-bottom: 1px solid var(--line); }
+  table.rules td { border: 0; padding: 4px 0; }
+  table.rules td.when { width: auto; }
+}
+.arc { margin-top: 20px; display: grid; gap: 10px; }
+.mv { display: grid; grid-template-columns: 9rem 1fr; gap: 4px 18px; padding: 14px 16px; background: var(--surface); border-radius: 8px; border-left: 3px solid var(--sage); }
+.mv.opt { border-left-color: var(--amber); }
+.mv .name { font-family: var(--serif); font-size: 1.15rem; }
+.mv .band { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--muted); }
+.mv p { margin: 0; font-size: 0.93rem; }
+.mv .from { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.compare td { font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .mv { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header class="prose">
+    <p class="eyebrow">Wellness Waves · personal programs</p>
+    <h1>The rulebook</h1>
+    <p class="lead">How a birth chart becomes every personal program: three a day (morning, midday, evening), one for the current chapter of life, two that build on strengths and two that give gentle support. Nothing is picked from the catalog. Every rate is worked out from the chart, so no two people get the same program, and the day programs are new each day. No AI is involved: the same chart on the same day always gives the same programs.</p>
+    <div class="status">
+      <span><b>Version</b> 2.0.0 (day arcs)</span>
+      <span><b>Status</b> draft, waiting for your sign-off</span>
+      <span><b>Rules</b> 27</span>
+      <span><b>Replaces</b> 1.0.0 for every set</span>
+    </div>
+  </header>
+
+  <section class="prose">
+    <h2>How a day program is built</h2>
+    <p>Each program is an <em>arc</em>: a few movements that follow the time of day. Each movement has its own rates, its own length, a slow drift around the rate, and sometimes short bursts or a breathing swell. The chart decides every one of these.</p>
+  </section>
+  <div class="steps">
+    <div class="step"><strong>1. Read the chart in depth</strong><span>Six-fold strength of every planet, birth degrees, the Moon's station and nadi, element balance, ascendant, the three running periods, and today's Moon, weekday and hour rulers.</span></div>
+    <div class="step"><strong>2. Find your tones</strong><span>Every planet gets a tone from its orbit, turned by the degree it stood at at your birth. Your home tone is the blend of all nine, weighted by their strength.</span></div>
+    <div class="step"><strong>3. Shape the arc</strong><span>The time of day sets the movements. Your constitution, your strengths and challenges, and today's pace add, lengthen, soften or skip movements.</span></div>
+    <div class="step"><strong>4. Play and hold</strong><span>The arc plays as a pulse in the music. It glides between rates, drifts gently, and then holds its last movement until you change it.</span></div>
+  </div>
+
+  <section class="prose">
+    <h2>Your tones</h2>
+    <p>The method is the <em>cosmic octave</em>: a planet's orbit is a very slow rhythm, and doubling it again and again (raising it by octaves) brings it into hearing range. The orbit gives each planet its place in the octave. Two things then make it personal:</p>
+    <p><b>Your birth degree.</b> One full turn of the zodiac counts as one octave, Kepler's old mapping. Each planet's tone is turned by the degree it stood at when you were born, so Mars in your chart sounds different from Mars in anyone else's.</p>
+    <p><b>Your strength.</b> When several planets voice a movement, their tones are blended and each one counts by its six-fold strength (shadbala). Strong planets pull the blend towards themselves. The blend is then placed inside the movement's band: 12–15 Hz for a lift, 4.5–6.5 Hz for a release, and so on.</p>
+  </section>
+  <div class="scale"><table>
+    <thead><tr><th>Planet</th><th>Orbit used</th><th>Tone</th></tr></thead>
+    <tbody>
+      <tr><td>Sun</td><td>Sidereal year, 365.26 days</td><td class="num">136.10 Hz</td></tr>
+      <tr><td>Moon</td><td>Synodic month, 29.53 days</td><td class="num">210.42 Hz</td></tr>
+      <tr><td>Mercury</td><td>87.97 days</td><td class="num">141.27 Hz</td></tr>
+      <tr><td>Venus</td><td>224.70 days</td><td class="num">221.23 Hz</td></tr>
+      <tr><td>Mars</td><td>686.98 days</td><td class="num">144.72 Hz</td></tr>
+      <tr><td>Jupiter</td><td>4,332.59 days</td><td class="num">183.58 Hz</td></tr>
+      <tr><td>Saturn</td><td>10,759.22 days</td><td class="num">147.85 Hz</td></tr>
+      <tr><td>Rahu and Ketu</td><td>Lunar nodes, 6,798.38 days (one axis, one tone)</td><td class="num">233.99 Hz</td></tr>
+    </tbody>
+  </table></div>
+  <section class="prose">
+    <p class="note">These match the published cosmic-octave values. The code computes them from the orbits rather than copying them, and a test checks the result. The program only ever plays them as pulse rates in the 0.5–40 Hz range, never as audible tones.</p>
+    <h3>Your home tone</h3>
+    <p>This is the blend of all nine planets, with the Moon and the ascendant lord counted extra, placed between 8.5 and 11.5 Hz. It plays the part of an <em>individual alpha rhythm</em> (research tunes stimulation to each person's own resting rhythm, which varies between people). Every program passes through it.</p>
+    <h3>Your constitution</h3>
+    <p>An Ayurvedic-style lean towards airy (<b>vata</b>), fiery (<b>pitta</b>) or earthy (<b>kapha</b>). It comes from the Moon's nadi (counts double), the element balance of the chart, and the ascendant's element. It changes the shape of the programs, never the planets' tones.</p>
+  </section>
+
+  <h2>The three arcs</h2>
+  <section class="prose"><p>Amber movements are optional: rules add or skip them. Rates in the band column are where the blended tone is placed.</p></section>
+
+  <h3>Morning: wake, rise, lift, spark, settle</h3>
+  <div class="arc">
+    <div class="mv opt"><div><div class="name">Ground</div><div class="band">7.83 Hz · 2 min</div></div><div><p>Earth resonance with a breathing swell, before waking.</p><p class="from">Only when the Moon or the 4th area is low.</p></div></div>
+    <div class="mv"><div><div class="name">Wake</div><div class="band">5.5–7.5 Hz · 3–4 min</div></div><div><p>Slow start with a breathing swell at six breaths a minute.</p><p class="from">Voiced by the Moon, today's Moon, the 08:00 hour ruler and today's Moon-station lord. Shorter when earthy, longer when airy or on a rest day.</p></div></div>
+    <div class="mv"><div><div class="name">Rise</div><div class="band">wake → home tone · 4 min</div></div><div><p>Glides up to your home tone.</p><p class="from">All nine planets by strength.</p></div></div>
+    <div class="mv"><div><div class="name">Lift</div><div class="band">home → 12–15 Hz · 5 min</div></div><div><p>Climbs into a calm, alert range.</p><p class="from">The Sun, the ascendant lord, the weekday lord and the main period lord. Firm pulse when earthy or Mars is strong.</p></div></div>
+    <div class="mv opt"><div><div class="name">Spark</div><div class="band">15–20 Hz (16 airy, 22 earthy) · 4–5 min</div></div><div><p>The brightest point of the day, with a larger drift.</p><p class="from">Mars, the Sun and the sub-period lord. Skipped on gentle or rest days, when Mars is low, when vitality needs recovery, or when airy (unless the day has momentum).</p></div></div>
+    <div class="mv"><div><div class="name">Settle</div><div class="band">10–12.5 Hz · 3–4 min, then holds</div></div><div><p>Comes down to a steady working rate and stays there.</p><p class="from">Your strongest planet and the ascendant lord.</p></div></div>
+  </div>
+
+  <h3>Midday: reset, focus, drive, pause, return</h3>
+  <div class="arc">
+    <div class="mv"><div><div class="name">Reset</div><div class="band">10–12.5 → home · 3 min</div></div><div><p>Breathing swell; back to your home tone.</p><p class="from">The 13:00 hour ruler and today's Moon.</p></div></div>
+    <div class="mv"><div><div class="name">Focus</div><div class="band">home → 12–15 Hz · 5–7 min</div></div><div><p>Sustained attention range. May carry 40 Hz bursts (2 s every 15 s).</p><p class="from">Mercury (counts 1.5), Jupiter, the hour ruler and the main period lord. Bursts when Mercury is low or runs a current period; one minute longer when Mercury is strong.</p></div></div>
+    <div class="mv opt"><div><div class="name">Drive</div><div class="band">15–19 Hz (17 fiery, 16 airy) · 5–6 min</div></div><div><p>Push for the afternoon.</p><p class="from">Mars, the Sun and the main period lord. Skipped on gentle and rest days; rounded pulse when fiery or airy.</p></div></div>
+    <div class="mv"><div><div class="name">Pause</div><div class="band">7.8–9.5 Hz · 3–5 min</div></div><div><p>Breathing swell, deeper than the reset.</p><p class="from">Venus, today's Moon and your quietest planet. Becomes a 10 Hz renewal movement when the 6th area or vitality is low. One minute longer when fiery.</p></div></div>
+    <div class="mv"><div><div class="name">Return</div><div class="band">→ 11.5–14 Hz · 4 min, then holds</div></div><div><p>Back to a working rate for the afternoon.</p><p class="from">Mercury, the weekday lord, today's Moon and its station lord.</p></div></div>
+  </div>
+
+  <h3>Evening: unwind, ground, release, drift, deep</h3>
+  <div class="arc">
+    <div class="mv"><div><div class="name">Unwind</div><div class="band">home → 7.8–9.5 Hz · 4 min</div></div><div><p>Leaves the day's working range.</p><p class="from">Venus and the 21:00 hour ruler.</p></div></div>
+    <div class="mv"><div><div class="name">Ground</div><div class="band">6.5–8 Hz, or 7.83 Hz · 4–6 min</div></div><div><p>Breathing swell at 5.4 a minute.</p><p class="from">The Moon and Venus; Earth resonance (7.83 Hz) instead when airy, or when the Moon or 4th area is low (then longer).</p></div></div>
+    <div class="mv"><div><div class="name">Release</div><div class="band">→ 4.5–6.5 Hz · 5–6 min</div></div><div><p>Breathing swell at 5 a minute.</p><p class="from">Saturn, Ketu, the hour ruler and the sub-period lord. Longer and steadier while Saturn presses on the Moon.</p></div></div>
+    <div class="mv"><div><div class="name">Drift</div><div class="band">→ 1.5–3.5 Hz · 6–7 min</div></div><div><p>Long glide down.</p><p class="from">The Moon, today's Moon, Jupiter and the Moon-station lord. Slower and longer when the 12th area is low.</p></div></div>
+    <div class="mv"><div><div class="name">Deep</div><div class="band">→ 0.6–1.2 Hz · 5–6 min, then holds</div></div><div><p>Slow-wave ending that stays until you stop it.</p><p class="from">The Moon, today's Moon and Ketu.</p></div></div>
+  </div>
+  <section class="prose"><p class="note">On gentle and rest days, active movements run 10 % shorter and evenings 15 % longer; on days with momentum, lift, spark, focus and drive run 10 % longer. Programs run 15 to 31 minutes and never more than 45.</p></section>
+
+  <h2>Chapter, strengths and gentle support</h2>
+  <section class="prose">
+    <p>These four kinds of program are not tied to a time of day. Each is a <em>theme arc</em> of five movements, about 22 minutes, that holds its last movement:</p>
+  </section>
+  <div class="arc">
+    <div class="mv"><div><div class="name">Arrive</div><div class="band">home tone · 3 min</div></div><div><p>Starts from your own resting rate, with a breathing swell.</p></div></div>
+    <div class="mv"><div><div class="name">Move in</div><div class="band">home → theme band · 4 min</div></div><div><p>Glides into the band of the theme planet. Its tone is turned by its birth degree and blended with the ascendant lord (strengths), the Moon (support) or the sub-period lord (chapter).</p></div></div>
+    <div class="mv"><div><div class="name">Stay</div><div class="band">theme band · 6 min</div></div><div><p>The heart of the program. Support arcs may use a research value here: 10 Hz renewal, 7.83 Hz grounding, or 40 Hz bursts for focus.</p></div></div>
+    <div class="mv"><div><div class="name">Deepen</div><div class="band">brighter half (strength), softer half (support) · 5 min</div></div><div><p>Strengths lean further in; support eases further down. The chapter deepens into its sub-period.</p></div></div>
+    <div class="mv"><div><div class="name">Back to centre</div><div class="band">halfway to home · 4 min, then holds</div></div><div><p>Settles halfway between the theme and your home tone, and stays.</p></div></div>
+  </div>
+  <section class="prose">
+    <p><b>Strengths</b> are your two strongest planets that are good or strong. <b>Support</b> goes first to a low 12th, 4th or 6th area (only with a birth time). After that it goes to low planets, then to the weakest average ones, and never to a planet that is also a strength. <b>The chapter</b> follows the main period lord. It uses the gentle version when the period has low backing or Saturn is pressing on the Moon. Strengths and support never change from day to day. The chapter changes when the sub-period does.</p>
+  </section>
+  <div class="scale"><table>
+    <thead><tr><th>Theme</th><th>Building on a strength</th><th>Gentle support</th></tr></thead>
+    <tbody>
+      <tr><td>Sun</td><td><b>Steady Fire</b><span class="weight">12–15 Hz · firm pulse</span></td><td><b>Renewal</b><span class="weight">9–11 Hz · 10 Hz renewal · breathing swell</span></td></tr>
+      <tr><td>Moon</td><td><b>Inner Tide</b><span class="weight">6–8 Hz · breathing swell</span></td><td><b>Grounding</b><span class="weight">6.5–8 Hz · 7.83 Hz grounding · breathing swell</span></td></tr>
+      <tr><td>Mars</td><td><b>Clear Drive</b><span class="weight">15–20 Hz · firm pulse</span></td><td><b>Gentle Start</b><span class="weight">10–13 Hz · breathing swell</span></td></tr>
+      <tr><td>Mercury</td><td><b>Quick Mind</b><span class="weight">12–15 Hz</span></td><td><b>Clear Focus</b><span class="weight">12–14 Hz · 40 Hz bursts · breathing swell</span></td></tr>
+      <tr><td>Jupiter</td><td><b>Wide View</b><span class="weight">8.5–11 Hz · breathing swell</span></td><td><b>Open Outlook</b><span class="weight">8–10 Hz · breathing swell</span></td></tr>
+      <tr><td>Venus</td><td><b>Easy Grace</b><span class="weight">7.8–10 Hz · breathing swell</span></td><td><b>Softening</b><span class="weight">7.8–9.5 Hz · breathing swell</span></td></tr>
+      <tr><td>Saturn</td><td><b>Long Patience</b><span class="weight">4.5–6.5 Hz</span></td><td><b>Steady Ground</b><span class="weight">4.5–6.5 Hz · breathing swell</span></td></tr>
+      <tr><td>Rahu</td><td><b>Bold Reach</b><span class="weight">13–17 Hz</span></td><td><b>Settling</b><span class="weight">6.5–8 Hz · 7.83 Hz grounding · breathing swell</span></td></tr>
+      <tr><td>Ketu</td><td><b>Quiet Depth</b><span class="weight">3–5 Hz · breathing swell</span></td><td><b>Present Moment</b><span class="weight">6.5–8 Hz · breathing swell</span></td></tr>
+      <tr><td>4th area</td><td>—</td><td><b>Home Ground</b><span class="weight">6.5–8 Hz · 7.83 Hz grounding</span></td></tr>
+      <tr><td>6th area</td><td>—</td><td><b>Daily Renewal</b><span class="weight">9–11 Hz · 10 Hz renewal</span></td></tr>
+      <tr><td>12th area</td><td>—</td><td><b>Deep Rest</b><span class="weight">descends 6.5–8 → 4.5–6.5 → 1.5–3.5 → 0.6–1.2 Hz</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Rules</h2>
+  <div class="scale"><table class="rules">
+    <thead><tr><th>When</th><th>What it does</th><th>What the member reads</th></tr></thead>
+    <tbody>
+      <tr><td class="when">Always.</td><td>Your home tone (8.5–11.5 Hz) is the blend of all nine planets weighted by their strength. Every program passes through it.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Always.</td><td>The planet ruling the hour of each slot (08:00, 13:00, 21:00, equal hours from 06:00) voices that slot's opening movement.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Always.</td><td>The running period lords (main and sub-period) voice the lift, drive and release movements lightly.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Always.</td><td>Today's Moon (at its degree today), the weekday lord and the planet ruling today's Moon station voice the waking, reset, pause, return, drift and deep movements, so the programs change every day.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Your constitution leans airy (vata).</td><td>Lower peaks (beta capped at 16 Hz), longer grounding and settling, smaller drift, rounded pulse; evening always grounds at 7.83 Hz.</td><td class="quote">Your programs keep a grounded, unhurried shape.</td></tr>
+      <tr><td class="when">Your constitution leans fiery (pitta).</td><td>Midday drive capped at 17 Hz with a rounded pulse, and a longer midday pause to cool down.</td><td class="quote">Your midday program builds in a longer pause to cool down.</td></tr>
+      <tr><td class="when">Your constitution leans earthy (kapha).</td><td>Shorter waking, a firmer pulse and a higher morning peak (up to 22 Hz), larger drift.</td><td class="quote">Your mornings get a brighter, firmer lift.</td></tr>
+      <tr><td class="when">The Moon or the 4th area (home, inner calm) is low.</td><td>Adds a 7.83 Hz grounding movement before waking and lengthens evening grounding.</td><td class="quote">A grounding passage is added, because steadiness is something to build on.</td></tr>
+      <tr><td class="when">Midday · Mercury is low, or Mercury runs the current period.</td><td>Adds 40 Hz bursts (2 s every 15 s) to the midday focus movement.</td><td class="quote">Short, bright bursts are woven into the focus part.</td></tr>
+      <tr><td class="when">Midday · The 6th area (daily health, routines) or overall vitality is low.</td><td>The midday pause becomes a 10 Hz renewal movement, one minute longer; the morning spark is left out.</td><td class="quote">Midday includes a longer renewal pause.</td></tr>
+      <tr><td class="when">Evening · The 12th area (sleep, letting go) is low.</td><td>Longer, slower drift (breathing swell at 4.5 per minute) and a longer slow-wave ending.</td><td class="quote">Your evening winds down more slowly than most.</td></tr>
+      <tr><td class="when">Evening · Saturn is pressing on the Moon (the 7.5-year cycle at its rising or peak).</td><td>Longer release with less drift: a steadier, more even descent.</td><td class="quote">Evenings stay especially even for now.</td></tr>
+      <tr><td class="when">Morning · Mars is strong.</td><td>The morning spark gets a firm pulse and one extra minute.</td><td class="quote">Your morning has a strong, clear spark to work with.</td></tr>
+      <tr><td class="when">Morning · Mars is low.</td><td>No spark: the morning lifts to its steady peak and settles.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Midday · Mercury is strong.</td><td>The midday focus movement runs one minute longer.</td><td class="quote">Focus is a strength, so midday gives it more room.</td></tr>
+      <tr><td class="when">Morning · Always (your strongest planet).</td><td>Your strongest planet voices the morning settle, so the day starts from your strength.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Midday · Always (your quietest planet).</td><td>Your quietest planet voices the midday pause, so it gets attention when the day is calm.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Today scores 64 or more.</td><td>Lift, spark, focus and drive run 10 % longer.</td><td class="quote">Today has good momentum.</td></tr>
+      <tr><td class="when">Today scores 42–63.</td><td>Lengths as designed.</td><td class="quote">Today is an even, steady day.</td></tr>
+      <tr><td class="when">Today scores 28–41, or a lower score with a supportive Moon station.</td><td>No spark or drive; active movements 10 % shorter, evening 15 % longer.</td><td class="quote">Today asks for a gentler pace.</td></tr>
+      <tr><td class="when">Today scores below 28.</td><td>As soften, and the morning wakes more slowly.</td><td class="quote">Today asks for a slower start and plenty of pauses.</td></tr>
+      <tr><td class="when">Your two strongest planets (strong or good, by six-fold strength).</td><td>Each gets its own arc: home tone → that planet's band, built on with its extras (firm pulse, breathing swell), then integrates. The tone is that planet's, turned by its birth degree, blended with the ascendant lord.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Your weakest planets: low ones first, then the weakest average ones (by six-fold strength). Never a planet that is also a strength.</td><td>A support arc in a softer band for that planet, sometimes with a research value: 10 Hz renewal, 7.83 Hz grounding or 40 Hz bursts. Breathing swell throughout, smaller drift.</td><td class="quote">—</td></tr>
+      <tr><td class="when">The 4th (inner calm), 6th (routines) or 12th (rest) area is low (needs a birth time).</td><td>A support arc for that area: grounding, renewal, or a slow descent to about 1 Hz.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Always (the current main and sub-period).</td><td>The chapter arc is voiced by the main period lord (counts 1.5) and the sub-period lord, in the main lord's band.</td><td class="quote">—</td></tr>
+      <tr><td class="when">The chapter's backing is low, or Saturn is pressing on the Moon (rising or peak).</td><td>The chapter arc uses the gentle support version of the main lord's band, with a breathing swell.</td><td class="quote">This stretch of time asks for patience, so this keeps the pace calm and even.</td></tr>
+      <tr><td class="when">The chapter's backing is good or strong.</td><td>The chapter arc uses the build-on version of the main lord's band.</td><td class="quote">This stretch of time has good backing, so this builds on it.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Two people, same day</h2>
+  <section class="prose"><p>The two test charts on 27 November 2026, as they play. Same Moon station, weekday and date; different charts.</p></section>
+  <div class="scale"><table class="compare">
+    <thead><tr><th></th><th>Alex (airy, gentle day)</th><th>Jordan (earthy, momentum)</th></tr></thead>
+    <tbody>
+      <tr><td>Home tone</td><td>9.17 Hz</td><td>9.65 Hz</td></tr>
+      <tr><td>Morning</td><td>6.85 → 9.17 → 12.7 → 10.8 Hz · 17 min</td><td>6.41 → 9.65 → 13.1 → 17.9 (firm) → 11.1 Hz · 19 min</td></tr>
+      <tr><td>Midday</td><td>12.4 → 9.17 → 12.6 · pause 9.49 → 11.6 Hz · 15 min</td><td>10.5 → 9.65 → 13.6 → 16.7 (firm) · pause 7.92 → 13 Hz · 22 min</td></tr>
+      <tr><td>Evening</td><td>9.17 → 8.07 → 7.83 → 4.7 → 3.03 → 1.01 Hz · 31 min</td><td>9.65 → 8.53 → 7.13 → 6.45 → 1.61 → 0.91 Hz · 24 min</td></tr>
+    </tbody>
+  </table></div>
+
+  <section class="prose">
+    <h2>Research values</h2>
+    <dl class="map">
+      <dt>Drift</dt><dd>From the Infinity jitter spec: ±5 % for calm and sleep, ±10 % for activation, so the pattern never sits still (against habituation). The device updates every 0.3–3 s; the audio glides every 2–6 s, which sounds smoother in music.</dd>
+      <dt>0.1 Hz breathing</dt><dd>About six breaths a minute (range 4.5–6.5) is the resonance rate of heart-rate variability (<a href="https://doi.org/10.3389/fpsyg.2014.00756">Lehrer &amp; Gevirtz 2014</a>). Evenings slow to 5 and 4.5 a minute.</dd>
+      <dt>7.83 Hz</dt><dd>Schumann resonance. It is used for grounding throughout the device catalog (Deep Relaxation, Meditation Support, Emotional Grounding).</dd>
+      <dt>40 Hz bursts</dt><dd>The auditory steady-state response is strongest near 40 Hz (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9759142/">review</a>). The pattern, 2 s every 15 s, is the device catalog's Focus Boost.</dd>
+      <dt>10 Hz renewal</dt><dd>The rate most studied for cell-level renewal in pulsed-field research (Goodwin, NASA TP-2003-212054). It is used in the device's recovery programs.</dd>
+      <dt>≤ 1 Hz ending</dt><dd>Pulsed-field sleep trials use slow rates (<a href="https://pubmed.ncbi.nlm.nih.gov/11697020/">Pelka et al. 2001</a>), and they match the slow oscillation of deep sleep.</dd>
+      <dt>Arc shapes</dt><dd>These follow the device catalog's protocols. Morning Smooth Wake-Up and Morning Activation run 5 → 10 → 15–18 Hz, Focus Boost and Productivity Mode run 10–16 Hz, and Evening Wind-Down and Deep Sleep Induction run 12 → 8 → 5 → 4 Hz. Bands follow the whitepaper: delta 2–4, theta 4–8, alpha 8–12, low beta 12–20 Hz.</dd>
+      <dt>Your own rate</dt><dd>Stimulation tuned to a person's own alpha rhythm is an active research line, with mixed results (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8261289">review</a>). Here the chart stands in for an EEG measurement. That is our design choice, not a research finding.</dd>
+    </dl>
+    <p class="note">The Pro view shows every rate, its voices with their weights, the rules that fired, and, when a rate lands within 1 % of a value in the 105-program catalog, which program holds it. That link is shown for reference only; it never decides anything.</p>
+
+    <h2>Safety limits</h2>
+    <p>Checked every time a program is loaded. A program outside them is refused, not played. Rates stay between 0.5 and 40 Hz (pulse only: no tones, no binaural). Each movement runs 1 to 15 minutes, and a whole program at most 45. Pulse depth is at most 0.4, drift at most ±12 %, and the breathing swell 3 to 7 a minute. Bursts last at most 4 s and come at least 8 s apart. Visuals never flash faster than once a second.</p>
+
+    <h2>What needs your decision</h2>
+    <div class="decide"><ul>
+      <li><b>The tone method.</b> Is orbit tones turned by birth degree, blended by strength, right for Wellness First? The alternative is to drop the birth-degree turn and use the plain cosmic-octave tones. That is more traditional, but people's programs then sound much more alike.</li>
+      <li><b>The voices</b> of each movement: the Moon at waking, Mercury for focus, Saturn and Ketu for release, Venus for the pause.</li>
+      <li><b>The constitution</b> rules, and that the Moon's nadi counts double.</li>
+      <li><b>Hour rulers from 06:00 in equal hours.</b> Real sunrise would be more exact but needs the member's current location, which we do not ask for.</li>
+      <li><b>Lengths and peaks.</b> Mornings peak at up to 22 Hz, middays at 19, and evenings end near 1 Hz and hold there.</li>
+      <li><b>The theme bands and titles.</b> Each planet has a band and a title for building on it and for supporting it (the table above). Saturn sits low (4.5–6.5 Hz) both ways; Rahu's support is grounding at 7.83 Hz.</li>
+      <li><b>Support picks.</b> Low life areas come before low planets, and the second place can go to an average planet.</li>
+    </ul></div>
+    <p>Write your changes here in the chat. Programs already made keep the version they were made with, so saved programs never change.</p>
+  </section>
+
+  <footer>Source: <code>src/lib/sound/dayArc.ts</code> (rules, tones, day and theme composers) and <code>src/sound/engine/compose/arc.ts</code> (limits), version 2.0.0. Device references: Infinity PEMF Program Catalog, Frequency Catalog whitepaper, Jitter spec.</footer>
+</div>

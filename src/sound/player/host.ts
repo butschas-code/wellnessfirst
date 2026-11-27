@@ -9,7 +9,7 @@
  * state sync and the listening log in Supabase).
  */
 
-import type { Composition } from '../engine/compose/types';
+import type { AnyComposition } from '../engine/compose/plan';
 
 /** Why a stretch of listening was logged. `chunk`: periodic save during a long session. */
 export type EndedBy = 'switch' | 'stop' | 'timer' | 'leave' | 'chunk';
@@ -46,8 +46,9 @@ export interface PersonalProgram {
   descriptionPro: string;
   intent: string;
   recipeId: string;
-  composition: Composition;
-  reasons: Array<{ ruleId: string; layer: string; use: string; category: string; weight: number }>;
+  composition: AnyComposition;
+  /** Catalog rules carry use/category/weight; day-arc rules carry the movements they shaped. */
+  reasons: Array<{ ruleId: string; layer: string; use?: string; category?: string; weight?: number; movements?: string[] }>;
   validFrom: string;
   validTo: string | null;
   contentHash: string;

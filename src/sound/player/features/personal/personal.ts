@@ -1,5 +1,5 @@
 /**
- * Personal programs ("For you") — a stored composition → a playable technique.
+ * Personal programs ("For you") — a stored composition or day arc → a playable technique.
  *
  * The composition is re-validated against this build's catalog and turned into
  * a plan with planForComposition, so what plays is exactly the catalog values
@@ -19,8 +19,25 @@ export const personalTechniqueId = (p: Pick<PersonalProgram, 'id' | 'contentHash
 
 /** Null if the program no longer matches this build's catalog (it is then not played). */
 export async function techniqueForProgram(p: PersonalProgram): Promise<Technique | null> {
-  const { planForComposition, validateComposition } = await import('../../../engine/compose/index');
+  const { planForComposition, validateComposition, isArc, arcSteps } = await import('../../../engine/compose/index');
   if (validateComposition(p.composition).length) return null;
+  if (isArc(p.composition)) {
+    // A personal day arc: every movement keeps its glide, drift, bursts and breathing swell.
+    const c = p.composition;
+    const steps = arcSteps(c);
+    const all = steps.flatMap((s) => [s.hz, s.toHz]);
+    return {
+      id: personalTechniqueId(p),
+      name: p.name,
+      tag: `${steps.length} movements`,
+      spaces: ['focus', 'relax', 'sleep', 'meditate', 'energy', 'balance', 'recover'],
+      kind: 'pulse',
+      pulse: { hz: steps[0].hz, depth: steps[0].depth, sequence: steps, holdLast: true, seed: c.seed },
+      benefit: p.description,
+      what: `${steps.length} movements over ${Math.round(c.totalSeconds / 60)} minutes, ${fmt(Math.min(...all))} to ${fmt(Math.max(...all))} Hz, as a gentle pulse in the music; it holds the last one until you change it.`,
+      background: 'Composed for you from your whole birth chart: each rate is worked out for you, not picked from a list.',
+    };
+  }
   const plan = planForComposition(p.composition, p.name);
   if (!plan.renderable) return null;
   const seq = plan.sequence;

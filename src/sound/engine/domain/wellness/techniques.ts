@@ -22,6 +22,24 @@ export interface BreathPattern {
   holdOut: number;
 }
 
+/** One step of a sequence. Catalog programs use hz/seconds/depth; personal arcs add the rest. */
+export interface SequenceStep {
+  hz: number;
+  seconds: number;
+  depth: number;
+  tone?: boolean;
+  /** Glide from `hz` to this rate across the whole step. */
+  toHz?: number;
+  /** firm: slightly squarer pulse (adds a third harmonic to the pulse). */
+  shape?: 'sine' | 'firm';
+  /** Slow drift around the rate: ± pct, new target every `every` s. */
+  jitter?: { pct: number; every: number };
+  /** Short bursts at another rate: `on` s every `every` s. */
+  burst?: { hz: number; on: number; every: number };
+  /** A breathing swell in the music. */
+  breath?: { hz: number; depth: number };
+}
+
 export interface Technique {
   id: string;
   name: string;
@@ -36,7 +54,11 @@ export interface Technique {
     /** Modulation depth 0–1 of the music's amplitude. */
     depth: number;
     /** Frequency programs: cycle through these rates in order, looping. Overrides `hz`/`to`. */
-    sequence?: Array<{ hz: number; seconds: number; depth: number; tone?: boolean }>;
+    sequence?: Array<SequenceStep>;
+    /** Personal arcs: after the last step, hold it instead of starting over. */
+    holdLast?: boolean;
+    /** Seed for the deterministic drift (jitter) pattern. */
+    seed?: string;
   };
   /** frequency program this technique plays, if any. */
   programId?: string;
