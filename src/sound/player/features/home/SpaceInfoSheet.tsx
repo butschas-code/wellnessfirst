@@ -13,6 +13,7 @@ import { useSwipeDown } from '../../ui/mobile';
 import { useWellness } from '../wellness/wellness';
 import { usePlayer } from '../../sessions/playerContext';
 import { PLAYER_NAME } from '../../brand';
+import { PERSONAL_HOW, isPersonalTechnique } from '../personal/personal';
 
 export const SpaceInfoSheet: React.FC<{ space: Intent | null; onClose: () => void }> = ({ space, onClose }) => {
   const swipe = useSwipeDown(onClose);
@@ -53,6 +54,7 @@ export const SpaceInfoSheet: React.FC<{ space: Intent | null; onClose: () => voi
                 <p className="about__benefit">{t.benefit}</p>
                 <p>{t.what}</p>
                 <p className="about__fine">{t.background}</p>
+                {isPersonalTechnique(t.id) && <p className="about__fine">{PERSONAL_HOW}</p>}
               </section>
             )}
 

@@ -59,6 +59,12 @@ export async function techniqueForProgram(p: PersonalProgram): Promise<Technique
   };
 }
 
+/** Plain-words "how is this made", shown under the (i) when a personal program plays. */
+export const PERSONAL_HOW =
+  'How it is made: your birth date, time and place show where the planets were when you were born. Each one has its own slow rhythm. We turn those rhythms into soft pulses in the music and put them in an order that fits the time of day. Nobody picks it from a list: it is put together just for you.';
+
+export const isPersonalTechnique = (id: string | undefined) => !!id && id.startsWith('ww:');
+
 export const SLOT_LABEL = { morning: 'Morning', midday: 'Midday', evening: 'Evening' } as const;
 
 /** The slot the listener is in now (local time): before 11 morning, before 17 midday, else evening. */
