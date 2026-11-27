@@ -12,6 +12,13 @@ import { SPACES } from '../../ui/catalogue';
 import type { Intent } from '../../../engine/types/index';
 import { haptic } from '../../ui/mobile';
 
+/** "For you" (personal programs) is a space of its own, first in the list. */
+export type SpaceKey = Intent | 'you';
+const ITEMS: Array<{ key: SpaceKey; name: string; line: string }> = [
+  { key: 'you', name: 'For you', line: 'Programs made from your birth chart.' },
+  ...SPACES.map((x) => ({ key: x.intent as SpaceKey, name: x.name, line: x.line })),
+];
+
 const ITEM = 150;
 const GAP = 4;
 
@@ -49,33 +56,33 @@ function useArrowKeys(step: (dir: 1 | -1) => void): void {
 }
 
 export const SpaceCarousel: React.FC<{
-  selected: Intent;
-  onSelect: (intent: Intent) => void;
+  selected: SpaceKey;
+  onSelect: (key: SpaceKey) => void;
   onTapSelected: () => void;
 }> = (props) => (useDesktop() ? <SpaceRow {...props} /> : <SpaceRail {...props} />);
 
 const SpaceRow: React.FC<{
-  selected: Intent;
-  onSelect: (intent: Intent) => void;
+  selected: SpaceKey;
+  onSelect: (key: SpaceKey) => void;
   onTapSelected: () => void;
 }> = ({ selected, onSelect, onTapSelected }) => {
-  const index = Math.max(0, SPACES.findIndex((s) => s.intent === selected));
+  const index = Math.max(0, ITEMS.findIndex((s) => s.key === selected));
   const go = (i: number) => {
-    const n = (i + SPACES.length) % SPACES.length;
-    if (n !== index) onSelect(SPACES[n].intent);
+    const n = (i + ITEMS.length) % ITEMS.length;
+    if (n !== index) onSelect(ITEMS[n].key);
   };
   useArrowKeys((dir) => go(index + dir));
 
   return (
     <div className="spaces spaces--row">
       <div className="spaces__bar">
-        <button type="button" className="spaces__step" onClick={() => go(index - 1)} aria-label={`Previous space: ${SPACES[(index + SPACES.length - 1) % SPACES.length].name}`}>
+        <button type="button" className="spaces__step" onClick={() => go(index - 1)} aria-label={`Previous space: ${ITEMS[(index + ITEMS.length - 1) % ITEMS.length].name}`}>
           <ChevronLeft size={22} strokeWidth={1.25} aria-hidden="true" />
         </button>
         <div className="spaces__list" role="radiogroup" aria-label="Space">
-          {SPACES.map((s, i) => (
+          {ITEMS.map((s, i) => (
             <button
-              key={s.intent}
+              key={s.key}
               type="button"
               role="radio"
               aria-checked={i === index}
@@ -87,12 +94,12 @@ const SpaceRow: React.FC<{
             </button>
           ))}
         </div>
-        <button type="button" className="spaces__step" onClick={() => go(index + 1)} aria-label={`Next space: ${SPACES[(index + 1) % SPACES.length].name}`}>
+        <button type="button" className="spaces__step" onClick={() => go(index + 1)} aria-label={`Next space: ${ITEMS[(index + 1) % ITEMS.length].name}`}>
           <ChevronRight size={22} strokeWidth={1.25} aria-hidden="true" />
         </button>
       </div>
       <p className="spaces__line" aria-live="polite">
-        {SPACES[index].line}
+        {ITEMS[index].line}
         <span className="spaces__keys" aria-hidden="true">← → to change</span>
       </p>
     </div>
@@ -100,13 +107,13 @@ const SpaceRow: React.FC<{
 };
 
 const SpaceRail: React.FC<{
-  selected: Intent;
-  onSelect: (intent: Intent) => void;
+  selected: SpaceKey;
+  onSelect: (key: SpaceKey) => void;
   onTapSelected: () => void;
 }> = ({ selected, onSelect, onTapSelected }) => {
   const rail = useRef<HTMLDivElement>(null);
   const settle = useRef<number | null>(null);
-  const index = Math.max(0, SPACES.findIndex((s) => s.intent === selected));
+  const index = Math.max(0, ITEMS.findIndex((s) => s.key === selected));
   const lastIndex = useRef(index);
 
   // Keep the rail centred on the selected space (also when it changes from elsewhere).
@@ -123,11 +130,11 @@ const SpaceRail: React.FC<{
     settle.current = window.setTimeout(() => {
       const el = rail.current;
       if (!el) return;
-      const i = Math.max(0, Math.min(SPACES.length - 1, Math.round(el.scrollLeft / (ITEM + GAP))));
+      const i = Math.max(0, Math.min(ITEMS.length - 1, Math.round(el.scrollLeft / (ITEM + GAP))));
       if (i !== lastIndex.current) {
         lastIndex.current = i;
         haptic();
-        onSelect(SPACES[i].intent);
+        onSelect(ITEMS[i].key);
       }
     }, 140);
   };
@@ -149,13 +156,13 @@ const SpaceRail: React.FC<{
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
             e.preventDefault();
-            tap(Math.max(0, Math.min(SPACES.length - 1, index + (e.key === 'ArrowRight' ? 1 : -1))));
+            tap(Math.max(0, Math.min(ITEMS.length - 1, index + (e.key === 'ArrowRight' ? 1 : -1))));
           }
         }}
       >
-        {SPACES.map((s, i) => (
+        {ITEMS.map((s, i) => (
           <button
-            key={s.intent}
+            key={s.key}
             type="button"
             role="radio"
             aria-checked={i === index}
@@ -168,11 +175,11 @@ const SpaceRail: React.FC<{
         ))}
       </div>
       <p className="spaces__line" aria-live="polite">
-        {SPACES[index].line}
+        {ITEMS[index].line}
       </p>
       <div className="spaces__dots" aria-hidden="true">
-        {SPACES.map((s, i) => (
-          <span key={s.intent} className={i === index ? 'is-on' : ''} />
+        {ITEMS.map((s, i) => (
+          <span key={s.key} className={i === index ? 'is-on' : ''} />
         ))}
       </div>
     </div>

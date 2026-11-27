@@ -9,11 +9,12 @@ import { haptic } from '../../ui/mobile';
 import { AudioWaveform, Check, ChevronRight, Heart, Info, Infinity as InfinityIcon, Leaf, Moon, Pause, Play, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { SpaceInfoSheet } from './SpaceInfoSheet';
 import { FeelPad } from './FeelPad';
-import { techniqueFor, useWellness, wellnessEnabled } from '../wellness/wellness';
+import { pinnedPersonal, techniqueFor, useWellness, wellnessEnabled } from '../wellness/wellness';
+import { isPersonalTechnique } from '../personal/personal';
 import type { Technique } from '../../../engine/domain/wellness/techniques';
 import { usePlayer } from '../../sessions/playerContext';
 import { FLAGSHIP_BY_INTENT, SPACES, flagshipForNow, recipesFor } from '../../ui/catalogue';
-import { SpaceCarousel } from './SpaceCarousel';
+import { SpaceCarousel, type SpaceKey } from './SpaceCarousel';
 import { SoundscapeSheet } from './SoundscapeSheet';
 import { previewDepth, setHeroPlacement } from '../../ui/stage/stage';
 import type { Intent } from '../../../engine/types/index';
@@ -86,6 +87,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
   const busy = status === 'loading' || status === 'resuming';
   const space: Intent | null = live ? currentRecipe!.intent : null;
   const [sel, setSel] = useState<Intent>(() => shortcut ?? currentRecipe?.intent ?? flagshipForNow().intent);
+  // "For you" is its own space in the carousel; it starts selected while a personal program plays.
+  const [forYou, setForYou] = useState<boolean>(() => !shortcut && isPersonalTechnique(wellness.technique?.id));
+  const personalNow = live && isPersonalTechnique(wellness.technique?.id) ? wellness.technique : null;
+  // Picking a program moves the carousel with it: a personal one to For you, a space's one away.
+  const techId = wellness.technique?.id;
+  useEffect(() => {
+    if (!techId) return;
+    setForYou(isPersonalTechnique(techId));
+  }, [techId]);
+  const openForYou = () => {
+    setPickYou(true);
+    setPicking(true);
+  };
 
   // Follow what plays (e.g. lock-screen "next"), so the carousel always shows it.
   useEffect(() => {
@@ -100,10 +114,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
   const tapRing = () => {
     haptic();
     if (live) void togglePlayPause();
+    // For you with nothing chosen yet: show the programs; with one chosen, it plays under the soundscape.
+    else if (forYou && !pinnedPersonal()) openForYou();
     else playSel(sel);
   };
 
-  const selectSpace = (intent: Intent) => {
+  const selectSpace = (key: SpaceKey) => {
+    if (key === 'you') {
+      setForYou(true);
+      if (!live) previewDepth(null);
+      return;
+    }
+    const intent = key;
+    setForYou(false);
     setSel(intent);
     if (live && space !== intent) {
       previewDepth(null);
@@ -113,7 +136,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
 
   const tapSelected = () => {
     haptic();
-    if (live && space === sel) void togglePlayPause();
+    if (forYou) openForYou();
+    else if (live && space === sel) void togglePlayPause();
     else playSel(sel);
   };
 
@@ -219,7 +243,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
       </button>
 
       <div className="home__below" ref={below}>
-        {!feeling && <SpaceCarousel selected={sel} onSelect={selectSpace} onTapSelected={tapSelected} />}
+        {!feeling && <SpaceCarousel selected={forYou ? 'you' : sel} onSelect={selectSpace} onTapSelected={tapSelected} />}
         <button
           type="button"
           className="home__now"
@@ -237,10 +261,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
             <span aria-live="polite">{shownRecipe.title}</span>
             <ChevronRight size={15} strokeWidth={1.5} aria-hidden="true" />
           </button>
-          <button type="button" className="home__program" onClick={() => setPicking(true)} aria-label="Choose program">
+          <button
+            type="button"
+            className={`home__program${forYou ? ' home__program--you' : ''}`}
+            onClick={() => (forYou ? openForYou() : setPicking(true))}
+            aria-label={forYou ? 'Your programs' : 'Choose program'}
+          >
             <InfinityIcon size={15} strokeWidth={1.5} aria-hidden="true" />
             <span aria-live="polite">
-              {live ? (wellness.technique ? wellness.technique.name : 'Just music') : upNext ? upNext.name : 'Choose a program'}
+              {forYou
+                ? personalNow?.name ?? pinnedPersonal()?.name ?? 'Your programs'
+                : live
+                  ? wellness.technique
+                    ? wellness.technique.name
+                    : 'Just music'
+                  : upNext
+                    ? upNext.name
+                    : 'Choose a program'}
             </span>
             <ChevronRight size={15} strokeWidth={1.5} aria-hidden="true" />
           </button>

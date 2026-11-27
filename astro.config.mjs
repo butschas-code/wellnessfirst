@@ -41,6 +41,14 @@ export default defineConfig({
       },
     },
     plugins: [tailwindcss()],
+    ssr: {
+      /**
+       * astronomy-engine ships its ESM build as `.js` without `"type": "module"`, so Node on
+       * Vercel loads it as CommonJS and the programs API crashes ("Unexpected token 'export'").
+       * Bundling it into the server build avoids loading it from node_modules at runtime.
+       */
+      noExternal: ['astronomy-engine'],
+    },
   },
   adapter: useVercel ? vercel() : cloudflare(),
   integrations: [

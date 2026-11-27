@@ -58,7 +58,7 @@ import MemberSkeletonBlock from '@/components/member/MemberSkeletonBlock.astro';
       panel?.classList.remove('hidden');
       const err = document.getElementById('w-rh-err');
       if (data.error && err) {
-        err.textContent = 'We could not load everything just now. Refresh when you have a moment.';
+        err.textContent = `We could not load everything just now. Refresh when you have a moment. (${data.error})`;
         err.classList.remove('hidden');
       }
       document.getElementById('w-rh-profile')!.innerHTML = profileHtml(data.profile);

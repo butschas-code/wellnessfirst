@@ -27,14 +27,18 @@ export interface RhythmData {
 export async function fetchRhythmData(token: string): Promise<RhythmData> {
   const headers = { Authorization: `Bearer ${token}` };
   const out: RhythmData = { profile: null, programs: [], error: null };
-  const [p, s] = await Promise.allSettled([
-    fetch('/api/astro/profile', { headers }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`profile ${r.status}`)))),
-    fetch('/api/sound/programs?set=saved', { headers }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`programs ${r.status}`)))),
-  ]);
+  // A failed call keeps the server's own message (it carries a short error code).
+  const get = async (url: string, what: string) => {
+    const r = await fetch(url, { headers });
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`${what}: ${body.message || body.error || `HTTP ${r.status}`}`);
+    return body;
+  };
+  const [p, s] = await Promise.allSettled([get('/api/astro/profile', 'Birth details'), get('/api/sound/programs?set=saved', 'Saved programs')]);
   if (p.status === 'fulfilled') out.profile = p.value.profile ?? null;
-  else out.error = String(p.reason);
+  else out.error = (p.reason as Error).message;
   if (s.status === 'fulfilled') out.programs = s.value.programs ?? [];
-  else out.error = out.error ?? String(s.reason);
+  else out.error = out.error ?? (s.reason as Error).message;
   return out;
 }
 
