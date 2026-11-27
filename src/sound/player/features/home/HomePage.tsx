@@ -6,11 +6,13 @@
 
 import React, { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { haptic } from '../../ui/mobile';
-import { AudioWaveform, Check, ChevronRight, Heart, Info, Infinity as InfinityIcon, Leaf, Moon, Pause, Play, Shuffle, SlidersHorizontal } from 'lucide-react';
+import { AudioWaveform, Check, ChevronRight, Heart, Info, ListMusic, Infinity as InfinityIcon, Leaf, Moon, Pause, Play, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { SpaceInfoSheet } from './SpaceInfoSheet';
 import { FeelPad } from './FeelPad';
-import { pinnedPersonal, techniqueFor, useWellness, wellnessEnabled } from '../wellness/wellness';
-import { isPersonalTechnique } from '../personal/personal';
+import { choosePersonal, pinPersonal, pinnedPersonal, techniqueFor, useWellness, wellnessEnabled } from '../wellness/wellness';
+import { isPersonalTechnique, personalTechniqueId, techniqueForProgram } from '../personal/personal';
+import { TodayStrip, nowProgram } from '../personal/TodayStrip';
+import { personalPrograms, saveProgram, type PersonalProgram, type PersonalResult } from '../../host';
 import type { Technique } from '../../../engine/domain/wellness/techniques';
 import { usePlayer } from '../../sessions/playerContext';
 import { FLAGSHIP_BY_INTENT, SPACES, flagshipForNow, recipesFor } from '../../ui/catalogue';
@@ -96,6 +98,63 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
     if (!techId) return;
     setForYou(isPersonalTechnique(techId));
   }, [techId]);
+  // While a stored personal program plays, the heart saves that program to the account
+  // (it then shows in the Wellness Space). Otherwise it favourites the soundscape.
+  const storedProgramId = personalNow && /^ww:[0-9a-f]{8}-[0-9a-f]{4}-/i.test(personalNow.id) ? personalNow.id.slice(3) : null;
+  const [programSaved, setProgramSaved] = useState(false);
+  useEffect(() => {
+    setProgramSaved(false);
+    if (!storedProgramId) return;
+    let alive = true;
+    void personalPrograms('saved').then((r) => alive && setProgramSaved(r.status === 'ok' && r.programs.some((p) => p.id === storedProgramId)));
+    return () => {
+      alive = false;
+    };
+  }, [storedProgramId]);
+  const hearted = storedProgramId ? programSaved : !!currentRecipe && isFavorite(currentRecipe.id);
+  const toggleHeart = () => {
+    if (storedProgramId) void saveProgram(storedProgramId, !programSaved).then(setProgramSaved);
+    else if (currentRecipe) toggleFavorite(currentRecipe.id);
+  };
+  // Today's personal programs, shown on the home while For you is selected.
+  const [today, setToday] = useState<PersonalResult | null>(null);
+  const playNowWhenLoaded = useRef(false);
+  const playPersonal = async (p: PersonalProgram) => {
+    haptic();
+    const t = await techniqueForProgram(p);
+    if (!t) return;
+    if (live) choosePersonal(t);
+    else {
+      pinPersonal(t);
+      await playRecipe(p.recipeId);
+    }
+  };
+  // Load today's programs the first time For you is shown.
+  useEffect(() => {
+    if (!forYou || today) return;
+    let alive = true;
+    void personalPrograms('today').then((r) => {
+      if (!alive) return;
+      setToday(r);
+      const p = playNowWhenLoaded.current ? nowProgram(r) : null;
+      playNowWhenLoaded.current = false;
+      if (p) void playPersonal(p);
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forYou, today]);
+  // A pin from an earlier day is not today's program: start the one for now instead.
+  const startForYou = () => {
+    const pinned = pinnedPersonal();
+    const programs = today?.status === 'ok' ? today.programs : [];
+    const picked = pinned && programs.find((p) => personalTechniqueId(p) === pinned.id);
+    const p = picked || nowProgram(today);
+    if (p) void playPersonal(p);
+    else if (pinned) playSel(sel);
+    else openForYou();
+  };
   const openForYou = () => {
     setPickYou(true);
     setPicking(true);
@@ -114,8 +173,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
   const tapRing = () => {
     haptic();
     if (live) void togglePlayPause();
-    // For you with nothing chosen yet: show the programs; with one chosen, it plays under the soundscape.
-    else if (forYou && !pinnedPersonal()) openForYou();
+    // For you: the program picked today, else the one for this time of day.
+    else if (forYou) startForYou();
     else playSel(sel);
   };
 
@@ -123,6 +182,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
     if (key === 'you') {
       setForYou(true);
       if (!live) previewDepth(null);
+      // Already playing something else: switch to the program for now, like any other space.
+      else if (!personalNow) {
+        const p = nowProgram(today);
+        if (p) void playPersonal(p);
+        else if (!today) playNowWhenLoaded.current = true;
+      }
       return;
     }
     const intent = key;
@@ -136,8 +201,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
 
   const tapSelected = () => {
     haptic();
-    if (forYou) openForYou();
-    else if (live && space === sel) void togglePlayPause();
+    if (forYou) {
+      if (live && personalNow) void togglePlayPause();
+      else startForYou();
+    } else if (live && space === sel) void togglePlayPause();
     else playSel(sel);
   };
 
@@ -244,6 +311,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
 
       <div className="home__below" ref={below}>
         {!feeling && <SpaceCarousel selected={forYou ? 'you' : sel} onSelect={selectSpace} onTapSelected={tapSelected} />}
+        {!feeling && forYou && (
+          <TodayStrip
+            today={today}
+            activeId={live ? wellness.technique?.id ?? null : pinnedPersonal()?.id ?? null}
+            onPlay={(p) => void playPersonal(p)}
+          />
+        )}
         <button
           type="button"
           className="home__now"
@@ -265,12 +339,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
             type="button"
             className={`home__program${forYou ? ' home__program--you' : ''}`}
             onClick={() => (forYou ? openForYou() : setPicking(true))}
-            aria-label={forYou ? 'Your programs' : 'Choose program'}
+            aria-label={forYou ? 'All my programs' : 'Choose program'}
           >
-            <InfinityIcon size={15} strokeWidth={1.5} aria-hidden="true" />
+            {forYou ? <ListMusic size={15} strokeWidth={1.5} aria-hidden="true" /> : <InfinityIcon size={15} strokeWidth={1.5} aria-hidden="true" />}
             <span aria-live="polite">
               {forYou
-                ? personalNow?.name ?? pinnedPersonal()?.name ?? 'Your programs'
+                ? 'All my programs'
                 : live
                   ? wellness.technique
                     ? wellness.technique.name
@@ -319,13 +393,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
               </button>
               <button
                 type="button"
-                className={`tool${currentRecipe && isFavorite(currentRecipe.id) ? ' is-on' : ''}`}
-                onClick={() => currentRecipe && toggleFavorite(currentRecipe.id)}
+                className={`tool${hearted ? ' is-on' : ''}`}
+                onClick={toggleHeart}
                 disabled={!live}
-                aria-pressed={!!currentRecipe && isFavorite(currentRecipe.id)}
+                aria-pressed={hearted}
+                aria-label={storedProgramId ? (hearted ? 'Program saved' : 'Save this program') : undefined}
               >
-                <Heart size={20} strokeWidth={1.5} aria-hidden="true" fill={currentRecipe && isFavorite(currentRecipe.id) ? 'currentColor' : 'none'} />
-                <span>{currentRecipe && isFavorite(currentRecipe.id) ? 'Saved' : 'Save'}</span>
+                <Heart size={20} strokeWidth={1.5} aria-hidden="true" fill={hearted ? 'currentColor' : 'none'} />
+                <span>{hearted ? 'Saved' : 'Save'}</span>
               </button>
             </div>
           </>

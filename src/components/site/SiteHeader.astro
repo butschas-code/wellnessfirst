@@ -1,6 +1,6 @@
 ---
 import { getPublished } from '@/lib/content-filters';
-import { primaryNav } from '@/lib/navigation';
+import { headerNav } from '@/lib/navigation';
 
 const pathname = Astro.url.pathname;
 
@@ -55,7 +55,7 @@ const menuId = 'wfg-mobile-menu';
       </div>
 
       <nav class="hidden min-w-0 flex-1 items-center justify-end gap-0.5 lg:flex" aria-label="Primary">
-        {primaryNav.map((item) => {
+        {headerNav.map((item) => {
           const active = navItemActive(item.href);
           const iconOnly = item.iconOnly === true;
           const baseCls = iconOnly
@@ -163,7 +163,7 @@ const menuId = 'wfg-mobile-menu';
         </button>
       </div>
       <nav class="max-h-[min(70vh,28rem)] overflow-y-auto px-2 py-2" aria-label="Mobile">
-        {primaryNav.map((item) =>
+        {headerNav.map((item) =>
           item.iconOnly ? (
             <a
               class="flex min-h-12 items-center gap-2 rounded-xl px-3 py-2 text-base text-ink transition-colors hover:bg-primary/5 hover:text-primary active:bg-primary/8"

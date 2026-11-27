@@ -29,3 +29,16 @@
 
 /* Home: the program pill while "For you" is the selected space. */
 .ww .home__program--you { border-color: var(--glow); box-shadow: 0 0 0 1px var(--glow-soft), 0 0 18px -4px var(--glow); }
+
+/* Home: today's three programs under the carousel while "For you" is selected. */
+.ww .today-strip { display: flex; justify-content: center; gap: 6px; width: 100%; max-width: 440px; margin: 2px 0 10px; padding: 0 var(--gutter); box-sizing: border-box; }
+.ww .today-strip--loading { min-height: 52px; }
+.ww .today-strip__item { flex: 1 1 0; min-width: 0; display: grid; gap: 2px; justify-items: center; min-height: 52px; padding: 7px 8px; border-radius: 16px; border: 1px solid var(--glass-line); background: var(--glass); color: var(--paper); text-align: center; transition: border-color var(--t-micro), background-color var(--t-micro), box-shadow var(--t-micro); }
+.ww .today-strip__item:hover, .ww .today-strip__item:focus-visible { border-color: rgba(244, 239, 230, 0.3); }
+.ww .today-strip__item.is-now:not(.is-on) { border-color: var(--glow-soft); }
+.ww .today-strip__item.is-on { border-color: var(--glow); box-shadow: 0 0 0 1px var(--glow-soft), 0 0 18px -4px var(--glow); }
+.ww .today-strip__slot { font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper-dim); }
+.ww .today-strip__slot em { font-style: normal; color: var(--glow); }
+.ww .today-strip__name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; }
+.ww .today-strip--invite { justify-content: center; }
+.ww .today-strip__cta { font-size: 0.84rem; color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }

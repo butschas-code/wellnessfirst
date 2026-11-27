@@ -9,14 +9,14 @@
  *
  * Tapping a program plays it under whatever soundscape is playing (or starts
  * its suggested soundscape). It keeps playing across soundscapes until the
- * member picks something else. Each program has a Simple and a Pro "why".
+ * member picks something else. Each program has a plain-words "why".
  * Without birth details there is a quiet invitation, never a gate.
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { Bookmark, BookmarkCheck, Check, ChevronDown } from 'lucide-react';
 import { personalPrograms, saveProgram, type PersonalProgram, type PersonalResult, type PersonalSet } from '../../host';
-import { SLOT_LABEL, currentSlot, personalTechniqueId, readViewMode, writeViewMode } from './personal';
+import { SLOT_LABEL, currentSlot, personalTechniqueId } from './personal';
 import '../../styles/personal.css';
 
 type Loaded = Partial<Record<PersonalSet, PersonalResult>>;
@@ -52,12 +52,11 @@ interface RowProps {
   on: boolean;
   now: boolean;
   canSave: boolean;
-  pro: boolean;
   onPlay: (p: PersonalProgram) => void;
   onSave: (p: PersonalProgram) => void;
 }
 
-const Row: React.FC<RowProps> = ({ p, on, now, canSave, pro, onPlay, onSave }) => {
+const Row: React.FC<RowProps> = ({ p, on, now, canSave, onPlay, onSave }) => {
   const [why, setWhy] = useState(false);
   return (
     <div className={`fy-row${on ? ' is-on' : ''}`}>
@@ -82,7 +81,7 @@ const Row: React.FC<RowProps> = ({ p, on, now, canSave, pro, onPlay, onSave }) =
           </button>
         )}
       </div>
-      {why && (pro ? <pre className="fy-why fy-why--pro">{p.descriptionPro}</pre> : <p className="fy-why">{p.description}</p>)}
+      {why && <p className="fy-why">{p.description}</p>}
     </div>
   );
 };
@@ -92,7 +91,6 @@ export const ForYou: React.FC<{
   onPlay: (p: PersonalProgram) => void;
 }> = ({ activeId, onPlay }) => {
   const [loaded, setLoaded] = useState<Loaded>({});
-  const [mode, setMode] = useState<'simple' | 'pro'>(readViewMode);
   const slot = currentSlot();
 
   useEffect(() => {
@@ -124,11 +122,6 @@ export const ForYou: React.FC<{
     });
   }, []);
 
-  const setView = (m: 'simple' | 'pro') => {
-    setMode(m);
-    writeViewMode(m);
-  };
-
   const today = loaded.today;
   if (!today) return <p className="muted fy-note">Putting your programs together…</p>;
   if (today.status === 'no-profile') {
@@ -153,13 +146,6 @@ export const ForYou: React.FC<{
   return (
     <>
       <div className="fy-head">
-        <div className="segmented" role="radiogroup" aria-label="Detail">
-          {(['simple', 'pro'] as const).map((m) => (
-            <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setView(m)}>
-              {m === 'simple' ? 'Simple' : 'Pro'}
-            </button>
-          ))}
-        </div>
         {!today.canSave && (
           <p className="fy-note">
             {today.signedIn ? (
@@ -188,7 +174,6 @@ export const ForYou: React.FC<{
                   on={activeId === personalTechniqueId(p)}
                   now={set === 'today' && p.slot === slot}
                   canSave={canSave}
-                  pro={mode === 'pro'}
                   onPlay={onPlay}
                   onSave={(x) => void toggleSave(x)}
                 />
