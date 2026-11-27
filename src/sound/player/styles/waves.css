@@ -645,3 +645,11 @@
 .ww .auth__head h2 { font-size: clamp(1.7rem, 6vw, 2.2rem); font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; }
 .ww .auth__head p { margin-top: 10px; color: var(--paper-dim); line-height: 1.55; }
 .ww .auth--embedded .auth__form { margin-top: 18px; }
+
+/* Wider screens: the program rows get room for whole names instead of "Soft Land…". */
+@media (min-width: 760px) {
+  .ww .home__pills { max-width: 720px; }
+  .ww .home__pills .home__program { max-width: calc(50% - 4px); }
+  .ww .today-strip { max-width: 720px; gap: 8px; }
+  .ww .today-strip__name { font-size: 0.86rem; }
+}
