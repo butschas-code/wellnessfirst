@@ -85,6 +85,11 @@ export function choosePersonal(t: Technique): boolean {
   return run(t);
 }
 
+/** The listener leaves For you for a space: that space's own program takes over. */
+export function unpinPersonal(): void {
+  unpin();
+}
+
 export function turnWellnessOff(): void {
   unpin();
   setWellnessEnabled(false);

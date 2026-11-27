@@ -9,7 +9,7 @@ import { haptic } from '../../ui/mobile';
 import { AudioWaveform, Check, ChevronRight, Heart, Info, ListMusic, Infinity as InfinityIcon, Leaf, Moon, Pause, Play, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { SpaceInfoSheet } from './SpaceInfoSheet';
 import { FeelPad } from './FeelPad';
-import { choosePersonal, pinPersonal, pinnedPersonal, techniqueFor, useWellness, wellnessEnabled } from '../wellness/wellness';
+import { choosePersonal, pinPersonal, pinnedPersonal, startAutoWellness, techniqueFor, unpinPersonal, useWellness, wellnessEnabled } from '../wellness/wellness';
 import { isPersonalTechnique, personalTechniqueId, techniqueForProgram } from '../personal/personal';
 import { TodayStrip, nowProgram } from '../personal/TodayStrip';
 import { personalPrograms, saveProgram, type PersonalProgram, type PersonalResult } from '../../host';
@@ -136,7 +136,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
     void personalPrograms('today').then((r) => {
       if (!alive) return;
       setToday(r);
-      const p = playNowWhenLoaded.current ? nowProgram(r) : null;
+      const p = playNowWhenLoaded.current ? forYouProgram(r) : null;
       playNowWhenLoaded.current = false;
       if (p) void playPersonal(p);
     });
@@ -145,14 +145,17 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forYou, today]);
-  // A pin from an earlier day is not today's program: start the one for now instead.
+  // The personal program last picked; kept while the listener visits other spaces.
+  const lastPersonal = useRef<Technique | null>(null);
+  // Today's pick if there is one (a pin from an earlier day is not), else the one for now.
+  const forYouProgram = (r: PersonalResult | null) => {
+    const pinned = pinnedPersonal() ?? lastPersonal.current;
+    const programs = r?.status === 'ok' ? r.programs : [];
+    return (pinned && programs.find((p) => personalTechniqueId(p) === pinned.id)) || nowProgram(r);
+  };
   const startForYou = () => {
-    const pinned = pinnedPersonal();
-    const programs = today?.status === 'ok' ? today.programs : [];
-    const picked = pinned && programs.find((p) => personalTechniqueId(p) === pinned.id);
-    const p = picked || nowProgram(today);
+    const p = forYouProgram(today);
     if (p) void playPersonal(p);
-    else if (pinned) playSel(sel);
     else openForYou();
   };
   const openForYou = () => {
@@ -184,7 +187,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
       if (!live) previewDepth(null);
       // Already playing something else: switch to the program for now, like any other space.
       else if (!personalNow) {
-        const p = nowProgram(today);
+        const p = forYouProgram(today);
         if (p) void playPersonal(p);
         else if (!today) playNowWhenLoaded.current = true;
       }
@@ -192,10 +195,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onListen }) => {
     }
     const intent = key;
     setForYou(false);
+    // Leaving For you: the space's own program plays, not the personal one on top of it.
+    const pinned = pinnedPersonal();
+    if (pinned) {
+      lastPersonal.current = pinned;
+      unpinPersonal();
+    }
     setSel(intent);
     if (live && space !== intent) {
       previewDepth(null);
       void onListen(FLAGSHIP_BY_INTENT[intent], false);
+    } else if (live && personalNow && currentRecipe) {
+      // Same soundscape, but the personal program gives way to this space's program.
+      void startAutoWellness(currentRecipe);
     } else if (!live) previewDepth(intent);
   };
 
