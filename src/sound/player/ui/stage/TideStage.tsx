@@ -1,9 +1,11 @@
 /**
- * Tide stage renderer — deep water with a ring of its own light.
+ * Stage renderer — a lotus of light on a near-black night (Wellness First).
  *
- * One fixed WebGL canvas behind every route. It eases between depths (space
- * palettes) and ring placements, breathes with the music's smoothed level,
- * sends a ripple outward on each chord change, and mirrors a running frequency
+ * One fixed WebGL canvas behind every route: three rings of overlapping petal outlines
+ * turning slowly in opposite directions and opening and closing on their own
+ * phases, so the bloom never visibly repeats. It eases between space palettes
+ * and placements, breathes with the music's smoothed level, sends a soft
+ * soft wave outward on each chord change, and mirrors a running frequency
  * program's slow swells (< 1 Hz only: faster visual flicker is a photosensitivity
  * hazard, so faster program rates are never flashed). Renders at reduced
  * resolution (the image is soft by nature), ≤ 30 fps, pauses in hidden tabs,
@@ -22,48 +24,83 @@ precision highp float;
 uniform vec2 r; uniform float t;
 uniform vec3 C, DEEP, MID;
 uniform vec2 CENTER; uniform float R, LIGHT, DIM, PULSE, SWELL, RIP, SHIM;
+const float PI = 3.14159265;
+const vec3 CREAM = vec3(.957, .937, .902);
 float h(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
 float n(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1,0)),f.x), mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x), f.y); }
 float fbm(vec2 p){ float s=0., a=.5; for(int i=0;i<4;i++){ s+=a*n(p); p=p*2.03+vec2(1.7,9.2); a*=.5; } return s; }
+// Signed distance to a leaf (vesica) lying along +x, half-length hl, half-width hw.
+float leaf(vec2 q, float hl, float hw){
+  float rr = (hl * hl / hw + hw) * .5, dd = (hl * hl / hw - hw) * .5;
+  vec2 v = abs(vec2(q.y, q.x));
+  return ((v.y - hl) * dd > v.x * hl) ? length(v - vec2(0., hl)) : length(v - vec2(-dd, 0.)) - rr;
+}
+// One ring of k overlapping petals turned by rot: x = distance to the nearest outline, y = signed (inside < 0).
+// Only the petal under the point and its two neighbours are evaluated; the angle wraps, so it is seamless.
+vec2 bloom(vec2 p, float k, float rot, float base, float hl, float hw){
+  float sec = 6.2831853 / k;
+  float i0 = floor((atan(p.y, p.x) - rot) / sec + .5);
+  float edge = 1e3, inside = 1e3;
+  for (int j = -1; j <= 1; j++) {
+    float ang = (i0 + float(j)) * sec + rot;
+    float c = cos(ang), s = sin(ang);
+    vec2 q = vec2(c * p.x + s * p.y, -s * p.x + c * p.y) - vec2(base + hl, 0.);
+    float d = leaf(q, hl, hw);
+    edge = min(edge, abs(d));
+    inside = min(inside, d);
+  }
+  return vec2(edge, inside);
+}
+// Glowing outline at distance d.
+vec2 line(float d, float w){ return vec2(exp(-pow(d / w, 2.)), exp(-d * 26.) * .45 + exp(-d * 7.) * .16); }
 void main(){
   vec2 uv = gl_FragCoord.xy / r;
-  float aspect = r.x / r.y;
-  vec2 q = uv * vec2(aspect, 1.);
-  // Water: depth gradient, a slow shaft of light, caustic shimmer near the surface.
-  vec3 col = mix(DEEP, MID, smoothstep(0., 1., uv.y));
-  float cx = CENTER.x * aspect + .14 * sin(t * .06);
-  float d = abs(q.x - cx - (1. - uv.y) * .22);
-  float shaft = exp(-d * d * 7.) * smoothstep(.1, 1., uv.y);
-  float rays = fbm(vec2(q.x * 3. - (1. - uv.y) * 1.1, t * .07));
-  col += C * .2 * shaft * (.3 + .7 * rays) * DIM;
-  float cau = fbm(q * vec2(5., 11.) + vec2(t * .04, t * .09));
-  col += C * .14 * pow(cau, 3.) * smoothstep(.55, 1., uv.y) * DIM;
-  // The ring: seamless liquid light (noise sampled around a circle).
-  // The ring drifts a little, like something floating (slow, well under 1 Hz).
-  vec2 drift = vec2(sin(t * .13) + .5 * sin(t * .31 + 1.3), cos(t * .11) + .5 * cos(t * .23 + .7)) * R * .045;
-  vec2 p = (gl_FragCoord.xy - r * CENTER) / r.y - drift;
+  vec2 p = (gl_FragCoord.xy - r * CENTER) / r.y;
+  // Slow float, well under 1 Hz.
+  p -= vec2(sin(t * .11) + .4 * sin(t * .27 + 1.3), cos(t * .09) + .4 * cos(t * .21 + .7)) * R * .03;
+  float L = length(p);
   float a = atan(p.y, p.x);
   vec2 cd = vec2(cos(a), sin(a));
-  float beat = .5 + .5 * sin(t * PULSE * 1.6);
-  float wob = (fbm(cd * 1.3 + vec2(t * .08, -t * .06)) - .5) * .04;
-  float rad = R * (1. + .04 * beat + .09 * SWELL) + wob;
-  float dist = length(p) - rad;
-  float core = exp(-pow(dist / .0075, 2.));
-  float halo = exp(-abs(dist) * 30.) * .42 + exp(-abs(dist) * 8.) * .18 + exp(-abs(dist) * 2.5) * .06;
-  float bright = (.5 + .6 * SWELL) * (.8 + .32 * beat) * (1. + SHIM) * DIM * LIGHT;
-  float vary = .78 + .4 * fbm(cd * 2. + vec2(t * .07, 7.));
-  col += C * (core * .95 + halo) * bright * vary;
-  col += vec3(1.) * core * .16 * bright;
-  // Chord ripple travelling outward.
+
+  // Night: near-black with a faint tint of the space's light gathered behind the bloom.
+  vec3 col = DEEP;
+  col += MID * exp(-L * L / (R * R * 5.)) * DIM;
+  float mist = fbm(p * 2.2 + vec2(t * .018, -t * .014));
+  col += C * .035 * smoothstep(.35, .95, mist) * exp(-L / (R * 2.6)) * DIM;
+
+  float beat = .5 + .5 * sin(t * PULSE * .9);
+  float open = 1. + .045 * beat + .08 * SWELL;
+  float bright = (.55 + .55 * SWELL) * (.85 + .25 * beat) * (1. + SHIM) * DIM * LIGHT;
+  float wob = (fbm(cd * 1.2 + vec2(t * .05, -t * .04)) - .5) * .008;
+
+  // Three rings of petals turning slowly in opposite directions, each opening and closing on its own phase.
+  vec2 b1 = bloom(p, 8., t * .017, R * .06, R * .47 * open * (1. + .035 * sin(t * .23)), R * .17);
+  vec2 b2 = bloom(p, 8., PI / 8. - t * .023, R * .04, R * .36 * open * (1. + .045 * sin(t * .19 + 2.1)), R * .15);
+  vec2 b3 = bloom(p, 6., t * .031, R * .02, R * .22 * open * (1. + .055 * sin(t * .29 + 4.)), R * .1);
+  vec2 l1 = line(b1.x + wob, .0045);
+  vec2 l2 = line(b2.x + wob * .8, .0042);
+  vec2 l3 = line(b3.x + wob * .6, .0038);
+  vec3 c1 = C;
+  vec3 c2 = mix(C, CREAM, .3);
+  vec3 c3 = mix(C, CREAM, .6);
+  float vary = .8 + .35 * fbm(cd * 2. + vec2(t * .06, 7.));
+  col += (c1 * (l1.x * .8 + l1.y * .8) + c2 * (l2.x * .75 + l2.y * .7) + c3 * (l3.x * .7 + l3.y * .55)) * bright * vary;
+  // Soft petal bodies: light pools inside each ring, densest where rings overlap.
+  col += C * .05 * (smoothstep(.01, -.08, b1.y) + smoothstep(.01, -.06, b2.y) + smoothstep(.01, -.04, b3.y)) * DIM * LIGHT;
+  // A quiet seed of light at the heart.
+  col += mix(C, CREAM, .5) * exp(-L * L / (R * R * .02)) * .07 * bright;
+  // Keep the very centre calm so the play / pause mark stays readable.
+  col *= .45 + .55 * smoothstep(R * .05, R * .3, L);
+
+  // Chord change: a soft petal-shaped wave travelling outward.
   if (RIP >= 0. && RIP < 1.) {
-    float ripple = exp(-pow((length(p) - rad - RIP * .38) / .006, 2.)) * (1. - RIP) * .38;
-    col += C * ripple * DIM * LIGHT;
+    float rr = R * (1. + RIP * .34);
+    col += C * exp(-pow((L - rr) / .007, 2.)) * (1. - RIP) * .25 * DIM * LIGHT;
   }
-  col += C * .05 * smoothstep(rad, 0., length(p)) * DIM * LIGHT;
-  col *= smoothstep(1.45, .25, length(uv - vec2(.5, .55)));
-  col += (h(gl_FragCoord.xy + fract(t) * 91.) - .5) * .014;
-  gl_FragColor = vec4(col, 1.);
+  col *= smoothstep(1.5, .2, length(uv - vec2(.5, .52)));
+  col += (h(gl_FragCoord.xy + fract(t) * 91.) - .5) * .012;
+  gl_FragColor = vec4(max(col, 0.), 1.);
 }`;
 
 type V3 = [number, number, number];
