@@ -79,10 +79,10 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <h1>The rulebook</h1>
     <p class="lead">How a birth chart becomes every personal program: three a day (morning, midday, evening), one for the current chapter of life, two that build on strengths and two that give gentle support. Nothing is picked from the catalog. Every rate is worked out from the chart, so no two people get the same program, and the day programs are new each day. No AI is involved: the same chart on the same day always gives the same programs.</p>
     <div class="status">
-      <span><b>Version</b> 2.0.0 (day arcs)</span>
+      <span><b>Version</b> 2.1.0 (day arcs, sunrise hours, Shadbala per Raman)</span>
       <span><b>Status</b> draft, waiting for your sign-off</span>
       <span><b>Rules</b> 27</span>
-      <span><b>Replaces</b> 1.0.0 for every set</span>
+      <span><b>Replaces</b> 2.0.0 for every set</span>
     </div>
   </header>
 
@@ -193,7 +193,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <thead><tr><th>When</th><th>What it does</th><th>What the member reads</th></tr></thead>
     <tbody>
       <tr><td class="when">Always.</td><td>Your home tone (8.5–11.5 Hz) is the blend of all nine planets weighted by their strength. Every program passes through it.</td><td class="quote">—</td></tr>
-      <tr><td class="when">Always.</td><td>The planet ruling the hour of each slot (08:00, 13:00, 21:00, equal hours from 06:00) voices that slot's opening movement.</td><td class="quote">—</td></tr>
+      <tr><td class="when">Always.</td><td>The planet ruling the hour of each slot (08:00, 13:00, 21:00) voices that slot's opening movement. Hours follow the real sunrise and sunset at the birth place (day and night each in 12 equal hours, the first ruled by the weekday lord) while the member is in their birth time zone. Away from it, or where the sun does not rise, equal hours from 06:00 are used.</td><td class="quote">—</td></tr>
       <tr><td class="when">Always.</td><td>The running period lords (main and sub-period) voice the lift, drive and release movements lightly.</td><td class="quote">—</td></tr>
       <tr><td class="when">Always.</td><td>Today's Moon (at its degree today), the weekday lord and the planet ruling today's Moon station voice the waking, reset, pause, return, drift and deep movements, so the programs change every day.</td><td class="quote">—</td></tr>
       <tr><td class="when">Your constitution leans airy (vata).</td><td>Lower peaks (beta capped at 16 Hz), longer grounding and settling, smaller drift, rounded pulse; evening always grounds at 7.83 Hz.</td><td class="quote">Your programs keep a grounded, unhurried shape.</td></tr>
@@ -227,10 +227,10 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   <div class="scale"><table class="compare">
     <thead><tr><th></th><th>Alex (airy, gentle day)</th><th>Jordan (earthy, momentum)</th></tr></thead>
     <tbody>
-      <tr><td>Home tone</td><td>9.17 Hz</td><td>9.65 Hz</td></tr>
-      <tr><td>Morning</td><td>6.85 → 9.17 → 12.7 → 10.8 Hz · 17 min</td><td>6.41 → 9.65 → 13.1 → 17.9 (firm) → 11.1 Hz · 19 min</td></tr>
-      <tr><td>Midday</td><td>12.4 → 9.17 → 12.6 · pause 9.49 → 11.6 Hz · 15 min</td><td>10.5 → 9.65 → 13.6 → 16.7 (firm) · pause 7.92 → 13 Hz · 22 min</td></tr>
-      <tr><td>Evening</td><td>9.17 → 8.07 → 7.83 → 4.7 → 3.03 → 1.01 Hz · 31 min</td><td>9.65 → 8.53 → 7.13 → 6.45 → 1.61 → 0.91 Hz · 24 min</td></tr>
+      <tr><td>Home tone</td><td>9.07 Hz</td><td>9.63 Hz</td></tr>
+      <tr><td>Morning</td><td>7.2 → 9.07 → 12.6 (firm) → 10.7 Hz · 17 min</td><td>6.69 → 9.63 → 13.1 (firm) → 17.9 (firm) → 11.1 Hz · 19 min</td></tr>
+      <tr><td>Midday</td><td>12.4 → 9.07 → 12.5 · pause 9.48 → 11.6 Hz · 15 min</td><td>10.6 → 9.63 → 13.6 → 16.7 (firm) · pause 7.93 → 13 Hz · 22 min</td></tr>
+      <tr><td>Evening</td><td>9.07 → 8.0 → 7.83 → 4.7 → 3.06 → 1.04 Hz · 31 min</td><td>9.63 → 8.54 → 7.12 → 6.45 → 1.59 → 0.95 Hz · 24 min</td></tr>
     </tbody>
   </table></div>
 
@@ -248,6 +248,20 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     </dl>
     <p class="note">The Pro view shows every rate, its voices with their weights, the rules that fired, and, when a rate lands within 1 % of a value in the 105-program catalog, which program holds it. That link is shown for reference only; it never decides anything.</p>
 
+    <h2>Verification</h2>
+    <p>Automated tests check every step from chart to sound. They run with <code>npx vitest run</code>.</p>
+    <dl class="map">
+      <dt>Planet positions</dt><dd>Compared with NASA JPL Horizons (apparent geocentric longitude, true ecliptic of date) for all seven planets at six moments between 1950 and 2040. Worst difference 10.9″ (Saturn, 2001); the test allows 30″. One degree of error would move a played rate by only 1/360 of its band. <code>tests/astro/ephemeris-reference.test.ts</code></dd>
+      <dt>Lunar node</dt><dd>Mean node against Meeus, <i>Astronomical Algorithms</i>, Example 47.a (274.400656°): within 0.0001°.</dd>
+      <dt>Ayanamsha</dt><dd>Lahiri at J2000 (23.857092°) and at its 1956 definition (23.245525°), within 0.0005°. <code>tests/astro-engine.test.ts</code></dd>
+      <dt>Shadbala</dt><dd>Against B.V. Raman's worked Standard Horoscope (<i>Graha and Bhava Balas</i>, 16 Oct 1918), with his longitudes as input. Dig, Sthana, Drik and Naisargika within 0.1 virupa; Kala within 1.2; totals within 0.07 rupa; year, month, weekday and hour lords identical. One known difference: Mercury's Chesta bala (6.6 against 2.3), because Raman's traditional mean-motion tables put Mercury's Seeghrochcha about 12° from the modern mean element we use. Matching Raman meant four fixes in 2.1.0: year and month lords from Raman's ahargana (the Kali epoch gave different lords), Mercury counted as a malefic when combust or with Mars, Saturn, Rahu or Ketu, no separate Chesta for the Sun and Moon (Kala already counts it twice), and Ayana from the declination of the ecliptic point. <code>tests/astro/shadbala-raman.test.ts</code></dd>
+      <dt>Planet tones</dt><dd>Computed from the orbits and checked against the published cosmic-octave values (Sun 136.10 … Saturn 147.85 Hz) within 0.05 Hz.</dd>
+      <dt>Tone maths</dt><dd>The birth-degree turn, the circular blend (0.98 and 0.02 of an octave blend to its edge, not its middle), the fall-back to the heaviest voice when voices cancel, and the band mapping lo·(hi/lo)<sup>u</sup>. <code>tests/sound/toneMaths.test.ts</code></dd>
+      <dt>Hour rulers</dt><dd>Chaldean order from the weekday lord, real day and night lengths, and a moment before sunrise counted in the previous Vedic day. <code>tests/sound/hora.test.ts</code></dd>
+      <dt>Programs</dt><dd>Golden files pin every rate, length and rule of four test charts (one without birth time). Shape checks: mornings rise and settle, evenings only descend to about 1 Hz, bursts only at midday focus, no two people share a program. Offline audio renders are measured: the pulse sits at the planned rate within its drift, and with the layer off the music is sample-identical.</dd>
+      <dt>Not verified</dt><dd>Whether the chart-to-frequency method has any effect. It is a convention set out in this rulebook, not a measurement, and no study has tested the programs.</dd>
+    </dl>
+
     <h2>Safety limits</h2>
     <p>Checked every time a program is loaded. A program outside them is refused, not played. Rates stay between 0.5 and 40 Hz (pulse only: no tones, no binaural). Each movement runs 1 to 15 minutes, and a whole program at most 45. Pulse depth is at most 0.4, drift at most ±12 %, and the breathing swell 3 to 7 a minute. Bursts last at most 4 s and come at least 8 s apart. Visuals never flash faster than once a second.</p>
 
@@ -256,7 +270,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <li><b>The tone method.</b> Is orbit tones turned by birth degree, blended by strength, right for Wellness First? The alternative is to drop the birth-degree turn and use the plain cosmic-octave tones. That is more traditional, but people's programs then sound much more alike.</li>
       <li><b>The voices</b> of each movement: the Moon at waking, Mercury for focus, Saturn and Ketu for release, Venus for the pause.</li>
       <li><b>The constitution</b> rules, and that the Moon's nadi counts double.</li>
-      <li><b>Hour rulers from 06:00 in equal hours.</b> Real sunrise would be more exact but needs the member's current location, which we do not ask for.</li>
+      <li><b>Hour rulers.</b> They now follow the real sunrise at the birth place, but only while the member is in their birth time zone, since we do not ask where they are. Elsewhere they fall back to equal hours from 06:00. Asking for a current location would make them exact everywhere.</li>
       <li><b>Lengths and peaks.</b> Mornings peak at up to 22 Hz, middays at 19, and evenings end near 1 Hz and hold there.</li>
       <li><b>The theme bands and titles.</b> Each planet has a band and a title for building on it and for supporting it (the table above). Saturn sits low (4.5–6.5 Hz) both ways; Rahu's support is grounding at 7.83 Hz.</li>
       <li><b>Support picks.</b> Low life areas come before low planets, and the second place can go to an average planet.</li>
@@ -264,5 +278,5 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
     <p>Write your changes here in the chat. Programs already made keep the version they were made with, so saved programs never change.</p>
   </section>
 
-  <footer>Source: <code>src/lib/sound/dayArc.ts</code> (rules, tones, day and theme composers) and <code>src/sound/engine/compose/arc.ts</code> (limits), version 2.0.0. Device references: Infinity PEMF Program Catalog, Frequency Catalog whitepaper, Jitter spec.</footer>
+  <footer>Source: <code>src/lib/sound/dayArc.ts</code> (rules, tones, day and theme composers) and <code>src/sound/engine/compose/arc.ts</code> (limits), version 2.1.0. Device references: Infinity PEMF Program Catalog, Frequency Catalog whitepaper, Jitter spec.</footer>
 </div>

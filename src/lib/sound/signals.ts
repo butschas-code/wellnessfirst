@@ -10,10 +10,11 @@
 
 import { calculateJanamKundli, calculateGocharaTransits } from '../astro-engine/index.ts';
 import { calculatePlanetaryPositions } from '../astro-engine/core/ephemeris.ts';
+import { calculateSolarDay } from '../astro-engine/panchang/solar-day.ts';
 import type { ComprehensiveKundliResult } from '../astro-engine/types.ts';
 import { allAreas, chapterInsight, dayInsight, planetCondition } from '../astro-insights.ts';
 import type { BirthProfile } from './profile';
-import { WEEKDAY_LORD, type ArcFacts } from './dayArc';
+import { SLOT_HOUR, WEEKDAY_LORD, sunriseHoraLord, type ArcFacts } from './dayArc';
 import {
   RULEBOOK_VERSION,
   type CategoryWeights,
@@ -82,6 +83,30 @@ export function localNoon(date: string, timeZone: string): Date {
     /* unknown zone: UTC */
   }
   return new Date(guess - offsetMinutes(tz, guess) * 60_000);
+}
+
+/** The instant of `hour`:00 local time on `date` in `timeZone`. */
+function localTime(date: string, timeZone: string, hour: number): Date {
+  const [y, m, d] = date.split('-').map(Number);
+  const guess = Date.UTC(y, m - 1, d, hour);
+  return new Date(guess - offsetMinutes(timeZone, guess) * 60_000);
+}
+
+/**
+ * Hora rulers of the three slots from the real sunrise at the birth place, used
+ * only while the member is in the birth time zone (we do not know where they are
+ * otherwise). Undefined → the arcs fall back to equal hours from 06:00.
+ */
+export function slotHoras(profile: BirthProfile, date: string, timeZone: string): Record<Slot, Planet> | undefined {
+  if (!profile.tz || profile.tz !== timeZone) return undefined;
+  const out = {} as Record<Slot, Planet>;
+  for (const slot of ['morning', 'midday', 'evening'] as Slot[]) {
+    const at = localTime(date, timeZone, SLOT_HOUR[slot]);
+    const day = calculateSolarDay(at, profile.lat, profile.lon, timeZone);
+    if (day.isApproximate) return undefined;
+    out[slot] = sunriseHoraLord(day, at);
+  }
+  return out;
 }
 
 export function birthInstant(p: BirthProfile): Date {
@@ -193,7 +218,10 @@ export function computeSignals(profile: BirthProfile, date: string, timeZone: st
   });
   const facts = chartFacts(chart, noon, profile.timeUnknown);
   const signals = signalsFromFacts(facts, { profileId: profile.id, profileVersion: profile.version, date, timeZone });
-  return { ...signals, arc: arcFacts(chart, noon, date, facts) };
+  const arc = arcFacts(chart, noon, date, facts);
+  const hora = slotHoras(profile, date, timeZone);
+  if (hora) arc.today.hora = hora;
+  return { ...signals, arc };
 }
 
 /** The rulebook half of computeSignals, split out so it can be tested on hand-made facts. */

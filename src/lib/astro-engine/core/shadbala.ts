@@ -3,7 +3,7 @@ import type { AshtakavargaPlanet } from './ashtakavarga.ts';
 import { DIGNITIES_MAP, ZODIAC_SIGNS } from './constants.ts';
 import { getDivisionalSignIndex, type ShodashvargaId } from './shodashvarga.ts';
 import { compoundRelation } from './ephemeris.ts';
-import { meanLongitudes, localSiderealDegrees, norm360 } from './precision.ts';
+import { earthTilt, meanLongitudes, localSiderealDegrees, norm360 } from './precision.ts';
 import { calculateSolarDay } from '../panchang/solar-day.ts';
 import * as Astronomy from 'astronomy-engine';
 
@@ -14,9 +14,12 @@ import * as Astronomy from 'astronomy-engine';
  *  1. Sthana  : Uccha + Saptavargaja (7 vargas) + Ojhayugma + Kendradi + Drekkana
  *  2. Dig     : arc from the point of no directional strength / 3
  *  3. Kala    : Nathonnata + Paksha + Tribhaga + Abda + Masa + Vara + Hora + Ayana + Yuddha
- *  4. Chesta  : Chesta-kendra / 3 (Sun = Ayana bala, Moon = Paksha bala)
+ *  4. Chesta  : Chesta-kendra / 3. The Sun's and Moon's chesta is their Ayana and Paksha bala,
+ *               which Kala bala already counts twice for them, so it is not added again (as Raman).
  *  5. Naisargika
  *  6. Drik    : (aspects from benefics − aspects from malefics) / 4, incl. special aspects
+ *
+ * Checked against B.V. Raman, Graha and Bhava Balas, Standard Horoscope (tests/astro/shadbala-raman.test.ts).
  */
 
 export interface ShadbalaComponents {
@@ -86,7 +89,18 @@ const HORA_ORDER: AshtakavargaPlanet[] = ['Sun', 'Venus', 'Mercury', 'Moon', 'Sa
 const SAPTAVARGA: ShodashvargaId[] = ['D1', 'D2', 'D3', 'D7', 'D9', 'D12', 'D30'];
 const RELATION_VIRUPAS = { GreatFriend: 22.5, Friend: 15, Neutral: 7.5, Enemy: 3.75, GreatEnemy: 1.875, Self: 30 } as const;
 
-const KALI_EPOCH_JD = 588465.5; // 18 Feb 3102 BCE (Kali Yuga start)
+/**
+ * Ahargana (days since creation) for the Abda and Masa lords, after Raman,
+ * Graha and Bhava Balas §60–63: 714,404,096,641 days on Wednesday 2 May 1827.
+ */
+const AHARGANA_EPOCH = 714_404_096_641;
+const AHARGANA_EPOCH_DAY = Date.UTC(1827, 4, 2) / 86_400_000;
+
+/** Days since creation for the local civil date of `instant` (UTC offset `tz` hours). */
+export function ahargana(instant: Date, tz: number): number {
+  const day = Math.floor((instant.getTime() + tz * 3_600_000) / 86_400_000);
+  return AHARGANA_EPOCH + (day - AHARGANA_EPOCH_DAY);
+}
 
 const arc = (a: number, b: number) => {
   const d = Math.abs(norm360(a) - norm360(b));
@@ -148,23 +162,31 @@ export function calculateShadbala(
   const horaIndex = Math.floor((birthDate.getTime() - solar.sunrise.getTime()) / 3_600_000);
   const horaLord = HORA_ORDER[(HORA_ORDER.indexOf(varaLord) + horaIndex) % 7];
 
-  // Abda (year) and Masa (month) lords from the Kali ahargana.
-  const ahargana = Math.floor(solar.sunrise.getTime() / 86_400_000 + 2440587.5 - KALI_EPOCH_JD);
+  // Abda (year) and Masa (month) lords: weekday on which the 360-day year and 30-day month began,
+  // counted from the ahargana of the Vedic (sunrise) day of birth.
+  const days = ahargana(solar.sunrise, tz);
   const fromSunday = (n: number) => WEEKDAY_LORD[((n % 7) + 6) % 7]; // remainder 1 = Sunday
-  const abdaLord = fromSunday(Math.floor(ahargana / 360) * 3 + 1);
-  const masaLord = fromSunday(Math.floor(ahargana / 30) * 2 + 1);
+  const abdaLord = fromSunday(Math.floor(days / 360) * 3 + 1);
+  const masaLord = fromSunday(Math.floor(days / 30) * 2 + 1);
 
   // Paksha: Sun–Moon elongation folded to 0..180
   let elong = norm360(moonL - sunL);
   const waxing = elong <= 180;
   if (elong > 180) elong = 360 - elong;
 
+  // Mercury turns malefic when combust (within 14° of the Sun, 12° when retrograde) or in the
+  // same sign as Mars, Saturn, Rahu or Ketu (Raman counts it malefic in his combust example).
+  const merc = planets.Mercury;
+  const mercCombust = arc(merc.siderealLongitude, sunL) <= (merc.isRetrograde ? 12 : 14);
+  const mercWithMalefic = (['Mars', 'Saturn', 'Rahu', 'Ketu'] as const).some((q) => planets[q] && planets[q].sign.index === merc.sign.index);
+  const mercuryBenefic = !mercCombust && !mercWithMalefic;
   const benefic = (p: PlanetName) =>
-    p === 'Jupiter' || p === 'Venus' || p === 'Mercury' || (p === 'Moon' && waxing);
+    p === 'Jupiter' || p === 'Venus' || (p === 'Mercury' && mercuryBenefic) || (p === 'Moon' && waxing);
+  const obliquity = earthTilt(birthDate).trueObliquity;
 
   const means = meanLongitudes(birthDate);
   const comps = {} as Record<AshtakavargaPlanet, ShadbalaComponents>;
-  const partial = {} as Record<AshtakavargaPlanet, { sthana: number; dig: number; kala: number; chesta: number; drik: number }>;
+  const partial = {} as Record<AshtakavargaPlanet, { sthana: number; dig: number; kala: number; chesta: number; drik: number; phalaChesta: number }>;
 
   for (const p of PLANETS) {
     const pos = planets[p];
@@ -224,7 +246,8 @@ export function calculateShadbala(
     const vara = p === varaLord ? 45 : 0;
     const hora = p === horaLord ? 60 : 0;
 
-    const decl = pos.declination ?? 0;
+    // Kranti: declination of the planet's ecliptic point (latitude ignored, as in the texts).
+    const decl = (Math.asin(Math.sin((obliquity * Math.PI) / 180) * Math.sin((pos.tropicalLongitude * Math.PI) / 180)) * 180) / Math.PI;
     const ayanaBase =
       p === 'Mercury' ? ((24 + Math.abs(decl)) / 48) * 60
         : p === 'Moon' || p === 'Saturn' ? ((24 - decl) / 48) * 60
@@ -235,9 +258,11 @@ export function calculateShadbala(
     const kala = nathonnata + paksha + tribhaga + abda + masa + vara + hora + ayana;
 
     // ── 4. Chesta ──
+    // Sun and Moon: counted inside Kala (doubled Ayana / Paksha); `phalaChesta` keeps it for Ishta/Kashta.
     let chesta: number;
-    if (p === 'Sun') chesta = ayanaClamped;
-    else if (p === 'Moon') chesta = pakshaBase;
+    let phalaChesta: number;
+    if (p === 'Sun') { chesta = 0; phalaChesta = ayanaClamped; }
+    else if (p === 'Moon') { chesta = 0; phalaChesta = pakshaBase; }
     else {
       const trueTrop = pos.tropicalLongitude;
       const inner = p === 'Mercury' || p === 'Venus';
@@ -246,6 +271,7 @@ export function calculateShadbala(
       let ck = norm360(seeghrocha - (meanPlanet + trueTrop) / 2);
       if (ck > 180) ck = 360 - ck;
       chesta = ck / 3;
+      phalaChesta = chesta;
     }
 
     // ── 6. Drik ──
@@ -261,7 +287,7 @@ export function calculateShadbala(
       uccha, saptavargaja, ojhayugma: ojhayugmaTotal, kendradi, drekkana,
       nathonnata, paksha, tribhaga, abda, masa, vara, hora, ayana, yuddha: 0,
     };
-    partial[p] = { sthana, dig: digBala, kala, chesta, drik };
+    partial[p] = { sthana, dig: digBala, kala, chesta, drik, phalaChesta };
   }
 
   // ── Yuddha (planetary war): Mars–Saturn within 1°; the more northern planet wins. ──
@@ -282,7 +308,7 @@ export function calculateShadbala(
   const r1 = (x: number) => Math.round(x * 10) / 10;
   const result = {} as ShadbalaResult;
   for (const p of PLANETS) {
-    const { sthana, dig, kala, chesta, drik } = partial[p];
+    const { sthana, dig, kala, chesta, drik, phalaChesta } = partial[p];
     const naisargika = NAISARGIKA_BALA[p];
     const total = sthana + dig + kala + chesta + naisargika + drik;
     const totalRupas = Number((total / 60).toFixed(2));
@@ -301,8 +327,8 @@ export function calculateShadbala(
       requiredRupas: required,
       strengthRatio: Number((totalRupas / required).toFixed(2)),
       isStrong: totalRupas >= required,
-      ishtaPhala: r1(Math.sqrt(Math.max(0, c.uccha * chesta))),
-      kashtaPhala: r1(Math.sqrt(Math.max(0, (60 - c.uccha) * (60 - chesta)))),
+      ishtaPhala: r1(Math.sqrt(Math.max(0, c.uccha * phalaChesta))),
+      kashtaPhala: r1(Math.sqrt(Math.max(0, (60 - c.uccha) * (60 - phalaChesta)))),
       components: Object.fromEntries(Object.entries(c).map(([k, v]) => [k, r1(v)])) as unknown as ShadbalaComponents,
     };
   }

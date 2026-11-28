@@ -45,7 +45,7 @@ import { SUGGESTED_RECIPE } from '../../sound/engine/compose/compose';
 import { catalog } from '../../sound/engine/domain/programs/catalog';
 import type { DayTempo, Level, Planet, Slot } from './rulebook';
 
-export const ARC_RULEBOOK_VERSION = '2.0.0';
+export const ARC_RULEBOOK_VERSION = '2.1.0';
 export const ARC_RULEBOOK_STATUS: 'draft' | 'signed-off' = 'draft';
 export const ARC_LIBRARY_VERSION = '1.0.0';
 
@@ -80,6 +80,13 @@ export interface ArcFacts {
     moonLon: number;
     waxing: boolean;
     score: number;
+    /**
+     * Hora (hour) ruler of each slot's clock hour, from the real sunrise and sunset
+     * (day and night each split into 12 equal horas). Absent when the member is
+     * away from the birth time zone or the sun does not rise: then equal hours
+     * from 06:00 are used (horaLord).
+     */
+    hora?: Record<Slot, Planet>;
   };
 }
 
@@ -229,12 +236,31 @@ export function constitution(f: ArcFacts): { lean: Dosha; shares: Record<Dosha, 
 /** Chaldean order: each hour's ruler is the next planet in this list. */
 const CHALDEAN: Planet[] = ['Sun', 'Venus', 'Mercury', 'Moon', 'Saturn', 'Jupiter', 'Mars'];
 export const WEEKDAY_LORD: Planet[] = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
-/** Local clock hour each slot is built around. Hours are counted as equal hours from 06:00. */
+/** Local clock hour each slot is built around. */
 export const SLOT_HOUR: Record<Slot, number> = { morning: 8, midday: 13, evening: 21 };
 
+/** Fallback: equal 60-minute hours counted from 06:00, the first ruled by the weekday lord. */
 export function horaLord(vara: Planet, clockHour: number): Planet {
   const h = (((clockHour - 6) % 24) + 24) % 24;
   return CHALDEAN[(CHALDEAN.indexOf(vara) + h) % 7];
+}
+
+/**
+ * Hora ruler at `at` from the real solar day containing it: sunrise to sunset is
+ * split into 12 day horas, sunset to the next sunrise into 12 night horas, and the
+ * first hora after sunrise belongs to the lord of that sunrise's weekday. A moment
+ * before sunrise therefore belongs to the previous Vedic day.
+ */
+export function sunriseHoraLord(day: { sunrise: Date; sunset: Date; nextSunrise: Date; weekday: number }, at: Date): Planet {
+  const t = at.getTime();
+  const rise = day.sunrise.getTime();
+  const set = day.sunset.getTime();
+  const next = day.nextSunrise.getTime();
+  const index = t < set
+    ? Math.floor(((t - rise) / (set - rise)) * 12)
+    : 12 + Math.floor(((t - set) / (next - set)) * 12);
+  const vara = WEEKDAY_LORD[day.weekday];
+  return CHALDEAN[(CHALDEAN.indexOf(vara) + Math.max(0, Math.min(23, index))) % 7];
 }
 
 /* ───────────────────────── rules ───────────────────────── */
@@ -252,7 +278,7 @@ export interface ArcRule {
 
 export const ARC_RULES: ArcRule[] = [
   { id: 'base.home', slot: 'all', when: 'Always.', does: 'Your home tone (8.5–11.5 Hz) is the blend of all nine planets weighted by their strength. Every program passes through it.' },
-  { id: 'base.hora', slot: 'all', when: 'Always.', does: 'The planet ruling the hour of each slot (08:00, 13:00, 21:00, equal hours from 06:00) voices that slot\'s opening movement.' },
+  { id: 'base.hora', slot: 'all', when: 'Always.', does: 'The planet ruling the hour of each slot (08:00, 13:00, 21:00) voices that slot\'s opening movement. Hours follow the real sunrise and sunset at the birth place while the member is in the birth time zone; otherwise equal hours from 06:00.' },
   { id: 'base.period', slot: 'all', when: 'Always.', does: 'The running period lords (main and sub-period) voice the lift, drive and release movements lightly.' },
   { id: 'base.day', slot: 'all', when: 'Always.', does: 'Today\'s Moon (at its degree today), the weekday lord and the planet ruling today\'s Moon station voice the waking, reset, pause, return, drift and deep movements, so the programs change every day.' },
   { id: 'lean.vata', slot: 'all', when: 'Your constitution leans airy (vata).', does: 'Lower peaks (beta capped at 16 Hz), longer grounding and settling, smaller drift, rounded pulse; evening always grounds at 7.83 Hz.', simple: 'Your programs keep a grounded, unhurried shape.' },
@@ -338,7 +364,7 @@ function context(f: ArcFacts, slot: Slot, tempo: DayTempo): Ctx {
     slot,
     tempo,
     lean,
-    hora: horaLord(f.today.vara, SLOT_HOUR[slot]),
+    hora: f.today.hora?.[slot] ?? horaLord(f.today.vara, SLOT_HOUR[slot]),
     home: blendInBand(f, homeVoices, 8.5, 11.5),
     homeVoices,
     strongest: ranked[0],

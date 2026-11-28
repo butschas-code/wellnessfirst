@@ -3,7 +3,7 @@
     "kind": "today",
     "slot": "morning",
     "name": "Bright Morning Rise",
-    "description": "Today has good momentum. Your mornings get a brighter, firmer lift. Over 19 minutes it wakes slowly, rises to your home tone, lifts, sparks and settles, between 6.41 and 17.9 Hz, then holds 11.1 Hz until you change it.",
+    "description": "Today has good momentum. Your mornings get a brighter, firmer lift. Over 19 minutes it wakes slowly, rises to your home tone, lifts, sparks and settles, between 6.69 and 17.9 Hz, then holds 11.1 Hz until you change it.",
     "intent": "energy",
     "recipeId": "first-light",
     "validFrom": "2026-11-27",
@@ -16,8 +16,8 @@
       "movements": [
         {
           "id": "morning.wake",
-          "fromHz": 6.41,
-          "toHz": 6.41,
+          "fromHz": 6.69,
+          "toHz": 6.69,
           "seconds": 150,
           "depth": 0.27,
           "shape": "sine",
@@ -32,7 +32,11 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.24
+              "weight": 1.14
+            },
+            {
+              "source": "Mercury",
+              "weight": 0.83
             },
             {
               "source": "Moon today",
@@ -40,7 +44,7 @@
             },
             {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 0.5
             }
           ],
           "rules": [
@@ -49,8 +53,8 @@
         },
         {
           "id": "morning.rise",
-          "fromHz": 6.41,
-          "toHz": 9.65,
+          "fromHz": 6.69,
+          "toHz": 9.63,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -61,27 +65,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -89,7 +93,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -102,8 +106,8 @@
         },
         {
           "id": "morning.lift",
-          "fromHz": 9.65,
-          "toHz": 13.09,
+          "fromHz": 9.63,
+          "toHz": 13.07,
           "seconds": 330,
           "depth": 0.24,
           "shape": "firm",
@@ -114,15 +118,15 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Jupiter",
-              "weight": 1.02
+              "weight": 1.01
             },
             {
               "source": "Venus",
-              "weight": 0.56
+              "weight": 0.57
             },
             {
               "source": "Rahu",
@@ -136,8 +140,8 @@
         },
         {
           "id": "morning.spark",
-          "fromHz": 13.09,
-          "toHz": 17.89,
+          "fromHz": 13.07,
+          "toHz": 17.88,
           "seconds": 260,
           "depth": 0.24,
           "shape": "firm",
@@ -148,15 +152,15 @@
           "voices": [
             {
               "source": "Mars",
-              "weight": 1.24
+              "weight": 1.19
             },
             {
               "source": "Sun",
-              "weight": 0.98
+              "weight": 0.91
             },
             {
               "source": "Moon",
-              "weight": 0.46
+              "weight": 0.4
             }
           ],
           "rules": [
@@ -165,8 +169,8 @@
         },
         {
           "id": "morning.settle",
-          "fromHz": 17.89,
-          "toHz": 11.09,
+          "fromHz": 17.88,
+          "toHz": 11.08,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -177,11 +181,11 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Jupiter",
-              "weight": 0.64
+              "weight": 0.63
             }
           ],
           "rules": [
@@ -194,7 +198,7 @@
       "totalSeconds": 1160,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -246,14 +250,14 @@
         "movements": []
       }
     ],
-    "contentHash": "3e57ecf3f44c318ab2affdd1aec527c9",
-    "genKey": "fixture-jordan:1:today:morning:2026-11-27:arc-2.0.0"
+    "contentHash": "342b168df09be7c737e43c2d976406ec",
+    "genKey": "fixture-jordan:1:today:morning:2026-11-27:arc-2.1.0"
   },
   {
     "kind": "today",
     "slot": "midday",
     "name": "Bright Midday Current",
-    "description": "Today has good momentum. Over 22 minutes it resets, focuses, drives, pauses and returns, between 7.92 and 16.7 Hz, then holds 13 Hz until you change it.",
+    "description": "Today has good momentum. Over 22 minutes it resets, focuses, drives, pauses and returns, between 7.93 and 16.7 Hz, then holds 12.9 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
@@ -266,8 +270,8 @@
       "movements": [
         {
           "id": "midday.reset",
-          "fromHz": 10.54,
-          "toHz": 9.65,
+          "fromHz": 10.55,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -282,7 +286,7 @@
           "voices": [
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Moon today",
@@ -296,8 +300,8 @@
         },
         {
           "id": "midday.focus",
-          "fromHz": 9.65,
-          "toHz": 13.55,
+          "fromHz": 9.63,
+          "toHz": 13.57,
           "seconds": 400,
           "depth": 0.24,
           "shape": "sine",
@@ -308,7 +312,7 @@
           "voices": [
             {
               "source": "Mercury",
-              "weight": 1.67
+              "weight": 1.77
             },
             {
               "source": "Jupiter",
@@ -316,7 +320,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.47
+              "weight": 0.48
             },
             {
               "source": "Rahu",
@@ -329,7 +333,7 @@
         },
         {
           "id": "midday.drive",
-          "fromHz": 13.55,
+          "fromHz": 13.57,
           "toHz": 16.7,
           "seconds": 330,
           "depth": 0.24,
@@ -341,11 +345,11 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 1.31
+              "weight": 1.22
             },
             {
               "source": "Mars",
-              "weight": 1.24
+              "weight": 1.19
             },
             {
               "source": "Rahu",
@@ -358,8 +362,8 @@
         },
         {
           "id": "midday.pause",
-          "fromHz": 7.92,
-          "toHz": 7.92,
+          "fromHz": 7.93,
+          "toHz": 7.93,
           "seconds": 180,
           "depth": 0.27,
           "shape": "sine",
@@ -374,7 +378,7 @@
           "voices": [
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -391,8 +395,8 @@
         },
         {
           "id": "midday.return",
-          "fromHz": 7.92,
-          "toHz": 12.96,
+          "fromHz": 7.93,
+          "toHz": 12.95,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -403,15 +407,15 @@
           "voices": [
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
             },
             {
               "source": "Venus",
-              "weight": 0.65
+              "weight": 0.66
             },
             {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 0.5
             },
             {
               "source": "Moon today",
@@ -428,7 +432,7 @@
       "totalSeconds": 1330,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -480,14 +484,14 @@
         "movements": []
       }
     ],
-    "contentHash": "7a4db5c63fa26c0f7279407c1b938242",
-    "genKey": "fixture-jordan:1:today:midday:2026-11-27:arc-2.0.0"
+    "contentHash": "2f82bcbbd7f0a9439f929915e68d6c20",
+    "genKey": "fixture-jordan:1:today:midday:2026-11-27:arc-2.1.0"
   },
   {
     "kind": "today",
     "slot": "evening",
     "name": "Steady Evening Descent",
-    "description": "Today is an even, steady day. Over 24 minutes it unwinds, grounds, releases, drifts and goes deep, between 0.91 and 9.65 Hz, then holds 0.91 Hz until you change it.",
+    "description": "Today is an even, steady day. Over 24 minutes it unwinds, grounds, releases, drifts and goes deep, between 0.95 and 9.63 Hz, then holds 0.95 Hz until you change it.",
     "intent": "relax",
     "recipeId": "soft-landing",
     "validFrom": "2026-11-27",
@@ -500,8 +504,8 @@
       "movements": [
         {
           "id": "evening.unwind",
-          "fromHz": 9.65,
-          "toHz": 8.53,
+          "fromHz": 9.63,
+          "toHz": 8.54,
           "seconds": 240,
           "depth": 0.24,
           "shape": "sine",
@@ -512,19 +516,19 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Mercury",
-              "weight": 0.78
+              "weight": 0.83
             }
           ],
           "rules": [
@@ -534,8 +538,8 @@
         },
         {
           "id": "evening.ground",
-          "fromHz": 8.53,
-          "toHz": 7.13,
+          "fromHz": 8.54,
+          "toHz": 7.12,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -550,18 +554,18 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 1.32
+              "weight": 1.14
             },
             {
               "source": "Venus",
-              "weight": 0.56
+              "weight": 0.57
             }
           ],
           "rules": []
         },
         {
           "id": "evening.release",
-          "fromHz": 7.13,
+          "fromHz": 7.12,
           "toHz": 6.45,
           "seconds": 300,
           "depth": 0.27,
@@ -577,7 +581,7 @@
           "voices": [
             {
               "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.17
             },
             {
               "source": "Ketu",
@@ -585,11 +589,11 @@
             },
             {
               "source": "Mercury",
-              "weight": 0.56
+              "weight": 0.59
             },
             {
               "source": "Moon",
-              "weight": 0.46
+              "weight": 0.4
             }
           ],
           "rules": [
@@ -599,7 +603,7 @@
         {
           "id": "evening.drift",
           "fromHz": 6.45,
-          "toHz": 1.61,
+          "toHz": 1.59,
           "seconds": 360,
           "depth": 0.3,
           "shape": "sine",
@@ -614,11 +618,11 @@
           "voices": [
             {
               "source": "Jupiter",
-              "weight": 1.4
+              "weight": 1.39
             },
             {
               "source": "Moon",
-              "weight": 1.32
+              "weight": 1.14
             },
             {
               "source": "Moon today",
@@ -631,8 +635,8 @@
         },
         {
           "id": "evening.deep",
-          "fromHz": 1.61,
-          "toHz": 0.91,
+          "fromHz": 1.59,
+          "toHz": 0.95,
           "seconds": 300,
           "depth": 0.3,
           "shape": "sine",
@@ -647,7 +651,7 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 1.32
+              "weight": 1.14
             },
             {
               "source": "Moon today",
@@ -670,7 +674,7 @@
       "totalSeconds": 1440,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -714,14 +718,14 @@
         "movements": []
       }
     ],
-    "contentHash": "470d81854b27bda6e42f4316899af30f",
-    "genKey": "fixture-jordan:1:today:evening:2026-11-27:arc-2.0.0"
+    "contentHash": "88c92f96d473ea43e3a8d09e2ec13dc4",
+    "genKey": "fixture-jordan:1:today:evening:2026-11-27:arc-2.1.0"
   },
   {
     "kind": "chapter",
     "slot": null,
     "name": "This Chapter: Bold Reach",
-    "description": "This stretch of time has good backing, so this builds on it. Made for the stretch of time you are in now, until April 2028. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 9.65 and 15.9 Hz, then holds 12.4 Hz until you change it.",
+    "description": "This stretch of time has good backing, so this builds on it. Made for the stretch of time you are in now, until April 2028. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 9.63 and 15.9 Hz, then holds 12.4 Hz until you change it.",
     "intent": "focus",
     "recipeId": "quiet-momentum",
     "validFrom": "2026-11-27",
@@ -735,8 +739,8 @@
       "movements": [
         {
           "id": "theme.arrive",
-          "fromHz": 9.65,
-          "toHz": 9.65,
+          "fromHz": 9.63,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -751,27 +755,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -779,7 +783,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -792,8 +796,8 @@
         },
         {
           "id": "theme.approach",
-          "fromHz": 9.65,
-          "toHz": 14.72,
+          "fromHz": 9.63,
+          "toHz": 14.71,
           "seconds": 240,
           "depth": 0.24,
           "shape": "sine",
@@ -808,7 +812,7 @@
             },
             {
               "source": "Moon",
-              "weight": 1.32
+              "weight": 1.14
             }
           ],
           "rules": [
@@ -817,8 +821,8 @@
         },
         {
           "id": "theme.hold",
-          "fromHz": 14.72,
-          "toHz": 14.72,
+          "fromHz": 14.71,
+          "toHz": 14.71,
           "seconds": 360,
           "depth": 0.24,
           "shape": "sine",
@@ -833,7 +837,7 @@
             },
             {
               "source": "Moon",
-              "weight": 1.32
+              "weight": 1.14
             }
           ],
           "rules": [
@@ -842,8 +846,8 @@
         },
         {
           "id": "theme.deepen",
-          "fromHz": 14.72,
-          "toHz": 15.94,
+          "fromHz": 14.71,
+          "toHz": 15.93,
           "seconds": 300,
           "depth": 0.24,
           "shape": "sine",
@@ -854,7 +858,7 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 1.98
+              "weight": 1.71
             },
             {
               "source": "Rahu",
@@ -867,8 +871,8 @@
         },
         {
           "id": "theme.integrate",
-          "fromHz": 15.94,
-          "toHz": 12.4,
+          "fromHz": 15.93,
+          "toHz": 12.39,
           "seconds": 240,
           "depth": 0.24,
           "shape": "sine",
@@ -879,15 +883,15 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 1.98
+              "weight": 1.71
             },
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             }
           ],
           "rules": [
@@ -900,7 +904,7 @@
       "totalSeconds": 1320,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -928,14 +932,14 @@
         ]
       }
     ],
-    "contentHash": "fc480cb2aac756a60c238d20397469ce",
-    "genKey": "fixture-jordan:1:chapter:Rahu-Moon-2028-04-25:arc-2.0.0"
+    "contentHash": "44ef073971737a08e19a10824ccdf560",
+    "genKey": "fixture-jordan:1:chapter:Rahu-Moon-2028-04-25:arc-2.1.0"
   },
   {
     "kind": "strength",
     "slot": null,
     "name": "Your Strength: Steady Fire",
-    "description": "Steady energy and a clear sense of direction come naturally to you, so this builds on that. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 9.65 and 14.2 Hz, then holds 11.7 Hz until you change it.",
+    "description": "Steady energy and a clear sense of direction come naturally to you, so this builds on that. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 9.63 and 14.2 Hz, then holds 11.7 Hz until you change it.",
     "intent": "energy",
     "recipeId": "first-light",
     "validFrom": "2026-11-27",
@@ -949,8 +953,8 @@
       "movements": [
         {
           "id": "theme.arrive",
-          "fromHz": 9.65,
-          "toHz": 9.65,
+          "fromHz": 9.63,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -965,27 +969,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -993,7 +997,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -1006,7 +1010,7 @@
         },
         {
           "id": "theme.approach",
-          "fromHz": 9.65,
+          "fromHz": 9.63,
           "toHz": 13.37,
           "seconds": 240,
           "depth": 0.24,
@@ -1018,11 +1022,11 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 2.46
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 0.5
             }
           ],
           "rules": [
@@ -1043,11 +1047,11 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 2.46
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 0.5
             }
           ],
           "rules": [
@@ -1068,7 +1072,7 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 2.62
+              "weight": 2.43
             }
           ],
           "rules": [
@@ -1078,7 +1082,7 @@
         {
           "id": "theme.integrate",
           "fromHz": 14.23,
-          "toHz": 11.72,
+          "toHz": 11.71,
           "seconds": 240,
           "depth": 0.24,
           "shape": "sine",
@@ -1089,15 +1093,15 @@
           "voices": [
             {
               "source": "Sun",
-              "weight": 2.62
+              "weight": 2.43
             },
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             }
           ],
           "rules": [
@@ -1110,7 +1114,7 @@
       "totalSeconds": 1320,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -1133,29 +1137,29 @@
         ]
       }
     ],
-    "contentHash": "5560fece2773903770898d6e7d99281f",
-    "genKey": "fixture-jordan:1:strength:0:arc-2.0.0"
+    "contentHash": "4dee166b77d92859d9ab59038b2254c2",
+    "genKey": "fixture-jordan:1:strength:0:arc-2.1.0"
   },
   {
     "kind": "strength",
     "slot": null,
-    "name": "Your Strength: Inner Tide",
-    "description": "A rich inner life comes naturally to you, so this leaves space to feel it. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 6.87 and 9.65 Hz, then holds 8.5 Hz until you change it.",
-    "intent": "meditate",
-    "recipeId": "open-space",
+    "name": "Your Strength: Wide View",
+    "description": "Seeing the bigger picture comes naturally to you, so this opens out into a wide, easy calm. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 8.66 and 9.97 Hz, then holds 9.8 Hz until you change it.",
+    "intent": "balance",
+    "recipeId": "even-keel",
     "validFrom": "2026-11-27",
     "validTo": null,
     "composition": {
       "schema": "wellness-waves/arc@1",
       "slot": null,
-      "theme": "strength:Moon",
-      "intent": "meditate",
-      "recipeId": "open-space",
+      "theme": "strength:Jupiter",
+      "intent": "balance",
+      "recipeId": "even-keel",
       "movements": [
         {
           "id": "theme.arrive",
-          "fromHz": 9.65,
-          "toHz": 9.65,
+          "fromHz": 9.63,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -1170,27 +1174,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -1198,7 +1202,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -1211,27 +1215,23 @@
         },
         {
           "id": "theme.approach",
-          "fromHz": 9.65,
-          "toHz": 6.87,
+          "fromHz": 9.63,
+          "toHz": 8.66,
           "seconds": 240,
-          "depth": 0.27,
+          "depth": 0.24,
           "shape": "sine",
           "jitter": {
             "pct": 0.06,
             "every": 3
           },
           "breath": {
-            "hz": 0.09,
+            "hz": 0.1,
             "depth": 0.1
           },
           "voices": [
             {
-              "source": "Moon",
-              "weight": 1.98
-            },
-            {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 2.39
             }
           ],
           "rules": [
@@ -1240,27 +1240,23 @@
         },
         {
           "id": "theme.hold",
-          "fromHz": 6.87,
-          "toHz": 6.87,
+          "fromHz": 8.66,
+          "toHz": 8.66,
           "seconds": 360,
-          "depth": 0.27,
+          "depth": 0.24,
           "shape": "sine",
           "jitter": {
             "pct": 0.06,
             "every": 3
           },
           "breath": {
-            "hz": 0.09,
+            "hz": 0.1,
             "depth": 0.1
           },
           "voices": [
             {
-              "source": "Moon",
-              "weight": 1.98
-            },
-            {
               "source": "Jupiter",
-              "weight": 0.51
+              "weight": 2.39
             }
           ],
           "rules": [
@@ -1269,27 +1265,27 @@
         },
         {
           "id": "theme.deepen",
-          "fromHz": 6.87,
-          "toHz": 7.48,
+          "fromHz": 8.66,
+          "toHz": 9.97,
           "seconds": 300,
-          "depth": 0.27,
+          "depth": 0.24,
           "shape": "sine",
           "jitter": {
             "pct": 0.06,
             "every": 3
           },
           "breath": {
-            "hz": 0.09,
+            "hz": 0.1,
             "depth": 0.1
           },
           "voices": [
             {
-              "source": "Moon",
-              "weight": 1.32
+              "source": "Jupiter",
+              "weight": 1.26
             },
             {
               "source": "Sun",
-              "weight": 0.98
+              "weight": 0.91
             }
           ],
           "rules": [
@@ -1298,31 +1294,31 @@
         },
         {
           "id": "theme.integrate",
-          "fromHz": 7.48,
-          "toHz": 8.5,
+          "fromHz": 9.97,
+          "toHz": 9.8,
           "seconds": 240,
-          "depth": 0.27,
+          "depth": 0.24,
           "shape": "sine",
           "jitter": {
             "pct": 0.05,
             "every": 3
           },
           "breath": {
-            "hz": 0.09,
+            "hz": 0.1,
             "depth": 0.1
           },
           "voices": [
             {
-              "source": "Moon",
-              "weight": 1.32
+              "source": "Jupiter",
+              "weight": 1.26
             },
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             }
           ],
           "rules": [
@@ -1335,7 +1331,7 @@
       "totalSeconds": 1320,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -1358,14 +1354,14 @@
         ]
       }
     ],
-    "contentHash": "4d0e0172e1a88725cba96a96892d887b",
-    "genKey": "fixture-jordan:1:strength:1:arc-2.0.0"
+    "contentHash": "f96239934e455efe9ff408235320752d",
+    "genKey": "fixture-jordan:1:strength:1:arc-2.1.0"
   },
   {
     "kind": "challenge",
     "slot": null,
     "name": "Gentle Support: Present Moment",
-    "description": "Staying present can be harder for you, so this keeps a gentle, steady middle. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 7.03 and 9.65 Hz, then holds 8.24 Hz until you change it.",
+    "description": "Staying present can be harder for you, so this keeps a gentle, steady middle. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 7.07 and 9.63 Hz, then holds 8.25 Hz until you change it.",
     "intent": "balance",
     "recipeId": "even-keel",
     "validFrom": "2026-11-27",
@@ -1379,8 +1375,8 @@
       "movements": [
         {
           "id": "theme.arrive",
-          "fromHz": 9.65,
-          "toHz": 9.65,
+          "fromHz": 9.63,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -1395,27 +1391,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -1423,7 +1419,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -1436,8 +1432,8 @@
         },
         {
           "id": "theme.approach",
-          "fromHz": 9.65,
-          "toHz": 7.82,
+          "fromHz": 9.63,
+          "toHz": 7.83,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -1456,7 +1452,7 @@
             },
             {
               "source": "Moon",
-              "weight": 0.53
+              "weight": 0.46
             }
           ],
           "rules": [
@@ -1465,8 +1461,8 @@
         },
         {
           "id": "theme.hold",
-          "fromHz": 7.82,
-          "toHz": 7.82,
+          "fromHz": 7.83,
+          "toHz": 7.83,
           "seconds": 360,
           "depth": 0.27,
           "shape": "sine",
@@ -1485,7 +1481,7 @@
             },
             {
               "source": "Moon",
-              "weight": 0.53
+              "weight": 0.46
             }
           ],
           "rules": [
@@ -1494,8 +1490,8 @@
         },
         {
           "id": "theme.deepen",
-          "fromHz": 7.82,
-          "toHz": 7.03,
+          "fromHz": 7.83,
+          "toHz": 7.07,
           "seconds": 300,
           "depth": 0.27,
           "shape": "sine",
@@ -1514,7 +1510,7 @@
             },
             {
               "source": "Moon",
-              "weight": 0.79
+              "weight": 0.68
             }
           ],
           "rules": [
@@ -1523,8 +1519,8 @@
         },
         {
           "id": "theme.integrate",
-          "fromHz": 7.03,
-          "toHz": 8.24,
+          "fromHz": 7.07,
+          "toHz": 8.25,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -1543,11 +1539,11 @@
             },
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             }
           ],
           "rules": [
@@ -1560,7 +1556,7 @@
       "totalSeconds": 1320,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -1583,14 +1579,14 @@
         ]
       }
     ],
-    "contentHash": "2e4aba87384db056e9a849336b234a32",
-    "genKey": "fixture-jordan:1:challenge:0:arc-2.0.0"
+    "contentHash": "1319398c200b7a337f570e409239cf0b",
+    "genKey": "fixture-jordan:1:challenge:0:arc-2.1.0"
   },
   {
     "kind": "challenge",
     "slot": null,
     "name": "Gentle Support: Settling",
-    "description": "Restlessness can run high for you, so this brings things back down to earth. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 6.84 and 9.65 Hz, then holds 8.12 Hz until you change it.",
+    "description": "Restlessness can run high for you, so this brings things back down to earth. Over 22 minutes it arrives at your home tone, moves in, stays with it, deepens and comes back to centre, between 6.83 and 9.63 Hz, then holds 8.11 Hz until you change it.",
     "intent": "balance",
     "recipeId": "even-keel",
     "validFrom": "2026-11-27",
@@ -1604,8 +1600,8 @@
       "movements": [
         {
           "id": "theme.arrive",
-          "fromHz": 9.65,
-          "toHz": 9.65,
+          "fromHz": 9.63,
+          "toHz": 9.63,
           "seconds": 180,
           "depth": 0.24,
           "shape": "sine",
@@ -1620,27 +1616,27 @@
           "voices": [
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             },
             {
               "source": "Sun",
-              "weight": 1.64
+              "weight": 1.52
             },
             {
               "source": "Mars",
-              "weight": 1.24
-            },
-            {
-              "source": "Saturn",
-              "weight": 1.13
+              "weight": 1.19
             },
             {
               "source": "Mercury",
-              "weight": 1.11
+              "weight": 1.18
+            },
+            {
+              "source": "Saturn",
+              "weight": 1.17
             },
             {
               "source": "Rahu",
@@ -1648,7 +1644,7 @@
             },
             {
               "source": "Venus",
-              "weight": 0.93
+              "weight": 0.95
             },
             {
               "source": "Ketu",
@@ -1661,8 +1657,8 @@
         },
         {
           "id": "theme.approach",
-          "fromHz": 9.65,
-          "toHz": 7.14,
+          "fromHz": 9.63,
+          "toHz": 7.13,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -1681,7 +1677,7 @@
             },
             {
               "source": "Moon",
-              "weight": 0.53
+              "weight": 0.46
             }
           ],
           "rules": [
@@ -1690,7 +1686,7 @@
         },
         {
           "id": "theme.hold",
-          "fromHz": 7.14,
+          "fromHz": 7.13,
           "toHz": 7.83,
           "seconds": 360,
           "depth": 0.27,
@@ -1716,7 +1712,7 @@
         {
           "id": "theme.deepen",
           "fromHz": 7.83,
-          "toHz": 6.84,
+          "toHz": 6.83,
           "seconds": 300,
           "depth": 0.27,
           "shape": "sine",
@@ -1735,7 +1731,7 @@
             },
             {
               "source": "Moon",
-              "weight": 0.79
+              "weight": 0.68
             }
           ],
           "rules": [
@@ -1744,8 +1740,8 @@
         },
         {
           "id": "theme.integrate",
-          "fromHz": 6.84,
-          "toHz": 8.12,
+          "fromHz": 6.83,
+          "toHz": 8.11,
           "seconds": 240,
           "depth": 0.27,
           "shape": "sine",
@@ -1764,11 +1760,11 @@
             },
             {
               "source": "Moon",
-              "weight": 2.64
+              "weight": 2.28
             },
             {
               "source": "Jupiter",
-              "weight": 1.91
+              "weight": 1.89
             }
           ],
           "rules": [
@@ -1781,7 +1777,7 @@
       "totalSeconds": 1320,
       "versions": {
         "composer": "2.0.0",
-        "rulebook": "2.0.0",
+        "rulebook": "2.1.0",
         "library": "1.0.0"
       }
     },
@@ -1804,7 +1800,7 @@
         ]
       }
     ],
-    "contentHash": "bf894cb811d6164014b39c981d7b621b",
-    "genKey": "fixture-jordan:1:challenge:1:arc-2.0.0"
+    "contentHash": "77fd0f7012d7af13be494c05cc13beaa",
+    "genKey": "fixture-jordan:1:challenge:1:arc-2.1.0"
   }
 ]
